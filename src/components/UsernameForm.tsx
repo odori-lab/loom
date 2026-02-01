@@ -2,46 +2,28 @@
 
 import { useState } from 'react'
 
-export function UsernameForm() {
+interface UsernameFormProps {
+  onSubmit: (username: string) => void
+  loading: boolean
+  error: string
+}
+
+export function UsernameForm({ onSubmit, loading, error }: UsernameFormProps) {
   const [username, setUsername] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ threadsUsername: username.replace('@', '') }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error?.message || 'Something went wrong')
-        return
-      }
-
-      window.location.href = `/success?session_id=${data.sessionId}`
-    } catch {
-      setError('Network error. Please try again.')
-    } finally {
-      setLoading(false)
-    }
+    onSubmit(username.replace('@', ''))
   }
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
       <div>
-        <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="username" className="block text-sm font-medium text-gray-400 mb-1">
           Threads Username
         </label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">@</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">@</span>
           <input
             id="username"
             type="text"
@@ -49,7 +31,7 @@ export function UsernameForm() {
             onChange={(e) => setUsername(e.target.value)}
             placeholder="username"
             required
-            className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none"
+            className="w-full pl-8 pr-4 py-3 border border-gray-700 bg-gray-900 rounded-lg focus:ring-2 focus:ring-white focus:border-white outline-none"
           />
         </div>
       </div>
@@ -59,9 +41,9 @@ export function UsernameForm() {
       <button
         type="submit"
         disabled={loading || !username}
-        className="w-full py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+        className="w-full py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-200 disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
       >
-        {loading ? 'Processing...' : 'Create PDF'}
+        {loading ? 'Fetching Posts...' : 'Next'}
       </button>
     </form>
   )
