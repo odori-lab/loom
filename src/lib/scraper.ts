@@ -1,71 +1,51 @@
-import puppeteer from 'puppeteer'
 import { ThreadsPost } from '@/types/threads-post'
 
-export async function scrapeThreads(username: string, jobId: string, onProgress?: (count: number) => void): Promise<ThreadsPost[]> {
-  const browser = await puppeteer.launch({ headless: true })
-  const page = await browser.newPage()
-
-  await page.setUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
-  )
-
-  const posts: ThreadsPost[] = []
-
-  try {
-    await page.goto(`https://www.threads.net/@${username}`, {
-      waitUntil: 'networkidle2',
-      timeout: 30000,
-    })
-
-    // Wait for posts to load
-    await page.waitForSelector('[data-pressable-container="true"]', { timeout: 10000 }).catch(() => null)
-
-    // Scroll and collect posts
-    let previousHeight = 0
-    let scrollAttempts = 0
-    const maxScrollAttempts = 20
-
-    while (scrollAttempts < maxScrollAttempts) {
-      const newPosts = await page.evaluate(() => {
-        const postElements = document.querySelectorAll('[data-pressable-container="true"]')
-        return Array.from(postElements).map((el) => {
-          const textEl = el.querySelector('[dir="auto"]')
-          const imgEls = el.querySelectorAll('img[src*="scontent"]')
-          const timeEl = el.querySelector('time')
-
-          return {
-            content: textEl?.textContent || '',
-            imageUrls: Array.from(imgEls).map((img) => (img as HTMLImageElement).src),
-            postedAt: timeEl?.getAttribute('datetime') || new Date().toISOString(),
-          }
-        })
-      })
-
-      for (const post of newPosts) {
-        if (post.content && !posts.some((p) => p.content === post.content)) {
-          posts.push({
-            id: crypto.randomUUID(),
-            jobId,
-            content: post.content,
-            imageUrls: post.imageUrls,
-            postedAt: new Date(post.postedAt),
-            scrapedAt: new Date(),
-          })
-          onProgress?.(posts.length)
-        }
-      }
-
-      await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2))
-      await new Promise((r) => setTimeout(r, 1500))
-
-      const currentHeight = await page.evaluate(() => document.body.scrollHeight)
-      if (currentHeight === previousHeight) break
-      previousHeight = currentHeight
-      scrollAttempts++
-    }
-  } finally {
-    await browser.close()
+export async function scrapeThreads(username: string, jobId: string): Promise<ThreadsPost[]> {
+  const apifyToken = process.env.APIFY_TOKEN
+  if (!apifyToken) {
+    throw new Error('APIFY_TOKEN environment variable is not set')
   }
+
+  const response = await fetch(`https://api.apify.com/v2/acts/canadesk~threads/run-sync-get-dataset-items?token=${apifyToken}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      keyword: [username],
+      process: 'gt', // get threads for a user
+      maximum: 50,
+      proxy: {
+        useApifyProxy: true,
+      },
+    }),
+  })
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    console.error(`Failed to scrape threads from Apify: ${response.status} ${errorText}`)
+    throw new Error(`Failed to scrape threads from Apify: ${response.status} ${errorText}`)
+  }
+
+  const result: any[] = await response.json()
+
+  // The actual posts are nested inside the first element of the result array
+  const apifyThreads = result?.[0]?.data?.threads
+
+  if (!apifyThreads || !Array.isArray(apifyThreads)) {
+    console.log('No threads found in the expected format from Apify.')
+    return []
+  }
+
+  const posts: ThreadsPost[] = apifyThreads.map((post: any) => ({
+    id: post.id || crypto.randomUUID(),
+    jobId,
+    content: post.text || '',
+    imageUrls: post.media?.map((m: any) => m.url) || [],
+    // Convert Unix timestamp (seconds) to milliseconds for Date object
+    postedAt: new Date(post.timestamp * 1000),
+    scrapedAt: new Date(),
+  }))
 
   return posts
 }
