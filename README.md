@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Loom
+
+> Turn your Threads into a beautiful book
+
+Threads 포스트를 아름다운 PDF 책으로 변환하는 서비스
+
+## Features
+
+- **Book-like Format** - A5 사이즈, 적절한 마진과 타이포그래피
+- **Images Included** - 포스트의 이미지 자동 포함
+- **Filter & Sort** - 날짜 필터링, 최신순/역순 정렬
+- **Engagement Stats** - 좋아요, 댓글 수 보존
+
+## Tech Stack
+
+- **Frontend**: Next.js 16, React 19, TailwindCSS 4
+- **Backend**: Next.js API Routes
+- **Auth**: Supabase Auth (Google OAuth)
+- **Database**: Supabase PostgreSQL
+- **Storage**: Supabase Storage
+- **PDF Generation**: Puppeteer
+- **Scraping**: Apify API
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Setup Supabase
+
+1. [Supabase](https://supabase.com)에서 프로젝트 생성
+2. `supabase/schema.sql` 실행하여 테이블 생성
+3. Storage에서 `looms-pdf` 버킷 생성
+4. Authentication > Providers에서 Google OAuth 설정
+
+### 3. Environment Variables
+
+`.env.local` 파일 생성:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# Apify
+APIFY_TOKEN=your-apify-token
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 4. Run development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── page.tsx              # Landing page
+│   ├── login/                # Login page
+│   ├── my/                   # My Looms page
+│   ├── create/               # Create Loom flow
+│   ├── auth/callback/        # OAuth callback
+│   └── api/
+│       ├── scrape/           # Threads scraping
+│       ├── looms/            # Loom CRUD
+│       └── generate-pdf/     # PDF generation
+├── components/
+│   ├── auth/                 # Auth components
+│   ├── create/               # Create flow steps
+│   └── loom/                 # Loom components
+├── lib/
+│   ├── supabase/             # Supabase clients
+│   ├── scraper.ts            # Apify scraper
+│   └── pdf/                  # PDF generation
+└── types/                    # TypeScript types
+```
 
-## Learn More
+## Documentation
 
-To learn more about Next.js, take a look at the following resources:
+- [Plan Document](docs/01-plan/features/loom-mvp.plan.md)
+- [Design Document](docs/02-design/features/loom-mvp.design.md)
+- [Database Schema](supabase/schema.sql)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT

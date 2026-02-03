@@ -1,6 +1,6 @@
-# Unthread Coding Conventions
+# Loom Coding Conventions
 
-**Version**: 1.0
+**Version**: 2.0
 **Level**: Dynamic
 
 ---
@@ -11,22 +11,21 @@
 
 | Target | Rule | Example |
 |--------|------|---------|
-| Component files | PascalCase.tsx | `UsernameForm.tsx` |
-| Utility/lib files | kebab-case.ts | `job-store.ts`, `pdf-generator.ts` |
-| Type files | kebab-case.ts | `scrape-job.ts` |
-| API routes | route.ts in kebab-case dirs | `api/checkout/route.ts` |
-| Folders | kebab-case | `scrape-job/`, `[sessionId]/` |
+| Component files | PascalCase.tsx | `LoomCard.tsx` |
+| Utility/lib files | kebab-case.ts | `scraper.ts`, `generator.ts` |
+| Type files | kebab-case.ts | `threads.ts`, `loom.ts` |
+| API routes | route.ts in kebab-case dirs | `api/looms/route.ts` |
+| Folders | kebab-case | `create/`, `[id]/` |
 
 ### Code
 
 | Target | Rule | Example |
 |--------|------|---------|
-| Components | PascalCase | `UsernameForm`, `StatusTracker` |
-| Functions | camelCase | `createJob()`, `scrapeThreads()` |
-| Variables | camelCase | `sessionId`, `postCount` |
-| Constants | UPPER_SNAKE_CASE | `RATE_LIMIT_MAX`, `USERNAME_REGEX` |
-| Types/Interfaces | PascalCase | `ScrapeJob`, `ThreadsPost` |
-| Type unions | PascalCase + "Status" suffix | `ScrapeJobStatus`, `OrderStatus` |
+| Components | PascalCase | `LoomCard`, `UserMenu` |
+| Functions | camelCase | `scrapeThreads()`, `generatePdfHtml()` |
+| Variables | camelCase | `loomId`, `postCount` |
+| Constants | UPPER_SNAKE_CASE | `MAX_PAGE_HEIGHT`, `PDF_STYLES` |
+| Types/Interfaces | PascalCase | `ThreadsPost`, `Loom` |
 
 ---
 
@@ -35,13 +34,24 @@
 ```
 src/
 ├── app/                    # Next.js App Router pages & API routes
-│   ├── api/               # API routes (server-side)
-│   ├── success/           # Success page
-│   ├── cancel/            # Cancel page
+│   ├── api/               # API routes
+│   │   ├── looms/         # Loom CRUD
+│   │   ├── scrape/        # Threads scraping
+│   │   └── generate-pdf/  # PDF generation
+│   ├── auth/              # Auth callback
+│   ├── create/            # Create Loom flow
+│   ├── login/             # Login page
+│   ├── my/                # My Looms page
 │   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Home page
+│   └── page.tsx           # Landing page
 ├── components/            # Reusable UI components
-├── lib/                   # Server-side utilities & business logic
+│   ├── auth/              # Auth components
+│   ├── create/            # Create flow steps
+│   └── loom/              # Loom components
+├── lib/                   # Server-side utilities
+│   ├── supabase/          # Supabase clients
+│   ├── pdf/               # PDF generation
+│   └── scraper.ts         # Apify scraper
 └── types/                 # TypeScript type definitions
 ```
 
@@ -51,15 +61,15 @@ src/
 
 ```typescript
 // 1. External libraries
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { useState } from 'react'
 
 // 2. Internal absolute imports (@/)
-import { stripe } from '@/lib/stripe'
-import { ScrapeJob } from '@/types/scrape-job'
+import { createClient } from '@/lib/supabase/server'
+import { ThreadsPost } from '@/types/threads'
 
 // 3. Relative imports
-import { DownloadButton } from './DownloadButton'
+import { LoomCard } from './LoomCard'
 ```
 
 ---
@@ -68,9 +78,10 @@ import { DownloadButton } from './DownloadButton'
 
 | Prefix | Scope | Example |
 |--------|-------|---------|
-| `STRIPE_` | Stripe server keys | `STRIPE_SECRET_KEY` |
-| `NEXT_PUBLIC_STRIPE_` | Stripe client keys | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` |
-| `NEXT_PUBLIC_` | Client-side config | `NEXT_PUBLIC_BASE_URL` |
+| `NEXT_PUBLIC_SUPABASE_` | Supabase client | `NEXT_PUBLIC_SUPABASE_URL` |
+| `SUPABASE_` | Supabase server | `SUPABASE_SERVICE_ROLE_KEY` |
+| `APIFY_` | Apify API | `APIFY_TOKEN` |
+| `NEXT_PUBLIC_` | Client-side config | `NEXT_PUBLIC_APP_URL` |
 
 ---
 
@@ -80,7 +91,6 @@ import { DownloadButton } from './DownloadButton'
 - **Quotes**: Single quotes
 - **Semicolons**: None
 - **Max line length**: 120
-- **Trailing commas**: ES5
 - **Component pattern**: Named exports (`export function Component()`)
 - **Client components**: `'use client'` directive at top
 - **API routes**: Export named HTTP method functions (`GET`, `POST`)
@@ -93,12 +103,15 @@ All API errors must follow this structure:
 
 ```typescript
 {
-  error: {
-    code: string    // UPPER_SNAKE_CASE error code
-    message: string // Human-readable message (English)
-  }
+  error: string  // Human-readable message
 }
 ```
+
+With HTTP status codes:
+- 400: Bad Request
+- 401: Unauthorized
+- 404: Not Found
+- 500: Internal Server Error
 
 ---
 
@@ -112,6 +125,6 @@ Scope: api, ui, lib, types, config
 ```
 
 Examples:
-- `feat(api): add checkout endpoint`
-- `fix(lib): handle empty scrape results`
-- `docs: update CONVENTIONS.md`
+- `feat(api): add looms CRUD endpoints`
+- `fix(pdf): handle empty posts array`
+- `docs: update README`
