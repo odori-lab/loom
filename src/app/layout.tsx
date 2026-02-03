@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,10 +14,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Unthread - Turn Threads into PDF',
-  description: 'Convert any Threads profile into a beautiful, downloadable PDF. Enter a username, pay once, and get your PDF instantly.',
+  title: 'Loom - Turn Threads into PDF',
+  description: 'Convert any Threads profile into a beautiful, downloadable PDF. Create your own book from your Threads posts.',
   openGraph: {
-    title: 'Unthread - Turn Threads into PDF',
+    title: 'Loom - Turn Threads into PDF',
     description: 'Convert any Threads profile into a beautiful, downloadable PDF.',
     type: 'website',
   },
@@ -28,11 +29,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased dark:bg-black`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
