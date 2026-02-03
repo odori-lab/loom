@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-02-03T15:06:21.238Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-02-03T14:51:34.547Z",
+    "activeFeatures": [
+      "looms",
+      "callback"
+    ],
+    "primaryFeature": "looms",
+    "features": {
+      "looms": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-03T14:51:05.725Z",
+          "lastUpdated": "2026-02-03T14:51:16.479Z"
+        },
+        "lastFile": "/Users/ohdoyoel/work/loom/src/app/api/looms/route.ts"
+      },
+      "callback": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-03T14:51:34.547Z",
+          "lastUpdated": "2026-02-03T14:51:34.547Z"
+        },
+        "lastFile": "/Users/ohdoyoel/work/loom/src/app/auth/callback/route.ts"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-02-03T14:13:05.975Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-02-03T14:51:34.547Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-02-03T14:51:05.725Z",
+        "feature": "looms",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-03T14:51:11.728Z",
+        "feature": "looms",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-03T14:51:16.479Z",
+        "feature": "looms",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-03T14:51:34.547Z",
+        "feature": "callback",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}
