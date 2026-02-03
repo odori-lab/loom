@@ -9,11 +9,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Username is required' }, { status: 400 })
     }
 
-    const posts = await scrapeThreads(username, 'scrape-job')
+    // Clean username (remove @ if present)
+    const cleanUsername = username.replace(/^@/, '').trim()
 
-    return NextResponse.json({ posts })
-  } catch (error) {
-    console.error('[SCRAPE_API_ERROR]', error)
-    return NextResponse.json({ error: 'Failed to scrape threads' }, { status: 500 })
+    const { posts, profile } = await scrapeThreads(cleanUsername)
+
+    return NextResponse.json({ posts, profile })
+  } catch (error: any) {
+    console.error('[SCRAPE_ERROR]', error)
+    return NextResponse.json(
+      { error: error.message || 'Failed to scrape threads' },
+      { status: 500 }
+    )
   }
 }
