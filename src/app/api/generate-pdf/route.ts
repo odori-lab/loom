@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import puppeteer from 'puppeteer'
-import { ThreadsPost } from '@/types/threads-post'
+import { ThreadsPost, ThreadsProfile } from '@/types/threads'
+import { generatePdfHtml } from '@/lib/pdf/generator'
 import fs from 'fs'
 import path from 'path'
 
@@ -12,63 +13,48 @@ function ensureDownloadsDir() {
   }
 }
 
-function getPostHTML(post: ThreadsPost) {
-  return `
-    <div class="post">
-      <p>${post.content}</p>
-      <div class="timestamp">${new Date(post.postedAt).toLocaleString()}</div>
-    </div>
-  `
-}
-
-function getPDFTemplate(username: string, posts: ThreadsPost[]) {
-  const postsHTML = posts.map(getPostHTML).join('')
-
-  return `
-    <html>
-      <head>
-        <style>
-          body { font-family: sans-serif; background-color: #101010; color: #f1f1f1; padding: 2rem; }
-          .post { border: 1px solid #303030; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
-          .timestamp { font-size: 0.8rem; color: #808080; margin-top: 0.5rem; }
-          h1 { font-size: 2rem; margin-bottom: 0.5rem; }
-        </style>
-      </head>
-      <body>
-        <h1>@${username}</h1>
-        ${postsHTML}
-      </body>
-    </html>
-  `
-}
-
 export async function POST(request: Request) {
   try {
-    const { username, posts } = await request.json()
+    const { posts, profile } = await request.json() as {
+      posts: ThreadsPost[]
+      profile: ThreadsProfile
+    }
 
-    if (!username || !posts || !Array.isArray(posts)) {
-      return NextResponse.json({ error: 'Username and posts are required' }, { status: 400 })
+    if (!posts || !Array.isArray(posts) || posts.length === 0) {
+      return NextResponse.json({ error: 'Posts are required' }, { status: 400 })
+    }
+
+    if (!profile) {
+      return NextResponse.json({ error: 'Profile is required' }, { status: 400 })
     }
 
     ensureDownloadsDir()
 
-    const htmlContent = getPDFTemplate(username, posts)
+    // Generate HTML content
+    const htmlContent = generatePdfHtml(posts, profile)
     const sessionId = crypto.randomUUID()
     const pdfPath = path.join(DOWNLOADS_DIR, `${sessionId}.pdf`)
 
-    const browser = await puppeteer.launch({ headless: true })
+    // Generate PDF using Puppeteer
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    })
     const page = await browser.newPage()
     await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
+
     await page.pdf({
       path: pdfPath,
-      format: 'A4',
+      width: '148mm',
+      height: '210mm',
       printBackground: true,
-      margin: { top: '1in', right: '1in', bottom: '1in', left: '1in' },
+      margin: { top: '0', right: '0', bottom: '0', left: '0' },
     })
+
     await browser.close()
 
     const downloadUrl = `/downloads/${sessionId}.pdf`
-    return NextResponse.json({ downloadUrl })
+    return NextResponse.json({ downloadUrl, sessionId })
   } catch (error) {
     console.error('[PDF_GENERATION_ERROR]', error)
     return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 })
