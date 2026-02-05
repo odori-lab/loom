@@ -59,6 +59,7 @@ export function LoomCard({
     day: 'numeric'
   })
 
+  // TODO: 복잡한 SVG들 적잘한 icon import 해서 사용. 지금 너무 더럽 -> 가독성 down
   return (
     <div className="border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors">
       <div className="flex items-start justify-between">
