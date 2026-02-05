@@ -16,10 +16,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Loom - Turn Threads into PDF',
   description: 'Convert any Threads profile into a beautiful, downloadable PDF. Create your own book from your Threads posts.',
+  icons: {
+    icon: '/icon-white.png',
+    apple: '/icon-white.png',
+  },
   openGraph: {
     title: 'Loom - Turn Threads into PDF',
     description: 'Convert any Threads profile into a beautiful, downloadable PDF.',
     type: 'website',
+    images: ['/icon-white.png'],
   },
 };
 
