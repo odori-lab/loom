@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import puppeteer from 'puppeteer'
+import { PDFDocument } from 'pdf-lib'
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
-import { generatePdfHtml } from '@/lib/pdf/generator'
+import { generatePageContents, generatePageHtml } from '@/lib/pdf/generator'
 import fs from 'fs'
 import path from 'path'
 
@@ -30,28 +31,48 @@ export async function POST(request: Request) {
 
     ensureDownloadsDir()
 
-    // Generate HTML content
-    const htmlContent = generatePdfHtml(posts, profile)
+    // Generate page contents (same as preview uses)
+    const pages = generatePageContents(posts, profile)
     const sessionId = crypto.randomUUID()
     const pdfPath = path.join(DOWNLOADS_DIR, `${sessionId}.pdf`)
 
-    // Generate PDF using Puppeteer
+    // Generate PDF using Puppeteer - render each page individually
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     })
-    const page = await browser.newPage()
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
 
-    await page.pdf({
-      path: pdfPath,
-      width: '148mm',
-      height: '210mm',
-      printBackground: true,
-      margin: { top: '0', right: '0', bottom: '0', left: '0' },
-    })
+    // Create merged PDF document
+    const mergedPdf = await PDFDocument.create()
+
+    for (const pageContent of pages) {
+      const page = await browser.newPage()
+      
+      // Use the same HTML generation as preview (without scale)
+      const htmlContent = generatePageHtml(pageContent)
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
+
+      // Generate PDF for this single page
+      const pdfBuffer = await page.pdf({
+        width: '148mm',
+        height: '210mm',
+        printBackground: true,
+        margin: { top: '0', right: '0', bottom: '0', left: '0' },
+      })
+
+      // Add page to merged PDF
+      const pagePdf = await PDFDocument.load(pdfBuffer)
+      const [copiedPage] = await mergedPdf.copyPages(pagePdf, [0])
+      mergedPdf.addPage(copiedPage)
+
+      await page.close()
+    }
 
     await browser.close()
+
+    // Save merged PDF
+    const mergedPdfBytes = await mergedPdf.save()
+    fs.writeFileSync(pdfPath, mergedPdfBytes)
 
     const downloadUrl = `/downloads/${sessionId}.pdf`
     return NextResponse.json({ downloadUrl, sessionId })

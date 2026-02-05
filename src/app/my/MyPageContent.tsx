@@ -69,19 +69,24 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
 
   if (looms.length === 0) {
     return (
-      <main className="flex-1 flex items-center justify-center">
-        <div className="text-center py-16">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <main className="flex-1 flex items-center justify-center bg-gradient-to-b from-gray-50 to-white">
+        <div className="text-center py-16 px-8">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center shadow-sm">
+            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-1">No Looms yet</h3>
-          <p className="text-gray-500 mb-6">Create your first Loom from Threads posts</p>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Looms yet</h3>
+          <p className="text-gray-500 mb-8 max-w-sm">
+            Transform your Threads posts into beautiful PDFs
+          </p>
           <Link
             href="/create"
-            className="inline-flex px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 hover:scale-105 transition-all shadow-lg shadow-gray-900/20"
           >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
             Create Your First Loom
           </Link>
         </div>
@@ -92,33 +97,46 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
   return (
     <main className="flex-1 flex overflow-hidden">
       {/* Left Panel - Loom List */}
-      <div className="w-1/2 border-r flex flex-col">
-        <div className="p-4 border-b flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-gray-900">My Looms</h1>
+      <div className="w-1/2 border-r border-gray-100 flex flex-col bg-white">
+        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">My Looms</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{looms.length} {looms.length === 1 ? 'loom' : 'looms'}</p>
+          </div>
           <Link
             href="/create"
-            className="px-3 py-1.5 bg-black text-white text-sm rounded-lg font-medium hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-full font-medium hover:bg-gray-800 transition-all shadow-sm"
           >
-            + New
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            New Loom
           </Link>
         </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {looms.map(loom => (
             <div
               key={loom.id}
               onClick={() => handleSelect(loom)}
-              className={`p-4 rounded-xl border cursor-pointer transition-all ${
+              className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
                 selectedLoom?.id === loom.id
-                  ? 'border-black bg-gray-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-gray-900 bg-gray-50 shadow-sm'
+                  : 'border-transparent bg-gray-50 hover:bg-gray-100'
               }`}
             >
               <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 truncate">
-                    {loom.thread_display_name || `@${loom.thread_username}`}
-                  </h3>
-                  <p className="text-sm text-gray-500">@{loom.thread_username}</p>
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-bold text-white">
+                      {(loom.thread_display_name || loom.thread_username)?.[0]?.toUpperCase() || '?'}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-gray-900 truncate">
+                      {loom.thread_display_name || `@${loom.thread_username}`}
+                    </h3>
+                    <p className="text-sm text-gray-500 truncate">@{loom.thread_username}</p>
+                  </div>
                 </div>
                 <button
                   onClick={(e) => {
@@ -126,24 +144,29 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
                     handleDelete(loom.id)
                   }}
                   disabled={deletingId === loom.id}
-                  className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all disabled:opacity-50"
                   title="Delete"
                 >
                   {deletingId === loom.id ? (
-                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                   ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   )}
                 </button>
               </div>
-              <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                <span>{loom.post_count} posts</span>
-                <span>{formatDate(loom.created_at)}</span>
+              <div className="mt-3 flex items-center gap-4">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-full text-xs font-medium text-gray-600 shadow-sm">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  {loom.post_count} posts
+                </span>
+                <span className="text-xs text-gray-400">{formatDate(loom.created_at)}</span>
               </div>
             </div>
           ))}
@@ -151,48 +174,59 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
       </div>
 
       {/* Right Panel - Preview */}
-      <div className="w-1/2 flex flex-col bg-gray-50">
+      <div className="w-1/2 flex flex-col bg-gradient-to-b from-gray-50 to-gray-100">
         {selectedLoom ? (
           <>
-            <div className="p-4 border-b bg-white flex items-center justify-between">
-              <div>
-                <h2 className="font-semibold text-gray-900">
-                  {selectedLoom.thread_display_name || `@${selectedLoom.thread_username}`}
-                </h2>
-                <p className="text-sm text-gray-500">{selectedLoom.post_count} posts</p>
+            <div className="p-5 border-b border-gray-200 bg-white flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <span className="text-sm font-bold text-white">
+                    {(selectedLoom.thread_display_name || selectedLoom.thread_username)?.[0]?.toUpperCase() || '?'}
+                  </span>
+                </div>
+                <div>
+                  <h2 className="font-semibold text-gray-900">
+                    {selectedLoom.thread_display_name || `@${selectedLoom.thread_username}`}
+                  </h2>
+                  <p className="text-sm text-gray-500">{selectedLoom.post_count} posts included</p>
+                </div>
               </div>
               {previewUrl && (
                 <button
                   onClick={() => handleDownload(previewUrl)}
-                  className="px-3 py-1.5 bg-black text-white text-sm rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center gap-2"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-full font-medium hover:bg-gray-800 transition-all shadow-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Download
+                  Download PDF
                 </button>
               )}
             </div>
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-6">
               {loadingPreview ? (
                 <div className="h-full flex items-center justify-center">
                   <div className="text-center">
-                    <svg className="w-8 h-8 animate-spin mx-auto text-gray-400" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    <p className="mt-2 text-sm text-gray-500">Loading preview...</p>
+                    <div className="w-12 h-12 mx-auto mb-4 rounded-full border-4 border-gray-200 border-t-gray-900 animate-spin" />
+                    <p className="text-sm text-gray-500">Loading preview...</p>
                   </div>
                 </div>
               ) : previewUrl ? (
                 <iframe
                   src={previewUrl}
-                  className="w-full h-full rounded-lg border bg-white"
+                  className="w-full h-full rounded-2xl border border-gray-200 bg-white shadow-lg"
                   title="PDF Preview"
                 />
               ) : (
                 <div className="h-full flex items-center justify-center">
-                  <p className="text-gray-500">Failed to load preview</p>
+                  <div className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-50 flex items-center justify-center">
+                      <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-500">Failed to load preview</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -200,13 +234,14 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-200 flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gray-200/50 flex items-center justify-center">
+                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </div>
-              <p className="text-gray-500">Select a Loom to preview</p>
+              <p className="text-gray-500 font-medium">Select a Loom to preview</p>
+              <p className="text-sm text-gray-400 mt-1">Click on any item from the list</p>
             </div>
           </div>
         )}

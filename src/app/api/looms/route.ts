@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import puppeteer from 'puppeteer'
+import { PDFDocument } from 'pdf-lib'
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
-import { generatePdfHtml } from '@/lib/pdf/generator'
+import { generatePageContents, generatePageHtml } from '@/lib/pdf/generator'
 import { CoverData } from '@/types/loom'
 
 // GET /api/looms - List user's looms
@@ -56,23 +57,45 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Profile is required' }, { status: 400 })
     }
 
-    // Generate PDF
-    const htmlContent = generatePdfHtml(posts, profile)
+    // Generate page contents (same as preview uses)
+    const pages = generatePageContents(posts, profile)
+
+    // Generate PDF using Puppeteer - render each page individually
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     })
-    const page = await browser.newPage()
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
 
-    const pdfBuffer = await page.pdf({
-      width: '148mm',
-      height: '210mm',
-      printBackground: true,
-      margin: { top: '0', right: '0', bottom: '0', left: '0' },
-    })
+    // Create merged PDF document
+    const mergedPdf = await PDFDocument.create()
+
+    for (const pageContent of pages) {
+      const page = await browser.newPage()
+      
+      // Use the same HTML generation as preview (without scale)
+      const htmlContent = generatePageHtml(pageContent)
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
+
+      // Generate PDF for this single page
+      const pdfBuffer = await page.pdf({
+        width: '148mm',
+        height: '210mm',
+        printBackground: true,
+        margin: { top: '0', right: '0', bottom: '0', left: '0' },
+      })
+
+      // Add page to merged PDF
+      const pagePdf = await PDFDocument.load(pdfBuffer)
+      const [copiedPage] = await mergedPdf.copyPages(pagePdf, [0])
+      mergedPdf.addPage(copiedPage)
+
+      await page.close()
+    }
 
     await browser.close()
+
+    // Get merged PDF as buffer
+    const pdfBuffer = Buffer.from(await mergedPdf.save())
 
     // Upload to Supabase Storage
     const loomId = crypto.randomUUID()

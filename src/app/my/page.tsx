@@ -20,9 +20,11 @@ export default async function MyPage() {
 
   return (
     <div className="h-screen flex flex-col bg-white">
-      <header className="border-b shrink-0">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold">Loom</Link>
+      <header className="border-b border-gray-100 shrink-0 bg-white/80 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            Loom
+          </Link>
           <UserMenu user={user} />
         </div>
       </header>
