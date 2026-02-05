@@ -12,11 +12,17 @@ export function generateCoverPage(profile: ThreadsProfile): string {
 
   return `
     <div class="page cover-page">
-      ${profileImage}
-      <div class="cover-display-name">${escapeHtml(profile.displayName)}</div>
-      <div class="cover-username">@${escapeHtml(profile.username)}</div>
-      ${profile.bio ? `<div class="cover-bio">${escapeHtml(profile.bio)}</div>` : ''}
-      ${followerText ? `<div class="cover-stats">${followerText}</div>` : ''}
+      <div class="cover-content">
+        <div class="cover-info">
+          <h1 class="cover-display-name">${escapeHtml(profile.displayName)}</h1>
+          <div class="cover-username">${escapeHtml(profile.username)}</div>
+          ${profile.bio ? `<div class="cover-bio">${escapeHtml(profile.bio)}</div>` : ''}
+          ${followerText ? `<div class="cover-stats">${followerText}</div>` : ''}
+        </div>
+        <div class="cover-avatar">
+          ${profileImage}
+        </div>
+      </div>
       <div class="cover-logo">${LOOM_LOGO_SVG}</div>
     </div>
   `

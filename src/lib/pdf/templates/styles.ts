@@ -2,12 +2,8 @@
 // Margins: Top/Bottom 22mm, Left/Right 20mm
 // Content area: 108mm x 166mm
 
+// Single unified styles for both PDF and Preview
 export const PDF_STYLES = `
-  @page {
-    size: 148mm 210mm;
-    margin: 22mm 20mm;
-  }
-
   * {
     margin: 0;
     padding: 0;
@@ -20,47 +16,55 @@ export const PDF_STYLES = `
     line-height: 1.5;
     color: #1a1a1a;
     background: #ffffff;
+    margin: 0;
+    padding: 0;
   }
 
   .page {
-    width: 108mm;
-    min-height: 166mm;
-    page-break-after: always;
+    width: 148mm;
+    min-height: 210mm;
+    padding: 22mm 20mm;
     position: relative;
-  }
-
-  .page:last-child {
-    page-break-after: auto;
+    background: #ffffff;
   }
 
   /* Cover Page */
-  .cover-page {
+  .page.cover-page {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    height: 166mm;
+  }
+
+  .cover-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .cover-info {
+    flex: 1;
+  }
+
+  .cover-avatar {
+    flex-shrink: 0;
   }
 
   .cover-profile-image {
-    width: 80px;
-    height: 80px;
+    width: 84px;
+    height: 84px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 16px;
-    border: 2px solid #e5e5e5;
+    border: 1px solid #e5e5e5;
   }
 
   .cover-profile-placeholder {
-    width: 80px;
-    height: 80px;
+    width: 84px;
+    height: 84px;
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 16px;
   }
 
   .cover-profile-placeholder span {
@@ -70,28 +74,29 @@ export const PDF_STYLES = `
   }
 
   .cover-display-name {
-    font-size: 18pt;
+    font-size: 16pt;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin: 0 0 2px 0;
+    line-height: 1.4;
   }
 
   .cover-username {
-    font-size: 11pt;
-    color: #666;
-    margin-bottom: 16px;
+    font-size: 10pt;
+    color: #999;
+    margin-bottom: 12px;
   }
 
   .cover-bio {
     font-size: 10pt;
-    color: #333;
-    max-width: 80%;
-    margin-bottom: 16px;
+    color: #1a1a1a;
+    line-height: 1.5;
+    margin-bottom: 12px;
     white-space: pre-wrap;
   }
 
   .cover-stats {
     font-size: 9pt;
-    color: #666;
+    color: #999;
   }
 
   .cover-logo {
@@ -107,34 +112,47 @@ export const PDF_STYLES = `
     opacity: 0.3;
   }
 
-  /* Content Page */
+  /* Content Page - Threads-style layout (flex + grid hybrid) */
   .post {
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 9.5pt;
+    line-height: 1.4;
   }
 
   .post:last-child {
     border-bottom: none;
   }
 
-  .post-header {
+  /* Row 1: Avatar + Header (grid) */
+  .post-row-header {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    column-gap: 12px;
+    margin-bottom: 2px;
+  }
+
+  .post-avatar-cell {
+    grid-column: 1;
+    grid-row: 1;
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
+    justify-content: center;
   }
 
   .post-avatar {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     object-fit: cover;
   }
 
   .post-avatar-placeholder {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
@@ -143,51 +161,55 @@ export const PDF_STYLES = `
   }
 
   .post-avatar-placeholder span {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     color: white;
   }
 
-  .post-meta {
-    flex: 1;
+  .post-header {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.4;
   }
 
   .post-username {
-    font-size: 9pt;
+    font-size: 9.5pt;
     font-weight: 600;
+    color: #000;
   }
 
   .post-date {
-    font-size: 8pt;
+    font-size: 9.5pt;
     color: #999;
   }
 
-  .post-content {
-    font-size: 10pt;
-    line-height: 1.6;
+  /* Content area - full width (below header row) */
+  .post-text {
+    font-size: 9.5pt;
+    line-height: 1.4;
     white-space: pre-wrap;
     word-wrap: break-word;
-    margin-bottom: 10px;
+    color: #000;
   }
 
   .post-images {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
+    margin-top: 8px;
   }
 
   .post-image {
-    max-width: 48%;
-    max-height: 120px;
+    max-width: 100%;
+    max-height: 140px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 12px;
   }
 
   .post-stats {
     display: flex;
-    gap: 16px;
-    font-size: 8pt;
-    color: #666;
+    align-items: center;
+    gap: 12px;
   }
 
   .post-stat {
@@ -196,12 +218,68 @@ export const PDF_STYLES = `
     gap: 4px;
   }
 
+  .post-stat-icon {
+    width: 16px;
+    height: 16px;
+    color: #999;
+  }
+
+  .post-stat-like {
+    fill: transparent;
+    stroke: currentColor;
+  }
+
+  .post-stat-reply {
+    fill: transparent;
+    stroke: currentColor;
+  }
+
+  .post-stat-repost {
+    fill: currentColor;
+    stroke: none;
+  }
+
+  .post-stat-share {
+    fill: transparent;
+    stroke: currentColor;
+  }
+
+  .post-stat-count {
+    font-size: 8.5pt;
+    color: #999;
+    line-height: 1;
+  }
+
+  /* Post continuation styles */
+  .post-continuation {
+    font-size: 8pt;
+    color: #999;
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+
+  .post-continues {
+    font-size: 8pt;
+    color: #999;
+    font-style: italic;
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  .post-continuation-chunk {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .post-continues-chunk {
+    border-bottom: none;
+  }
+
   /* Last Page */
-  .last-page {
+  .page.last-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 166mm;
   }
 
   .last-page svg {
