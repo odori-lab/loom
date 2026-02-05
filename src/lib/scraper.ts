@@ -74,6 +74,7 @@ export async function scrapeThreads(username: string): Promise<ScrapeResult> {
   return { posts, profile }
 }
 
+// TODO: image 제대로 불러와야 댐
 function extractImageUrls(post: any): string[] {
   const urls: string[] = []
 
