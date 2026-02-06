@@ -45,10 +45,6 @@ yarn-error.log*
 # vercel
 .vercel
 
-# bkit
-.bkit-memory.json
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-docs/.pdca-status.json
