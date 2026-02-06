@@ -1,20 +1,15 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import puppeteer from 'puppeteer'
-import { PDFDocument } from 'pdf-lib'
-import { ThreadsPost, ThreadsProfile } from '@/types/threads'
-import { generatePageContents, generatePageHtml } from '@/lib/pdf/generator'
+import { generatePageContents } from '@/lib/pdf/generator'
+import { renderPagesToPdf } from '@/lib/pdf/render'
+import { requireAuth, AuthError } from '@/lib/api/auth'
+import { parseLoomInput, ValidationError } from '@/lib/api/validation'
+import { getSignedDownloadUrl } from '@/lib/api/storage'
 import { CoverData } from '@/types/loom'
 
 // GET /api/looms - List user's looms
 export async function GET() {
   try {
-    const supabase = await createClient()
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, supabase } = await requireAuth()
 
     const { data: looms, error } = await supabase
       .from('looms')
@@ -29,6 +24,9 @@ export async function GET() {
 
     return NextResponse.json({ looms })
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     console.error('[LOOMS_LIST_ERROR]', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -37,65 +35,14 @@ export async function GET() {
 // POST /api/looms - Create a new loom
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { posts, profile } = await request.json() as {
-      posts: ThreadsPost[]
-      profile: ThreadsProfile
-    }
-
-    if (!posts || !Array.isArray(posts) || posts.length === 0) {
-      return NextResponse.json({ error: 'Posts are required' }, { status: 400 })
-    }
-
-    if (!profile) {
-      return NextResponse.json({ error: 'Profile is required' }, { status: 400 })
-    }
+    const { user, supabase } = await requireAuth()
+    const { posts, profile } = parseLoomInput(await request.json())
 
     // Generate page contents (same as preview uses)
     const pages = generatePageContents(posts, profile)
 
-    // Generate PDF using Puppeteer - render each page individually
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    })
-
-    // Create merged PDF document
-    const mergedPdf = await PDFDocument.create()
-
-    for (const pageContent of pages) {
-      const page = await browser.newPage()
-      
-      // Use the same HTML generation as preview (without scale)
-      const htmlContent = generatePageHtml(pageContent)
-      await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
-
-      // Generate PDF for this single page
-      const pdfBuffer = await page.pdf({
-        width: '148mm',
-        height: '210mm',
-        printBackground: true,
-        margin: { top: '0', right: '0', bottom: '0', left: '0' },
-      })
-
-      // Add page to merged PDF
-      const pagePdf = await PDFDocument.load(pdfBuffer)
-      const [copiedPage] = await mergedPdf.copyPages(pagePdf, [0])
-      mergedPdf.addPage(copiedPage)
-
-      await page.close()
-    }
-
-    await browser.close()
-
-    // Get merged PDF as buffer
-    const pdfBuffer = Buffer.from(await mergedPdf.save())
+    // Generate PDF using Puppeteer
+    const pdfBuffer = await renderPagesToPdf(pages)
 
     // Upload to Supabase Storage
     const loomId = crypto.randomUUID()
@@ -146,15 +93,19 @@ export async function POST(request: Request) {
     }
 
     // Get download URL
-    const { data: urlData } = await supabase.storage
-      .from('looms-pdf')
-      .createSignedUrl(pdfPath, 3600) // 1 hour expiry
+    const downloadUrl = await getSignedDownloadUrl(supabase, pdfPath)
 
     return NextResponse.json({
       loom,
-      downloadUrl: urlData?.signedUrl
+      downloadUrl
     })
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    if (error instanceof ValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
     console.error('[LOOM_CREATE_ERROR]', error)
     const message = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json({ error: `Internal server error: ${message}` }, { status: 500 })

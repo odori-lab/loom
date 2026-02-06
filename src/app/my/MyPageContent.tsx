@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Database } from '@/types/database'
+import { SpinnerSvg } from '@/components/ui/Spinner'
+import { DownloadIcon, TrashIcon, PlusIcon, BookOpenIcon } from '@/components/ui/Icons'
 
 type Loom = Database['public']['Tables']['looms']['Row']
 
@@ -72,9 +74,7 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
       <main className="flex-1 flex items-center justify-center bg-gradient-to-b from-gray-50 to-white">
         <div className="text-center py-16 px-8">
           <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center shadow-sm">
-            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
+            <BookOpenIcon className="w-10 h-10 text-gray-400" />
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">No Looms yet</h3>
           <p className="text-gray-500 mb-8 max-w-sm">
@@ -84,9 +84,7 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
             href="/create"
             className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 hover:scale-105 transition-all shadow-lg shadow-gray-900/20"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <PlusIcon className="w-5 h-5" />
             Create Your First Loom
           </Link>
         </div>
@@ -107,9 +105,7 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
             href="/create"
             className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-full font-medium hover:bg-gray-800 transition-all shadow-sm"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <PlusIcon />
             New Loom
           </Link>
         </div>
@@ -148,14 +144,9 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
                   title="Delete"
                 >
                   {deletingId === loom.id ? (
-                    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
+                    <SpinnerSvg />
                   ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                    <TrashIcon />
                   )}
                 </button>
               </div>
@@ -196,9 +187,7 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
                   onClick={() => handleDownload(previewUrl)}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-full font-medium hover:bg-gray-800 transition-all shadow-sm"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
+                  <DownloadIcon className="w-4 h-4" />
                   Download PDF
                 </button>
               )}

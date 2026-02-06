@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/database'
+import { requireAuth, AuthError } from '@/lib/api/auth'
+import { getSignedDownloadUrl } from '@/lib/api/storage'
 
 type Loom = Database['public']['Tables']['looms']['Row']
 
@@ -11,12 +12,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const supabase = await createClient()
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, supabase } = await requireAuth()
 
     const { data, error } = await supabase
       .from('looms')
@@ -32,15 +28,16 @@ export async function GET(
     const loom = data as Loom
 
     // Generate signed download URL
-    const { data: urlData } = await supabase.storage
-      .from('looms-pdf')
-      .createSignedUrl(loom.pdf_path, 3600) // 1 hour expiry
+    const downloadUrl = await getSignedDownloadUrl(supabase, loom.pdf_path)
 
     return NextResponse.json({
       loom,
-      downloadUrl: urlData?.signedUrl
+      downloadUrl
     })
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     console.error('[LOOM_GET_ERROR]', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
@@ -53,12 +50,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    const supabase = await createClient()
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user, supabase } = await requireAuth()
 
     // Get loom to find PDF path
     const { data, error: fetchError } = await supabase
@@ -93,6 +85,9 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     console.error('[LOOM_DELETE_ERROR]', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

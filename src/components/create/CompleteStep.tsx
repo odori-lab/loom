@@ -1,5 +1,7 @@
 'use client'
 
+import { CheckIcon, DownloadIcon, PlusIcon } from '@/components/ui/Icons'
+
 interface CompleteStepProps {
   downloadUrl: string
   onCreateAnother: () => void
@@ -16,9 +18,7 @@ export function CompleteStep({
       <div className="relative w-24 h-24 mx-auto mb-8">
         <div className="absolute inset-0 bg-green-200 rounded-full animate-ping opacity-25" />
         <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-green-500 flex items-center justify-center shadow-lg">
-          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-          </svg>
+          <CheckIcon className="w-12 h-12 text-white" />
         </div>
       </div>
 
@@ -34,9 +34,7 @@ export function CompleteStep({
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-3 w-full py-4 bg-gray-900 text-white rounded-2xl font-medium text-lg hover:bg-gray-800 hover:scale-[1.02] transition-all shadow-lg shadow-gray-900/20"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
+          <DownloadIcon />
           Download PDF
         </a>
 
@@ -54,9 +52,7 @@ export function CompleteStep({
           onClick={onCreateAnother}
           className="w-full py-3 text-gray-500 hover:text-gray-900 font-medium transition-colors flex items-center justify-center gap-2"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <PlusIcon />
           Create Another
         </button>
       </div>

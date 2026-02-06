@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { Spinner } from '@/components/ui/Spinner'
+import { ArrowRightIcon } from '@/components/ui/Icons'
 
 interface UsernameStepProps {
   onSubmit: (username: string) => void
@@ -49,15 +51,13 @@ export function UsernameStep({ onSubmit, loading }: UsernameStepProps) {
         >
           {loading ? (
             <>
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <Spinner size="md" className="text-white" />
               Loading posts...
             </>
           ) : (
             <>
               Continue
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              <ArrowRightIcon />
             </>
           )}
         </button>

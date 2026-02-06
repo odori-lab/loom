@@ -1,5 +1,6 @@
 import { ThreadsProfile } from '@/types/threads'
 import { LOOM_LOGO_SVG } from './logo'
+import { formatNumber, escapeHtml } from '@/lib/utils/format'
 
 export function generateCoverPage(profile: ThreadsProfile): string {
   const profileImage = profile.profileImageUrl
@@ -26,23 +27,4 @@ export function generateCoverPage(profile: ThreadsProfile): string {
       <div class="cover-logo">${LOOM_LOGO_SVG}</div>
     </div>
   `
-}
-
-function formatNumber(num: number): string {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M'
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K'
-  }
-  return num.toString()
-}
-
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
 }
