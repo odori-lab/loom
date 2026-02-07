@@ -1,14 +1,14 @@
 'use client'
 
 import { useDashboard } from './DashboardContext'
-import { DownloadIcon } from '@/components/ui/Icons'
+import { PdfPageViewer } from '@/components/ui/PdfPageViewer'
 
 export function LoomPreviewPanel() {
   const { selectedLoom, previewUrl, loadingPreview, openPreviewModal } = useDashboard()
 
   if (!selectedLoom) {
     return (
-      <div className="w-[400px] bg-gray-50 border-l border-gray-100 flex items-center justify-center shrink-0">
+      <div className="w-[600px] bg-gray-50 border-l border-gray-100 flex items-center justify-center shrink-0">
         <div className="text-center">
           <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gray-200/50 flex items-center justify-center">
             <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,49 +24,8 @@ export function LoomPreviewPanel() {
   }
 
   return (
-    <div className="w-[400px] bg-gray-50 border-l border-gray-100 flex flex-col shrink-0">
-      {/* Header */}
-      <div className="p-5 border-b border-gray-200 bg-white">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-            <span className="text-sm font-bold text-white">
-              {(selectedLoom.thread_display_name || selectedLoom.thread_username)?.[0]?.toUpperCase() || '?'}
-            </span>
-          </div>
-          <div>
-            <h2 className="font-semibold text-gray-900">
-              {selectedLoom.thread_display_name || `@${selectedLoom.thread_username}`}
-            </h2>
-            <p className="text-sm text-gray-500">{selectedLoom.post_count} posts</p>
-          </div>
-        </div>
-        {previewUrl && (
-          <div className="flex gap-2">
-            <a
-              href={previewUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm rounded-lg font-medium hover:bg-gray-800 transition-all"
-            >
-              <DownloadIcon className="w-4 h-4" />
-              Download
-            </a>
-            <button
-              onClick={openPreviewModal}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium hover:bg-gray-200 transition-all"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              Preview
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* PDF Preview */}
-      <div className="flex-1 p-4">
+    <div className="w-[600px] bg-gray-50 border-l border-gray-100 flex flex-col shrink-0">
+      <div className="flex-1 overflow-y-auto px-4 snap-y snap-mandatory">
         {loadingPreview ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
@@ -75,11 +34,7 @@ export function LoomPreviewPanel() {
             </div>
           </div>
         ) : previewUrl ? (
-          <iframe
-            src={previewUrl}
-            className="w-full h-full rounded-xl border border-gray-200 bg-white shadow-sm"
-            title="PDF Preview"
-          />
+          <PdfPageViewer url={previewUrl} width={568} snapScroll onPageClick={() => openPreviewModal()} />
         ) : (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
