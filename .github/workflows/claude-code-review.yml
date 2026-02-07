@@ -1,0 +1,27 @@
+# PR이 열리거나 새 커밋이 푸시될 때마다 Claude Code가 코드 리뷰를 수행합니다.
+# 문서: https://code.claude.com/docs/ko/github-actions
+
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Claude Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: "/review. Write the entire review and all comments in Korean. Explain in detail and logically, using simple words so that even an elementary school student can understand (자세하고 논리적으로, 초등학생도 이해할 수 있게 쉬운 말로)."
+          claude_args: "--max-turns 5"

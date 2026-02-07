@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/Spinner'
 
 function LoginContent() {
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/my'
+  const redirect = searchParams.get('redirect') || '/dashboard'
 
   const handleGoogleLogin = async () => {
     const supabase = createClient()

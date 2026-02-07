@@ -49,7 +49,7 @@ src/
 │   ├── database.ts         # Supabase DB 타입
 │   ├── loom.ts             # Loom, CoverData 인터페이스
 │   └── threads.ts          # ThreadsPost, ThreadsProfile 인터페이스
-└── middleware.ts            # Supabase 세션 갱신 미들웨어
+└── proxy.ts                 # Supabase 세션 갱신 (Next.js proxy)
 ```
 
 ## Commands
