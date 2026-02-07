@@ -3,19 +3,16 @@
 import { useState } from 'react'
 import { Spinner } from '@/components/ui/Spinner'
 import { ArrowRightIcon } from '@/components/ui/Icons'
+import { useCreateFlow } from './CreateFlowContext'
 
-interface UsernameStepProps {
-  onSubmit: (username: string) => void
-  loading: boolean
-}
-
-export function UsernameStep({ onSubmit, loading }: UsernameStepProps) {
+export function UsernameStep() {
+  const { state: { loading }, actions: { submitUsername } } = useCreateFlow()
   const [username, setUsername] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!username.trim()) return
-    onSubmit(username.trim())
+    submitUsername(username.trim())
   }
 
   return (

@@ -1,0 +1,171 @@
+'use client'
+
+import { useState, useMemo, ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
+import { ThreadsPost, ThreadsProfile } from '@/types/threads'
+import { generatePageContents } from '@/lib/pdf/generator'
+import { calculateSpreads } from '@/lib/pdf/spreads'
+import {
+  CreateFlowContext,
+  CreateFlowContextValue,
+  Step,
+  SortOrder,
+} from './CreateFlowContext'
+import { MOCK_PROFILE, MOCK_POSTS } from '@/lib/mockdata'
+
+const USE_MOCK_DATA = true
+const STEPS = ['username', 'select', 'complete'] as const
+
+export function CreateFlowProvider({ children }: { children: ReactNode }) {
+  const router = useRouter()
+
+  // Core state (consolidated from page.tsx + SelectPostsStep.tsx)
+  const [step, setStep] = useState<Step>(USE_MOCK_DATA ? 'select' : 'username')
+  const [posts, setPosts] = useState<ThreadsPost[]>(USE_MOCK_DATA ? MOCK_POSTS : [])
+  const [profile, setProfile] = useState<ThreadsProfile | null>(USE_MOCK_DATA ? MOCK_PROFILE : null)
+  const [downloadUrl, setDownloadUrl] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(
+    () => new Set(USE_MOCK_DATA ? MOCK_POSTS.map(p => p.id) : [])
+  )
+  const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [currentSpread, setCurrentSpread] = useState(0)
+
+  // Derived values
+  const currentStepIndex = STEPS.indexOf(step)
+
+  const filteredAndSortedPosts = useMemo(() => {
+    let result = [...posts]
+
+    if (searchQuery) {
+      result = result.filter(p =>
+        p.content.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+
+    return result.toSorted((a, b) => {
+      const diff = new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+      return sortOrder === 'newest' ? diff : -diff
+    })
+  }, [posts, searchQuery, sortOrder])
+
+  const selectedPosts = useMemo(() => {
+    return posts
+      .filter(p => selectedIds.has(p.id))
+      .toSorted((a, b) => {
+        const diff = new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+        return sortOrder === 'newest' ? diff : -diff
+      })
+  }, [posts, selectedIds, sortOrder])
+
+  const pages = useMemo(() => {
+    if (selectedPosts.length === 0 || !profile) return []
+    return generatePageContents(selectedPosts, profile)
+  }, [selectedPosts, profile])
+
+  const spreads = useMemo(() => calculateSpreads(pages), [pages])
+
+  // Actions
+  const submitUsername = async (username: string) => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/scrape', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+
+      setPosts(data.posts)
+      setProfile(data.profile)
+      setSelectedIds(new Set(data.posts.map((p: ThreadsPost) => p.id)))
+      setStep('select')
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const generateLoom = async () => {
+    if (!profile) return
+
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/looms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ posts: selectedPosts, profile })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+
+      setDownloadUrl(data.downloadUrl)
+      setStep('complete')
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const createAnother = () => {
+    setPosts([])
+    setProfile(null)
+    setDownloadUrl('')
+    setSelectedIds(new Set())
+    setStep('username')
+  }
+
+  const togglePost = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+    setCurrentSpread(0)
+  }
+
+  const toggleAll = () => {
+    setSelectedIds(prev => {
+      if (prev.size === filteredAndSortedPosts.length) {
+        return new Set()
+      }
+      return new Set(filteredAndSortedPosts.map(p => p.id))
+    })
+    setCurrentSpread(0)
+  }
+
+  const prevSpread = () => {
+    setCurrentSpread(prev => Math.max(0, prev - 1))
+  }
+
+  const nextSpread = () => {
+    setCurrentSpread(prev => Math.min(spreads.length - 1, prev + 1))
+  }
+
+  const goBack = () => {
+    setStep('username')
+  }
+
+  const value: CreateFlowContextValue = {
+    state: { step, posts, profile, downloadUrl, loading, error, selectedIds, sortOrder, searchQuery, currentSpread },
+    actions: { submitUsername, generateLoom, createAnother, togglePost, toggleAll, setSortOrder, setSearchQuery, prevSpread, nextSpread, goBack },
+    meta: { steps: STEPS, currentStepIndex, filteredAndSortedPosts, selectedPosts, pages, spreads, currentSpreadData: spreads[currentSpread], selectedCount: selectedIds.size, totalSpreads: spreads.length },
+  }
+
+  return (
+    <CreateFlowContext value={value}>
+      {children}
+    </CreateFlowContext>
+  )
+}

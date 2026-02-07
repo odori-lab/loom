@@ -1,18 +1,13 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { CheckIcon, DownloadIcon, PlusIcon } from '@/components/ui/Icons'
+import { useCreateFlow } from './CreateFlowContext'
 
-interface CompleteStepProps {
-  downloadUrl: string
-  onCreateAnother: () => void
-  onViewLooms: () => void
-}
+export function CompleteStep() {
+  const router = useRouter()
+  const { state: { downloadUrl }, actions: { createAnother } } = useCreateFlow()
 
-export function CompleteStep({
-  downloadUrl,
-  onCreateAnother,
-  onViewLooms
-}: CompleteStepProps) {
   return (
     <div className="max-w-md mx-auto text-center">
       <div className="relative w-24 h-24 mx-auto mb-8">
@@ -39,7 +34,7 @@ export function CompleteStep({
         </a>
 
         <button
-          onClick={onViewLooms}
+          onClick={() => router.push('/my')}
           className="flex items-center justify-center gap-3 w-full py-4 bg-gray-100 text-gray-700 rounded-2xl font-medium text-lg hover:bg-gray-200 transition-all"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,7 +44,7 @@ export function CompleteStep({
         </button>
 
         <button
-          onClick={onCreateAnother}
+          onClick={createAnother}
           className="w-full py-3 text-gray-500 hover:text-gray-900 font-medium transition-colors flex items-center justify-center gap-2"
         >
           <PlusIcon />

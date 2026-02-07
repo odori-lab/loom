@@ -1,52 +1,34 @@
 'use client'
 
 import { generatePageHtml } from '@/lib/pdf/generator'
-import { SpreadData } from '@/lib/pdf/spreads'
+import { useCreateFlow } from './CreateFlowContext'
 
-interface BookPreviewProps {
-  pages: string[]
-  spreads: SpreadData[]
-  currentSpread: number
-  totalSpreads: number
-  currentSpreadData: SpreadData | undefined
-  selectedCount: number
-  loading: boolean
-  onPrevSpread: () => void
-  onNextSpread: () => void
-  onBack: () => void
-  onGenerate: () => void
-}
+const EmptyPreview = (
+  <div className="text-center">
+    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-200 flex items-center justify-center">
+      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    </div>
+    <p className="text-gray-500">Select posts to preview</p>
+  </div>
+)
 
-export function BookPreview({
-  pages,
-  spreads,
-  currentSpread,
-  totalSpreads,
-  currentSpreadData,
-  selectedCount,
-  loading,
-  onPrevSpread,
-  onNextSpread,
-  onBack,
-  onGenerate,
-}: BookPreviewProps) {
+export function BookPreview() {
+  const {
+    state: { currentSpread, loading },
+    actions: { prevSpread, nextSpread, goBack, generateLoom },
+    meta: { pages, spreads, currentSpreadData, selectedCount, totalSpreads },
+  } = useCreateFlow()
+
   return (
     <div className="flex-1 flex flex-col bg-gray-100">
       <div className="flex-1 p-6 flex items-center justify-center">
-        {pages.length === 0 ? (
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-200 flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <p className="text-gray-500">Select posts to preview</p>
-          </div>
-        ) : (
+        {pages.length === 0 ? EmptyPreview : (
           <div className="flex items-center gap-4">
             {/* Prev button */}
             <button
-              onClick={onPrevSpread}
+              onClick={prevSpread}
               disabled={currentSpread === 0}
               className="p-2 rounded-full bg-white shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
@@ -113,7 +95,7 @@ export function BookPreview({
 
             {/* Next button */}
             <button
-              onClick={onNextSpread}
+              onClick={nextSpread}
               disabled={currentSpread >= totalSpreads - 1}
               className="p-2 rounded-full bg-white shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
@@ -128,7 +110,7 @@ export function BookPreview({
       {/* Bottom action bar */}
       <div className="p-4 bg-white border-t border-gray-200 flex items-center justify-between">
         <button
-          onClick={onBack}
+          onClick={goBack}
           className="px-5 py-2.5 text-gray-600 hover:text-gray-900 font-medium transition-colors"
         >
           Back
@@ -143,7 +125,7 @@ export function BookPreview({
             {selectedCount} posts
           </span>
           <button
-            onClick={onGenerate}
+            onClick={generateLoom}
             disabled={selectedCount === 0 || loading}
             className="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
