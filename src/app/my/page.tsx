@@ -1,8 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { MyPageContent } from './MyPageContent'
-import { UserMenu } from '@/components/auth/UserMenu'
+import { DashboardShell } from '@/components/dashboard/DashboardShell'
 
 export default async function MyPage() {
   const supabase = await createClient()
@@ -18,18 +16,5 @@ export default async function MyPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
-  return (
-    <div className="h-screen flex flex-col bg-white">
-      <header className="border-b border-gray-100 shrink-0 bg-white/80 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-            Loom
-          </Link>
-          <UserMenu user={user} />
-        </div>
-      </header>
-
-      <MyPageContent initialLooms={looms || []} />
-    </div>
-  )
+  return <DashboardShell user={user} initialLooms={looms || []} />
 }
