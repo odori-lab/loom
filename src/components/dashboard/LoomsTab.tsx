@@ -61,31 +61,26 @@ export function LoomsTab() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Controls */}
-      <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">My Looms</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{looms.length} {looms.length === 1 ? 'loom' : 'looms'}</p>
+      <div className="h-16 px-6 py-4 flex gap-4 items-center border-b border-gray-100">
+        <div className="relative">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 pr-3 py-2 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 w-48 h-8"
+          />
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-3 py-2 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 w-48"
-            />
-          </div>
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-            className="px-3 py-2 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
-          >
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-          </select>
-        </div>
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+          className="px-3 py-1 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 h-8"
+        >
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+        </select>
+        <p className="text-sm text-gray-500">{looms.length} {looms.length === 1 ? 'loom' : 'looms'}</p>
       </div>
 
       {/* Grid */}
