@@ -11,8 +11,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
-    const { user, supabase } = await requireAuth()
+    const [{ id }, { user, supabase }] = await Promise.all([params, requireAuth()])
 
     const { data, error } = await supabase
       .from('looms')
@@ -49,8 +48,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
-    const { user, supabase } = await requireAuth()
+    const [{ id }, { user, supabase }] = await Promise.all([params, requireAuth()])
 
     // Get loom to find PDF path
     const { data, error: fetchError } = await supabase

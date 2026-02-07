@@ -35,8 +35,8 @@ export async function GET() {
 // POST /api/looms - Create a new loom
 export async function POST(request: Request) {
   try {
-    const { user, supabase } = await requireAuth()
-    const { posts, profile } = parseLoomInput(await request.json())
+    const [{ user, supabase }, body] = await Promise.all([requireAuth(), request.json()])
+    const { posts, profile } = parseLoomInput(body)
 
     // Generate page contents (same as preview uses)
     const pages = generatePageContents(posts, profile)
