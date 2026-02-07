@@ -30,7 +30,7 @@ export function LandingContent({ user }: LandingContentProps) {
             {user ? (
               <>
                 <Link
-                  href="/my"
+                  href="/dashboard"
                   className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   {t('nav.myLooms')}
@@ -66,7 +66,7 @@ export function LandingContent({ user }: LandingContentProps) {
             {t('hero.description')}
           </p>
           <Link
-            href={user ? "/my?tab=create" : "/login?redirect=/my?tab=create"}
+            href={user ? "/dashboard?tab=create" : "/login?redirect=/dashboard?tab=create"}
             className="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-full font-medium text-lg hover:bg-gray-800 hover:scale-105 transition-all shadow-lg shadow-gray-900/20"
           >
             {t('hero.cta')}
@@ -202,7 +202,7 @@ export function LandingContent({ user }: LandingContentProps) {
               {t('cta.description')}
             </p>
             <Link
-              href={user ? "/my?tab=create" : "/login?redirect=/my?tab=create"}
+              href={user ? "/dashboard?tab=create" : "/login?redirect=/dashboard?tab=create"}
               className="inline-flex items-center gap-3 px-8 py-4 bg-white text-gray-900 rounded-full font-medium text-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-lg"
             >
               {t('cta.button')}

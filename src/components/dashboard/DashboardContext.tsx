@@ -53,7 +53,7 @@ export function DashboardProvider({ initialLooms, children }: DashboardProviderP
 
   const setActiveTab = useCallback((tab: DashboardTab) => {
     setActiveTabState(tab)
-    const url = tab === 'create' ? '/my?tab=create' : '/my'
+    const url = tab === 'create' ? '/dashboard?tab=create' : '/dashboard'
     router.replace(url, { scroll: false })
   }, [router])
 
