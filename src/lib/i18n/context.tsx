@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, use, useState, useEffect, ReactNode } from 'react'
 import { Locale, translations, TranslationKey } from './translations'
 
 interface I18nContextType {
@@ -34,14 +34,14 @@ export function I18nProvider({ children, initialLocale = 'ko' }: { children: Rea
   }
 
   return (
-    <I18nContext.Provider value={{ locale, setLocale, t }}>
+    <I18nContext value={{ locale, setLocale, t }}>
       {children}
-    </I18nContext.Provider>
+    </I18nContext>
   )
 }
 
 export function useI18n() {
-  const context = useContext(I18nContext)
+  const context = use(I18nContext)
   if (!context) {
     throw new Error('useI18n must be used within an I18nProvider')
   }
