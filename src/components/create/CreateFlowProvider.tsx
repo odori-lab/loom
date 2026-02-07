@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useMemo, ReactNode } from 'react'
-import { useRouter } from 'next/navigation'
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
 import { generatePageContents } from '@/lib/pdf/generator'
 import { calculateSpreads } from '@/lib/pdf/spreads'
@@ -12,13 +11,19 @@ import {
   SortOrder,
 } from './CreateFlowContext'
 import { MOCK_PROFILE, MOCK_POSTS } from '@/lib/mockdata'
+import { Database } from '@/types/database'
+
+type Loom = Database['public']['Tables']['looms']['Row']
 
 const USE_MOCK_DATA = true
 const STEPS = ['username', 'select', 'complete'] as const
 
-export function CreateFlowProvider({ children }: { children: ReactNode }) {
-  const router = useRouter()
+interface CreateFlowProviderProps {
+  children: ReactNode
+  onComplete?: (loom: Loom) => void
+}
 
+export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderProps) {
   // Core state (consolidated from page.tsx + SelectPostsStep.tsx)
   const [step, setStep] = useState<Step>(USE_MOCK_DATA ? 'select' : 'username')
   const [posts, setPosts] = useState<ThreadsPost[]>(USE_MOCK_DATA ? MOCK_POSTS : [])
@@ -107,6 +112,10 @@ export function CreateFlowProvider({ children }: { children: ReactNode }) {
 
       setDownloadUrl(data.downloadUrl)
       setStep('complete')
+
+      if (onComplete && data.loom) {
+        onComplete(data.loom)
+      }
     } catch (err: any) {
       setError(err.message)
     } finally {

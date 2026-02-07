@@ -5,7 +5,11 @@ import { CheckIcon, HeartIcon, CommentIcon, RepostIcon, ShareIcon } from '@/comp
 import { useCreateFlow } from './CreateFlowContext'
 import { SortOrder } from './CreateFlowContext'
 
-export function PostListSidebar() {
+interface PostListSidebarProps {
+  className?: string
+}
+
+export function PostListSidebar({ className }: PostListSidebarProps) {
   const {
     state: { selectedIds, sortOrder, searchQuery, profile },
     actions: { togglePost, toggleAll, setSortOrder, setSearchQuery },
@@ -15,7 +19,7 @@ export function PostListSidebar() {
   if (!profile) return null
 
   return (
-    <div className="w-80 border-l border-gray-200 flex flex-col bg-white">
+    <div className={className ?? "w-80 border-l border-gray-200 flex flex-col bg-white"}>
       {/* Profile + Controls */}
       <div className="p-4 border-b border-gray-100 space-y-3">
         <div className="flex items-center gap-3">
