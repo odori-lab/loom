@@ -3,12 +3,22 @@ import chromium from '@sparticuz/chromium'
 import { PDFDocument } from 'pdf-lib'
 import { generatePageHtml } from './generator'
 
-export async function renderPagesToPdf(pages: string[]): Promise<Buffer> {
-  const browser = await puppeteer.launch({
+async function getBrowser() {
+  if (process.env.NODE_ENV === 'development') {
+    return puppeteer.launch({
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      headless: true,
+    })
+  }
+  return puppeteer.launch({
     args: chromium.args,
     executablePath: await chromium.executablePath(),
     headless: true,
   })
+}
+
+export async function renderPagesToPdf(pages: string[]): Promise<Buffer> {
+  const browser = await getBrowser()
 
   const mergedPdf = await PDFDocument.create()
 

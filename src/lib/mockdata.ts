@@ -10,7 +10,7 @@ export const MOCK_PROFILE: ThreadsProfile = {
 
 export const MOCK_POSTS: ThreadsPost[] = [
   {
-    id: '3823934700691949717_63898026705',
+    id: '3823934700691949717_63898026708',
     username: 'whatthesol',
     content: `
     우리 집 앞에 '유미' 라는 아시아 마트가 생겼다.
