@@ -21,6 +21,7 @@ jobs:
 
       - name: Run Claude Code Review
         uses: anthropics/claude-code-action@v1
+        continue-on-error: true
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: "/review. Write the entire review and all comments in Korean. Explain in detail and logically, using simple words so that even an elementary school student can understand (자세하고 논리적으로, 초등학생도 이해할 수 있게 쉬운 말로)."
