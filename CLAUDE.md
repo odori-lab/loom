@@ -12,7 +12,7 @@ Loom은 Threads 프로필의 포스트를 A5 PDF 책으로 변환하는 웹 서�
 - **PDF**: Puppeteer (HTML → PDF 렌더링) + pdf-lib (후처리)
 - **Scraping**: Apify API (Threads 포스트 수집)
 - **i18n**: 자체 구현 (ko/en, React Context)
-- **Design**: Pencil `.pen` 파일 (`pencil/loom.pen`) — Lunaris 디자인 시스템
+- **Design**: Pencil `.pen` 파일 (`pencil/loom.pen`)
 
 ## Project Structure
 
