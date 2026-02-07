@@ -8,6 +8,50 @@ import { DownloadIcon, TrashIcon, PlusIcon, BookOpenIcon } from '@/components/ui
 
 type Loom = Database['public']['Tables']['looms']['Row']
 
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
+const EmptyState = (
+  <main className="flex-1 flex items-center justify-center bg-gradient-to-b from-gray-50 to-white">
+    <div className="text-center py-16 px-8">
+      <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center shadow-sm">
+        <BookOpenIcon className="w-10 h-10 text-gray-400" />
+      </div>
+      <h3 className="text-xl font-semibold text-gray-900 mb-2">No Looms yet</h3>
+      <p className="text-gray-500 mb-8 max-w-sm">
+        Transform your Threads posts into beautiful PDFs
+      </p>
+      <Link
+        href="/create"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 hover:scale-105 transition-all shadow-lg shadow-gray-900/20"
+      >
+        <PlusIcon className="w-5 h-5" />
+        Create Your First Loom
+      </Link>
+    </div>
+  </main>
+)
+
+const SelectPlaceholder = (
+  <div className="flex-1 flex items-center justify-center">
+    <div className="text-center">
+      <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gray-200/50 flex items-center justify-center">
+        <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      </div>
+      <p className="text-gray-500 font-medium">Select a Loom to preview</p>
+      <p className="text-sm text-gray-400 mt-1">Click on any item from the list</p>
+    </div>
+  </div>
+)
+
 interface MyPageContentProps {
   initialLooms: Loom[]
 }
@@ -61,35 +105,8 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
     window.open(url, '_blank')
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
-  }
-
   if (looms.length === 0) {
-    return (
-      <main className="flex-1 flex items-center justify-center bg-gradient-to-b from-gray-50 to-white">
-        <div className="text-center py-16 px-8">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center shadow-sm">
-            <BookOpenIcon className="w-10 h-10 text-gray-400" />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Looms yet</h3>
-          <p className="text-gray-500 mb-8 max-w-sm">
-            Transform your Threads posts into beautiful PDFs
-          </p>
-          <Link
-            href="/create"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 hover:scale-105 transition-all shadow-lg shadow-gray-900/20"
-          >
-            <PlusIcon className="w-5 h-5" />
-            Create Your First Loom
-          </Link>
-        </div>
-      </main>
-    )
+    return EmptyState
   }
 
   return (
@@ -220,20 +237,7 @@ export function MyPageContent({ initialLooms }: MyPageContentProps) {
               )}
             </div>
           </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gray-200/50 flex items-center justify-center">
-                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </div>
-              <p className="text-gray-500 font-medium">Select a Loom to preview</p>
-              <p className="text-sm text-gray-400 mt-1">Click on any item from the list</p>
-            </div>
-          </div>
-        )}
+        ) : SelectPlaceholder}
       </div>
     </main>
   )
