@@ -47,6 +47,7 @@ function SpreadViewer({ url }: { url: string }) {
   const [flipState, setFlipState] = useState<{
     direction: 'forward' | 'backward'
     targetSpread: number
+    phase: 'start' | 'animating'
   } | null>(null)
 
   const spreads = useMemo(() => buildSpreads(numPages), [numPages])
@@ -57,8 +58,17 @@ function SpreadViewer({ url }: { url: string }) {
     if (flipState) return
     const target = direction === 'forward' ? currentSpread + 1 : currentSpread - 1
     if (target < 0 || target >= totalSpreads) return
-    setFlipState({ direction, targetSpread: target })
+    setFlipState({ direction, targetSpread: target, phase: 'start' })
   }, [flipState, currentSpread, totalSpreads])
+
+  // Start flip transition after mount so CSS transition runs
+  useEffect(() => {
+    if (!flipState || flipState.phase !== 'start') return
+    const id = requestAnimationFrame(() => {
+      setFlipState(prev => prev && prev.phase === 'start' ? { ...prev, phase: 'animating' } : prev)
+    })
+    return () => cancelAnimationFrame(id)
+  }, [flipState])
 
   const handleFlipEnd = useCallback(() => {
     if (!flipState) return
