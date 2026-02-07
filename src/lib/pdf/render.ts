@@ -1,11 +1,13 @@
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-core'
+import chromium from '@sparticuz/chromium'
 import { PDFDocument } from 'pdf-lib'
 import { generatePageHtml } from './generator'
 
 export async function renderPagesToPdf(pages: string[]): Promise<Buffer> {
   const browser = await puppeteer.launch({
+    args: chromium.args,
+    executablePath: await chromium.executablePath(),
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
   })
 
   const mergedPdf = await PDFDocument.create()
