@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
+import chromium from '@sparticuz/chromium-min'
 import { PDFDocument } from 'pdf-lib'
 import { generatePageHtml } from './generator'
 
@@ -10,10 +10,19 @@ async function getBrowser() {
       headless: true,
     })
   }
+
+  // Load fonts for production (serverless) environment
+  await chromium.font(
+    'https://raw.githack.com/googlei18n/noto-cjk/master/NotoSansCJKkr-Regular.otf'
+  )
+
   return puppeteer.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(),
-    headless: true,
+    args: [...chromium.args, '--disable-gpu', '--single-process'],
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath(
+      'https://github.com/Sparticuz/chromium/releases/download/v143.0.0/chromium-v143.0.0-pack.tar'
+    ),
+    headless: chromium.headless,
   })
 }
 
