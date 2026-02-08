@@ -11,18 +11,10 @@ async function getBrowser() {
     })
   }
 
-  // Load fonts for production (serverless) environment
-  await chromium.font(
-    'https://raw.githack.com/googlei18n/noto-cjk/master/NotoSansCJKkr-Regular.otf'
-  )
-
   return puppeteer.launch({
     args: [...chromium.args, '--disable-gpu', '--single-process'],
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(
-      'https://github.com/Sparticuz/chromium/releases/download/v143.0.0/chromium-v143.0.0-pack.tar'
-    ),
-    headless: chromium.headless,
+    executablePath: await chromium.executablePath(),
+    headless: true,
   })
 }
 
