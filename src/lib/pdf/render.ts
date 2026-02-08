@@ -1,38 +1,42 @@
-import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
+import { chromium } from 'playwright'
 import { PDFDocument } from 'pdf-lib'
 import { generatePageHtml } from './generator'
 
 async function getBrowser() {
   if (process.env.NODE_ENV === 'development') {
-    return puppeteer.launch({
-      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    return chromium.launch({
       headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     })
   }
 
-  // For Vercel serverless environment
-  // Set environment variables for fonts
-  process.env.FONTCONFIG_PATH = process.env.FONTCONFIG_PATH || '/tmp'
-  process.env.HOME = process.env.HOME || '/tmp'
-
-  return puppeteer.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(),
+  // Production (Vercel) - use bundled chromium
+  return chromium.launch({
     headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--disable-gpu',
+    ],
   })
 }
 
 export async function renderPagesToPdf(pages: string[]): Promise<Buffer> {
   const browser = await getBrowser()
+  const context = await browser.newContext()
 
   const mergedPdf = await PDFDocument.create()
 
   for (const pageContent of pages) {
-    const page = await browser.newPage()
+    const page = await context.newPage()
 
     const htmlContent = generatePageHtml(pageContent)
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
+    await page.setContent(htmlContent, { waitUntil: 'networkidle' })
 
     const pdfBuffer = await page.pdf({
       width: '148mm',
@@ -48,6 +52,7 @@ export async function renderPagesToPdf(pages: string[]): Promise<Buffer> {
     await page.close()
   }
 
+  await context.close()
   await browser.close()
 
   return Buffer.from(await mergedPdf.save())

@@ -1,7 +1,12 @@
 'use client'
 
 import { useDashboard } from './DashboardContext'
-import { PdfPageViewer } from '@/components/ui/PdfPageViewer'
+import dynamic from 'next/dynamic'
+
+const PdfPageViewer = dynamic(
+  () => import('@/components/ui/PdfPageViewer').then((mod) => mod.PdfPageViewer),
+  { ssr: false }
+)
 
 export function LoomPreviewPanel() {
   const { selectedLoom, previewUrl, loadingPreview, openPreviewModal } = useDashboard()

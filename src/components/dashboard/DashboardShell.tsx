@@ -6,9 +6,14 @@ import { DashboardProvider, useDashboard } from './DashboardContext'
 import { Sidebar } from './Sidebar'
 import { LoomsTab } from './LoomsTab'
 import { LoomPreviewPanel } from './LoomPreviewPanel'
-import { PreviewModal } from './PreviewModal'
 import { CreateTabContent, CreateTabRightPanel } from './CreateTab'
 import { CreateFlowProvider } from '@/components/create/CreateFlowProvider'
+import dynamic from 'next/dynamic'
+
+const PreviewModal = dynamic(
+  () => import('./PreviewModal').then((mod) => mod.PreviewModal),
+  { ssr: false }
+)
 
 type Loom = Database['public']['Tables']['looms']['Row']
 

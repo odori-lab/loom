@@ -1,101 +1,214 @@
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
+import { chromium } from 'playwright'
 
 interface ScrapeResult {
   posts: ThreadsPost[]
   profile: ThreadsProfile
+  hasMore: boolean
 }
 
-export async function scrapeThreads(username: string): Promise<ScrapeResult> {
-  const apifyToken = process.env.APIFY_TOKEN
-  if (!apifyToken) {
-    throw new Error('APIFY_TOKEN environment variable is not set')
-  }
-
-  const response = await fetch(
-    `https://api.apify.com/v2/acts/canadesk~threads/run-sync-get-dataset-items?token=${apifyToken}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        keyword: [username],
-        process: 'gt', // get threads for a user
-        maximum: 100,
-        proxy: {
-          useApifyProxy: true,
-        },
-      }),
-    }
-  )
-
-  if (!response.ok) {
-    const errorText = await response.text()
-    console.error(`Failed to scrape threads from Apify: ${response.status} ${errorText}`)
-    throw new Error(`Failed to scrape threads: ${response.status}`)
-  }
-
-  const result: any[] = await response.json()
-
-  const userData = result?.[0]?.data
-  if (!userData) {
-    throw new Error('No data found for this user')
-  }
-
-  // Extract profile info
-  const profile: ThreadsProfile = {
-    username: userData.username || username,
-    displayName: userData.fullName || userData.username || username,
-    bio: userData.bio || '',
-    followerCount: userData.followerCount || 0,
-    profileImageUrl: userData.profilePicUrl || '',
-  }
-
-  // Extract posts
-  const apifyThreads = userData.threads || []
-  if (!Array.isArray(apifyThreads)) {
-    return { posts: [], profile }
-  }
-
-  const posts: ThreadsPost[] = apifyThreads.map((post: any) => ({
-    id: post.id || crypto.randomUUID(),
-    username: profile.username,
-    content: post.text || '',
-    imageUrls: extractImageUrls(post),
-    likeCount: post.like_count || 0,
-    replyCount: post.direct_reply_count || 0,
-    repostCount: post.repost_count || 0,
-    postedAt: new Date(post.timestamp * 1000),
-  }))
-
-  // Sort by date (newest first)
-  posts.sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime())
-
-  return { posts, profile }
+interface ScrapeOptions {
+  limit?: number
+  cursor?: string
 }
 
-// TODO: image 제대로 불러와야 댐
-function extractImageUrls(post: any): string[] {
-  const urls: string[] = []
+let browserInstance: any = null
 
-  // Try medias array
-  if (post.medias && Array.isArray(post.medias)) {
-    for (const media of post.medias) {
-      if (media.url) {
-        urls.push(media.url)
+async function getBrowser() {
+  if (browserInstance) {
+    return browserInstance
+  }
+
+  const isLocal = process.env.NODE_ENV === 'development'
+
+  if (isLocal) {
+    // Local development - use installed Chrome
+    browserInstance = await chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    })
+  } else {
+    // Production (Vercel) - use bundled chromium
+    browserInstance = await chromium.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu',
+      ],
+    })
+  }
+
+  return browserInstance
+}
+
+export async function scrapeThreads(
+  username: string,
+  options: ScrapeOptions = {}
+): Promise<ScrapeResult> {
+  const threadsUsername = process.env.THREADS_USERNAME
+  const threadsPassword = process.env.THREADS_PASSWORD
+
+  if (!threadsUsername || !threadsPassword) {
+    throw new Error('THREADS_USERNAME and THREADS_PASSWORD environment variables are required')
+  }
+
+  const browser = await getBrowser()
+  const context = await browser.newContext({
+    viewport: { width: 1920, height: 1080 },
+    userAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  })
+  const page = await context.newPage()
+
+  try {
+    // Navigate to Threads login
+    console.log('[SCRAPER] Navigating to Threads login...')
+    await page.goto('https://www.threads.net/login', {
+      waitUntil: 'networkidle',
+      timeout: 30000,
+    })
+
+    // Wait for login form and enter credentials
+    console.log('[SCRAPER] Logging in...')
+    await page.waitForSelector('input[type="text"]', { timeout: 10000 })
+    await page.fill('input[type="text"]', threadsUsername)
+    await page.fill('input[type="password"]', threadsPassword)
+
+    // Click login button
+    await page.click('button[type="submit"]')
+    await page.waitForLoadState('networkidle', { timeout: 30000 })
+
+    // Navigate to user profile
+    console.log(`[SCRAPER] Navigating to @${username} profile...`)
+    await page.goto(`https://www.threads.net/@${username}`, {
+      waitUntil: 'networkidle',
+      timeout: 30000,
+    })
+
+    // Wait for profile to load
+    await page.waitForSelector('span[dir="auto"]', { timeout: 10000 })
+
+    // Extract profile info
+    const profile = await page.evaluate((uname: string) => {
+      const displayNameEl = document.querySelector('h1 span[dir="auto"]')
+      const bioEl = document.querySelector('div[dir="auto"][style*="line-height"]')
+      const profileImgEl = document.querySelector('img[crossorigin="anonymous"]')
+      const followerEl = Array.from(document.querySelectorAll('a[role="link"]')).find(
+        (el) => el.textContent?.includes('followers')
+      )
+
+      return {
+        username: uname,
+        displayName: displayNameEl?.textContent || uname,
+        bio: bioEl?.textContent || '',
+        followerCount: followerEl
+          ? parseInt(followerEl.textContent?.replace(/[^0-9]/g, '') || '0')
+          : 0,
+        profileImageUrl: (profileImgEl as HTMLImageElement)?.src || '',
       }
-    }
-  }
+    }, username)
 
-  // Try media array (alternative format)
-  if (post.media && Array.isArray(post.media)) {
-    for (const media of post.media) {
-      if (media.url) {
-        urls.push(media.url)
+    console.log('[SCRAPER] Profile extracted:', profile)
+
+    // Scroll and collect posts
+    const limit = options.limit || 50
+    let posts: ThreadsPost[] = []
+    let lastHeight = 0
+    let scrollAttempts = 0
+    const maxScrollAttempts = 10
+
+    console.log(`[SCRAPER] Collecting up to ${limit} posts...`)
+
+    while (posts.length < limit && scrollAttempts < maxScrollAttempts) {
+      // Extract posts from current viewport
+      const newPosts = await page.evaluate((uname: string) => {
+        const postElements = Array.from(document.querySelectorAll('div[role="button"]')).filter(
+          (el) => {
+            const text = el.textContent || ''
+            return text.includes('ago') || text.includes('Like') || text.includes('Reply')
+          }
+        )
+
+        return postElements.slice(0, 50).map((el, idx) => {
+          const contentEl = el.querySelector('span[dir="auto"]')
+          const timeEl = Array.from(el.querySelectorAll('time')).find((t) => t.dateTime)
+          const likeEl = Array.from(el.querySelectorAll('span')).find((s) =>
+            s.textContent?.toLowerCase().includes('like')
+          )
+          const replyEl = Array.from(el.querySelectorAll('span')).find((s) =>
+            s.textContent?.toLowerCase().includes('repl')
+          )
+
+          // Extract images
+          const imageEls = Array.from(el.querySelectorAll('img[src^="https://"]')).slice(0, 2)
+          const imageUrls = imageEls
+            .map((img) => (img as HTMLImageElement).src)
+            .filter((src) => !src.includes('avatar') && !src.includes('profile'))
+
+          return {
+            id: `${uname}-${Date.now()}-${idx}`,
+            username: uname,
+            content: contentEl?.textContent || '',
+            imageUrls: imageUrls,
+            likeCount: parseInt(likeEl?.textContent?.replace(/[^0-9]/g, '') || '0'),
+            replyCount: parseInt(replyEl?.textContent?.replace(/[^0-9]/g, '') || '0'),
+            repostCount: 0,
+            postedAt: timeEl?.dateTime || new Date().toISOString(),
+          }
+        })
+      }, username)
+
+      // Add new posts (deduplicate by content)
+      const existingContents = new Set(posts.map((p) => p.content))
+      const uniqueNewPosts = (newPosts as ThreadsPost[]).filter((p) => p.content && !existingContents.has(p.content))
+
+      posts.push(...uniqueNewPosts)
+      console.log(`[SCRAPER] Collected ${posts.length} unique posts so far...`)
+
+      // Scroll down
+      await page.evaluate(() => window.scrollBy(0, window.innerHeight))
+      await page.waitForTimeout(1500)
+
+      // Check if we've reached the bottom
+      const newHeight = await page.evaluate(() => document.body.scrollHeight)
+      if (newHeight === lastHeight) {
+        scrollAttempts++
+      } else {
+        scrollAttempts = 0
       }
+      lastHeight = newHeight
     }
-  }
 
-  // Limit to first 2 images as per design spec
-  return urls.slice(0, 2)
+    // Limit posts and sort by date
+    posts = posts.slice(0, limit)
+    posts.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
+
+    console.log(`[SCRAPER] Successfully collected ${posts.length} posts`)
+
+    return {
+      posts,
+      profile,
+      hasMore: posts.length >= limit,
+    }
+  } catch (error) {
+    console.error('[SCRAPER] Error:', error)
+    throw error
+  } finally {
+    await page.close()
+    await context.close()
+  }
 }
+
+// Close browser on process exit
+process.on('exit', async () => {
+  if (browserInstance) {
+    await browserInstance.close()
+    browserInstance = null
+  }
+})

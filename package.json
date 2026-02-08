@@ -6,16 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "playwright install chromium --with-deps"
   },
   "dependencies": {
     "@fontsource/pretendard": "^5.2.5",
-    "@sparticuz/chromium": "^143.0.4",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.94.0",
     "next": "16.1.6",
     "pdf-lib": "^1.17.1",
-    "puppeteer-core": "^24.37.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-pdf": "^10.3.0"
@@ -27,7 +26,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-    "playwright": "^1.58.1",
+    "playwright": "^1.58.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
