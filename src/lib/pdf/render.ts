@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
+import chromium from '@sparticuz/chromium-min'
 import { PDFDocument } from 'pdf-lib'
 import { generatePageHtml } from './generator'
 
@@ -10,8 +10,9 @@ async function getBrowser() {
       headless: true,
     })
   }
+
   return puppeteer.launch({
-    args: chromium.args,
+    args: [...chromium.args, '--disable-gpu', '--single-process'],
     executablePath: await chromium.executablePath(),
     headless: true,
   })
