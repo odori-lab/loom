@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium-min'
+import chromium from '@sparticuz/chromium'
 import { PDFDocument } from 'pdf-lib'
 import { generatePageHtml } from './generator'
 
@@ -11,8 +11,13 @@ async function getBrowser() {
     })
   }
 
+  // For Vercel serverless environment
+  // Set environment variables for fonts
+  process.env.FONTCONFIG_PATH = process.env.FONTCONFIG_PATH || '/tmp'
+  process.env.HOME = process.env.HOME || '/tmp'
+
   return puppeteer.launch({
-    args: [...chromium.args, '--disable-gpu', '--single-process'],
+    args: chromium.args,
     executablePath: await chromium.executablePath(),
     headless: true,
   })
