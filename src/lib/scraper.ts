@@ -1,6 +1,6 @@
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
 import { chromium } from 'playwright-core'
-import chromiumPkg from '@sparticuz/chromium'
+import chromiumPkg from '@sparticuz/chromium-min'
 
 interface ScrapeResult {
   posts: ThreadsPost[]
