@@ -31,7 +31,6 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
   const [downloadUrl, setDownloadUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [hasMore, setHasMore] = useState(false)
   const [error, setError] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     () => new Set(USE_MOCK_DATA ? MOCK_POSTS.map(p => p.id) : [])
@@ -40,6 +39,7 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
   const [searchQuery, setSearchQuery] = useState('')
   const [currentSpread, setCurrentSpread] = useState(0)
   const [currentUsername, setCurrentUsername] = useState('')
+  const [displayLimit, setDisplayLimit] = useState(10) // Start with 10 posts
 
   // Derived values
   const currentStepIndex = STEPS.indexOf(step)
@@ -53,11 +53,14 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
       )
     }
 
-    return result.toSorted((a, b) => {
+    const sorted = result.toSorted((a, b) => {
       const diff = new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
       return sortOrder === 'newest' ? diff : -diff
     })
-  }, [posts, searchQuery, sortOrder])
+
+    // Only show up to displayLimit posts for infinite scroll
+    return sorted.slice(0, displayLimit)
+  }, [posts, searchQuery, sortOrder, displayLimit])
 
   const selectedPosts = useMemo(() => {
     return posts
@@ -83,15 +86,15 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
       const res = await fetch('/api/scrape', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, limit: 30 })
+        body: JSON.stringify({ username, limit: 100 }) // Fetch 100 posts upfront
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
 
       setPosts(data.posts)
       setProfile(data.profile)
-      setHasMore(data.hasMore)
       setCurrentUsername(username)
+      setDisplayLimit(10) // Reset to show first 10
       setSelectedIds(new Set(data.posts.map((p: ThreadsPost) => p.id)))
       setStep('select')
     } catch (err: any) {
@@ -101,41 +104,17 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
     }
   }
 
-  const loadMorePosts = async () => {
-    if (!currentUsername || loadingMore || !hasMore) return
+  const loadMorePosts = () => {
+    // Client-side pagination: just increase display limit
+    if (displayLimit >= posts.length) return
 
     setLoadingMore(true)
-    try {
-      const res = await fetch('/api/scrape', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: currentUsername,
-          limit: 20,
-          cursor: posts.length.toString(),
-        })
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
 
-      // Deduplicate posts
-      const existingIds = new Set(posts.map(p => p.id))
-      const newPosts = data.posts.filter((p: ThreadsPost) => !existingIds.has(p.id))
-
-      setPosts(prev => [...prev, ...newPosts])
-      setHasMore(data.hasMore)
-
-      // Auto-select new posts
-      setSelectedIds(prev => {
-        const next = new Set(prev)
-        newPosts.forEach((p: ThreadsPost) => next.add(p.id))
-        return next
-      })
-    } catch (err: any) {
-      console.error('[LOAD_MORE_ERROR]', err)
-    } finally {
+    // Simulate loading delay for smooth UX
+    setTimeout(() => {
+      setDisplayLimit(prev => Math.min(prev + 10, posts.length))
       setLoadingMore(false)
-    }
+    }, 300)
   }
 
   const generateLoom = async () => {
@@ -208,8 +187,11 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
     setStep('username')
   }
 
+  // Compute hasMore based on client-side pagination
+  const computedHasMore = displayLimit < posts.length
+
   const value: CreateFlowContextValue = {
-    state: { step, posts, profile, downloadUrl, loading, loadingMore, hasMore, error, selectedIds, sortOrder, searchQuery, currentSpread },
+    state: { step, posts, profile, downloadUrl, loading, loadingMore, hasMore: computedHasMore, error, selectedIds, sortOrder, searchQuery, currentSpread },
     actions: { submitUsername, generateLoom, createAnother, togglePost, toggleAll, setSortOrder, setSearchQuery, prevSpread, nextSpread, goBack, loadMorePosts },
     meta: { steps: STEPS, currentStepIndex, filteredAndSortedPosts, selectedPosts, pages, spreads, currentSpreadData: spreads[currentSpread], selectedCount: selectedIds.size, totalSpreads: spreads.length },
   }
