@@ -13,6 +13,9 @@ interface ScrapeOptions {
 }
 
 let browserInstance: any = null
+let contextInstance: any = null
+let lastLoginTime: number = 0
+const SESSION_LIFETIME = 30 * 60 * 1000 // 30 minutes
 
 async function getBrowser() {
   if (browserInstance) {
@@ -55,24 +58,11 @@ async function getBrowser() {
   return browserInstance
 }
 
-export async function scrapeThreads(
-  username: string,
-  options: ScrapeOptions = {}
-): Promise<ScrapeResult> {
-  const threadsUsername = process.env.THREADS_USERNAME
-  const threadsPassword = process.env.THREADS_PASSWORD
-
-  if (!threadsUsername || !threadsPassword) {
-    throw new Error('THREADS_USERNAME and THREADS_PASSWORD environment variables are required')
-  }
-
-  const browser = await getBrowser()
+async function createContext(browser: any) {
   const context = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
     userAgent:
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    // Add extra headers to appear more like a real browser
-    // Note: Removed Upgrade-Insecure-Requests to avoid CORS issues
     extraHTTPHeaders: {
       'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
@@ -82,54 +72,89 @@ export async function scrapeThreads(
       'Sec-Fetch-Site': 'none',
       'Sec-Fetch-User': '?1',
     },
-    // Disable automation indicators
     ignoreHTTPSErrors: true,
   })
-  
+
   // Add script to hide webdriver property
   await context.addInitScript(() => {
     Object.defineProperty(navigator, 'webdriver', {
       get: () => false,
     })
-    
+
     // Override permissions
     const originalQuery = window.navigator.permissions.query
     window.navigator.permissions.query = (parameters) =>
       parameters.name === 'notifications'
         ? Promise.resolve({ state: Notification.permission } as PermissionStatus)
         : originalQuery(parameters)
-    
+
     // Mock plugins
     Object.defineProperty(navigator, 'plugins', {
       get: () => [1, 2, 3, 4, 5],
     })
-    
+
     // Mock languages
     Object.defineProperty(navigator, 'languages', {
       get: () => ['ko-KR', 'ko', 'en-US', 'en'],
     })
   })
-  
+
+  return context
+}
+
+async function isSessionValid(context: any): Promise<boolean> {
+  try {
+    // Check if session is too old
+    const now = Date.now()
+    if (now - lastLoginTime > SESSION_LIFETIME) {
+      console.log('[SCRAPER] Session expired (30min)')
+      return false
+    }
+
+    // Check if we have valid Threads cookies
+    const cookies = await context.cookies()
+    const hasThreadsSession = cookies.some((cookie: any) =>
+      (cookie.name.includes('sessionid') || cookie.name.includes('ds_user_id')) &&
+      (cookie.domain.includes('threads.net') || cookie.domain.includes('threads.com'))
+    )
+
+    return hasThreadsSession
+  } catch (error) {
+    console.log('[SCRAPER] Error checking session validity:', error)
+    return false
+  }
+}
+
+async function loginToThreads(context: any): Promise<void> {
+  const threadsUsername = process.env.THREADS_USERNAME
+  const threadsPassword = process.env.THREADS_PASSWORD
+
+  if (!threadsUsername || !threadsPassword) {
+    throw new Error('THREADS_USERNAME and THREADS_PASSWORD environment variables are required')
+  }
+
+  console.log('[SCRAPER] Starting login process...')
+
   const page = await context.newPage()
-  
+
   // Set extra headers for the page
   await page.setExtraHTTPHeaders({
     'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
   })
-  
+
   // Remove webdriver property from page
   await page.addInitScript(() => {
     // @ts-ignore
     delete window.navigator.__proto__.webdriver
   })
-  
+
   // Intercept and modify network requests to add required headers
   await page.route('**/*', async (route: any) => {
     const request = route.request()
     const headers = {
       ...request.headers(),
     }
-    
+
     // Add CSRF token if available
     const cookies = await context.cookies()
     const csrfCookie = cookies.find((c: any) => c.name === 'csrftoken')
@@ -139,7 +164,7 @@ export async function scrapeThreads(
       headers['X-IG-App-ID'] = '238260118697367'
       headers['X-Instagram-AJAX'] = '1'
     }
-    
+
     await route.continue({ headers })
   })
 
@@ -175,7 +200,7 @@ export async function scrapeThreads(
 
     // Fill credentials directly on Threads login page (no Instagram button click needed)
     console.log('[SCRAPER] Waiting for Threads login form...')
-    
+
     // Wait for inputs to appear
     await page.waitForSelector('input[type="text"], input[placeholder*="사용자"], input[placeholder*="username"]', { timeout: 10000 })
 
@@ -202,7 +227,7 @@ export async function scrapeThreads(
     try {
       const usernameInput = page.locator('input[name="username"]').first()
       const passwordInput = page.locator('input[name="password"]').first()
-      
+
       if (await usernameInput.isVisible({ timeout: 3000 }) && await passwordInput.isVisible({ timeout: 3000 })) {
         await usernameInput.fill(threadsUsername)
         console.log('[SCRAPER] ✓ Username filled (by name="username")')
@@ -221,7 +246,7 @@ export async function scrapeThreads(
         const form = await page.locator('form').first()
         const formInputs = await form.locator('input[type="text"], input[type="password"]').all()
         console.log(`[SCRAPER] Found ${formInputs.length} inputs in form`)
-        
+
         if (formInputs.length >= 2) {
           // First input is username, second is password
           await formInputs[0].fill(threadsUsername)
@@ -241,9 +266,9 @@ export async function scrapeThreads(
       try {
         const textInputs = await page.locator('input[type="text"]').all()
         const passwordInputs = await page.locator('input[type="password"]').all()
-        
+
         console.log(`[SCRAPER] Found ${textInputs.length} text inputs, ${passwordInputs.length} password inputs`)
-        
+
         if (textInputs.length > 0 && passwordInputs.length > 0) {
           await textInputs[0].fill(threadsUsername)
           console.log('[SCRAPER] ✓ Username filled (first text input)')
@@ -262,7 +287,7 @@ export async function scrapeThreads(
       try {
         const allInputs = await page.locator('input').all()
         console.log(`[SCRAPER] Found ${allInputs.length} total inputs`)
-        
+
         // Filter out hidden inputs
         const visibleInputs = []
         for (const input of allInputs) {
@@ -272,13 +297,13 @@ export async function scrapeThreads(
             visibleInputs.push(input)
           }
         }
-        
+
         console.log(`[SCRAPER] Found ${visibleInputs.length} visible inputs`)
-        
+
         if (visibleInputs.length >= 2) {
           const firstType = await visibleInputs[0].getAttribute('type')
           const secondType = await visibleInputs[1].getAttribute('type')
-          
+
           if (firstType === 'text' && secondType === 'password') {
             await visibleInputs[0].fill(threadsUsername)
             console.log('[SCRAPER] ✓ Username filled (visible input[0])')
@@ -317,10 +342,10 @@ export async function scrapeThreads(
 
     // Find and click login button
     console.log('[SCRAPER] Looking for login button...')
-    
+
     // Wait a bit longer to ensure page is fully loaded and scripts are ready
     await page.waitForTimeout(2000)
-    
+
     // Get CSRF token from cookies before login
     const cookiesBefore = await context.cookies()
     const csrfCookie = cookiesBefore.find((c: any) => c.name === 'csrftoken')
@@ -412,7 +437,7 @@ export async function scrapeThreads(
     }
 
     console.log(`[SCRAPER] Login button clicked using method: ${clickMethod}`)
-    
+
     // Monitor network requests to see if login API is called and what status it returns
     let loginApiStatus: number | null = null
     const responseHandler = (response: any) => {
@@ -428,13 +453,13 @@ export async function scrapeThreads(
       }
     }
     page.on('response', responseHandler)
-    
+
     // Wait for login request to be sent and processed
     await page.waitForTimeout(3000)
-    
+
     // Remove handler after checking
     page.off('response', responseHandler)
-    
+
     if (loginApiStatus === 403) {
       console.log('[SCRAPER] ⚠️  Login API returned 403 - request was blocked')
       console.log('[SCRAPER] This may be due to:')
@@ -446,7 +471,7 @@ export async function scrapeThreads(
     }
 
     console.log('[SCRAPER] Waiting for login to complete and redirect to Threads...')
-    
+
     // Wait for redirect to Threads (threads.net or threads.com, not login page)
     // This is critical - we must wait for redirect before proceeding
     let redirected = false
@@ -458,7 +483,7 @@ export async function scrapeThreads(
         const isNotLogin = !urlString.includes('/login')
         return isThreads && isNotLogin
       }, { timeout: 20000 })
-      
+
       const redirectedUrl = page.url()
       console.log(`[SCRAPER] ✓ Redirected to Threads: ${redirectedUrl}`)
       redirected = true
@@ -466,7 +491,7 @@ export async function scrapeThreads(
       const currentUrl = page.url()
       console.log(`[SCRAPER] ⚠️  Redirect timeout: ${e?.message || 'Unknown error'}`)
       console.log(`[SCRAPER] Current URL: ${currentUrl}`)
-      
+
       // If still on login page after timeout, login likely failed
       if (currentUrl.includes('/login')) {
         // If we got 403, provide more specific error message
@@ -500,9 +525,9 @@ export async function scrapeThreads(
     const cookieNames = cookiesAfter.map((c: any) => c.name)
     console.log(`[SCRAPER] Cookies after login: ${cookiesAfter.length}`)
     console.log(`[SCRAPER] Cookie names: ${cookieNames.join(', ')}`)
-    
-    const hasSessionCookie = cookiesAfter.some((cookie: any) => 
-      cookie.name.includes('sessionid') || 
+
+    const hasSessionCookie = cookiesAfter.some((cookie: any) =>
+      cookie.name.includes('sessionid') ||
       cookie.name.includes('csrftoken') ||
       cookie.name.includes('ds_user_id') ||
       cookie.name.includes('mid') ||
@@ -514,7 +539,7 @@ export async function scrapeThreads(
     // Check if we're still on login page or redirected to Threads
     const isStillOnLoginPage = currentUrl.includes('/login')
     const isOnThreads = currentUrl.includes('threads.net') || currentUrl.includes('threads.com')
-    
+
     const loginCheck = await page.evaluate(() => {
       const bodyText = document.body.textContent || ''
       const title = document.title
@@ -542,20 +567,20 @@ export async function scrapeThreads(
       console.log(`[SCRAPER]    Still on login page: ${isStillOnLoginPage}`)
       console.log(`[SCRAPER]    Has session cookies: ${hasSessionCookie}`)
       console.log(`[SCRAPER]    Cookies before: ${cookiesBefore.length}, after: ${cookiesAfter.length}`)
-      
+
       // Check if cookies changed
       const newCookies = cookiesAfter.filter((c: any) => !cookiesBefore.some((b: any) => b.name === c.name && b.value === c.value))
       console.log(`[SCRAPER]    New cookies: ${newCookies.length}`)
       if (newCookies.length > 0) {
         console.log(`[SCRAPER]    New cookie names: ${newCookies.map((c: any) => c.name).join(', ')}`)
       }
-      
+
       // Try to see if there's an error message
       const errorText = await page.evaluate(() => {
         const errorEls = Array.from(document.querySelectorAll('div, span, p, [role="alert"]')).filter(el => {
           const text = el.textContent || ''
           const ariaLabel = el.getAttribute('aria-label') || ''
-          return text.includes('틀렸') || text.includes('incorrect') || text.includes('잘못') || 
+          return text.includes('틀렸') || text.includes('incorrect') || text.includes('잘못') ||
                  text.includes('error') || text.includes('Error') ||
                  ariaLabel.includes('error') || ariaLabel.includes('틀렸')
         })
@@ -567,12 +592,12 @@ export async function scrapeThreads(
       if (errorText.length > 0) {
         console.log(`[SCRAPER]    Error messages found:`, JSON.stringify(errorText, null, 2))
       }
-      
+
       if (process.env.SCRAPER_DEBUG === 'true') {
         await page.screenshot({ path: 'debug-login-failed.png', fullPage: true })
         console.log('[SCRAPER] Screenshot saved: debug-login-failed.png')
       }
-      
+
       // If we got 403, provide specific error message about account blocking
       if (loginApiStatus === 403) {
         throw new Error(
@@ -581,7 +606,7 @@ export async function scrapeThreads(
           `Please wait 1-2 hours before retrying, or try using a different account.`
         )
       }
-      
+
       throw new Error('Login failed - authentication not successful. Check credentials or 2FA requirements.')
     } else {
       console.log('[SCRAPER] ✅ Login appears successful')
@@ -589,7 +614,7 @@ export async function scrapeThreads(
 
     // Wait for redirect to Threads after login - use event-based waiting instead of timeout
     console.log('[SCRAPER] Waiting for redirect to Threads...')
-    
+
     // Set up navigation listener to detect when we're redirected to Threads
     const navigationPromise = page.waitForURL(
       (url: URL) => url.toString().includes('threads.net') || url.toString().includes('threads.com'),
@@ -599,16 +624,16 @@ export async function scrapeThreads(
     // Check if we're on Instagram's "save login info" page
     const currentUrlAfterLogin = page.url()
     const isOnSaveLoginPage = currentUrlAfterLogin.includes('onetap') || currentUrlAfterLogin.includes('accounts/onetap')
-    
+
     if (isOnSaveLoginPage) {
       console.log('[SCRAPER] Detected Instagram save login info page, looking for save button...')
-      
+
       // Wait a bit for the page to fully render
       await page.waitForTimeout(2000)
-      
+
       // Try multiple selectors for save button
       let saveButtonClicked = false
-      
+
       // Method 1: Korean "저장하기"
       try {
         const saveButton = page.locator('button:has-text("저장하기"), div[role="button"]:has-text("저장하기")').first()
@@ -620,7 +645,7 @@ export async function scrapeThreads(
       } catch (e) {
         // Continue to next method
       }
-      
+
       // Method 2: English "Save"
       if (!saveButtonClicked) {
         try {
@@ -634,7 +659,7 @@ export async function scrapeThreads(
           // Continue to next method
         }
       }
-      
+
       // Method 3: Find button by checking page text
       if (!saveButtonClicked) {
         try {
@@ -656,7 +681,7 @@ export async function scrapeThreads(
           console.log(`[SCRAPER] Method 3 failed: ${e instanceof Error ? e.message : 'Unknown error'}`)
         }
       }
-      
+
       if (saveButtonClicked) {
         // Wait for redirect after saving - but don't wait too long
         try {
@@ -674,38 +699,38 @@ export async function scrapeThreads(
     const urlAfterSave = page.url()
     if (urlAfterSave.includes('instagram.com') && !urlAfterSave.includes('threads')) {
       console.log('[SCRAPER] Still on Instagram, waiting for automatic redirect to Threads...')
-      
+
       try {
         // Wait for navigation to Threads (this will be triggered by Instagram's redirect)
         await navigationPromise
         const newUrl = page.url()
         console.log(`[SCRAPER] ✓ Redirected to: ${newUrl}`)
-        
+
         // Wait for Threads page to load
         await page.waitForLoadState('domcontentloaded', { timeout: 15000 })
         console.log('[SCRAPER] ✓ Threads page loaded')
-        
+
         // Wait a bit more for session cookies to be set
         await page.waitForTimeout(3000)
-        
+
         // Verify Threads session cookies are present
         const threadsCookies = await context.cookies()
-        const hasThreadsSession = threadsCookies.some((cookie: any) => 
+        const hasThreadsSession = threadsCookies.some((cookie: any) =>
           (cookie.name.includes('sessionid') || cookie.name.includes('ds_user_id')) &&
           (cookie.domain.includes('threads.net') || cookie.domain.includes('threads.com'))
         )
-        
+
         if (!hasThreadsSession) {
           console.log('[SCRAPER] ⚠️  No Threads session cookies found after redirect, waiting more...')
           await page.waitForTimeout(5000)
-          
+
           // Check again
           const threadsCookies2 = await context.cookies()
-          const hasThreadsSession2 = threadsCookies2.some((cookie: any) => 
+          const hasThreadsSession2 = threadsCookies2.some((cookie: any) =>
             (cookie.name.includes('sessionid') || cookie.name.includes('ds_user_id')) &&
             (cookie.domain.includes('threads.net') || cookie.domain.includes('threads.com'))
           )
-          
+
           if (!hasThreadsSession2) {
             console.log('[SCRAPER] ⚠️  Still no Threads session cookies - may need to refresh or re-login')
           } else {
@@ -717,7 +742,7 @@ export async function scrapeThreads(
       } catch (e: unknown) {
         console.log(`[SCRAPER] ⚠️  Automatic redirect didn't happen: ${e instanceof Error ? e.message : 'Unknown error'}`)
         console.log('[SCRAPER] Manually navigating to Threads...')
-        
+
         // Fallback: manually navigate to Threads
         try {
           await page.goto('https://www.threads.net', {
@@ -735,10 +760,10 @@ export async function scrapeThreads(
       console.log('[SCRAPER] ✓ Already on Threads, waiting for page to stabilize...')
       await page.waitForLoadState('domcontentloaded', { timeout: 10000 })
       await page.waitForTimeout(3000)
-      
+
       // Verify Threads session cookies
       const threadsCookies = await context.cookies()
-      const hasThreadsSession = threadsCookies.some((cookie: any) => 
+      const hasThreadsSession = threadsCookies.some((cookie: any) =>
         (cookie.name.includes('sessionid') || cookie.name.includes('ds_user_id')) &&
         (cookie.domain.includes('threads.net') || cookie.domain.includes('threads.com'))
       )
@@ -747,6 +772,81 @@ export async function scrapeThreads(
       // Unknown state, wait a bit
       await page.waitForTimeout(2000)
     }
+
+    // Update last login time on success
+    lastLoginTime = Date.now()
+    console.log('[SCRAPER] ✅ Login successful, session cached')
+  } finally {
+    await page.close()
+  }
+}
+
+async function getContext() {
+  // Check if we have a valid existing context
+  if (contextInstance) {
+    const isValid = await isSessionValid(contextInstance)
+    if (isValid) {
+      console.log('[SCRAPER] ♻️  Reusing existing session (no login needed)')
+      return contextInstance
+    } else {
+      console.log('[SCRAPER] Session invalid, creating new one...')
+      try {
+        await contextInstance.close()
+      } catch (e) {
+        // Ignore errors when closing invalid context
+      }
+      contextInstance = null
+    }
+  }
+
+  // Create new context and login
+  const browser = await getBrowser()
+  contextInstance = await createContext(browser)
+  await loginToThreads(contextInstance)
+
+  return contextInstance
+}
+
+export async function scrapeThreads(
+  username: string,
+  options: ScrapeOptions = {}
+): Promise<ScrapeResult> {
+  // Get or create authenticated context (login only once, reuse session)
+  const context = await getContext()
+  const page = await context.newPage()
+
+  // Set extra headers for the page
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+  })
+
+  // Remove webdriver property from page
+  await page.addInitScript(() => {
+    // @ts-ignore
+    delete window.navigator.__proto__.webdriver
+  })
+
+  // Intercept and modify network requests to add required headers
+  await page.route('**/*', async (route: any) => {
+    const request = route.request()
+    const headers = {
+      ...request.headers(),
+    }
+
+    // Add CSRF token if available
+    const cookies = await context.cookies()
+    const csrfCookie = cookies.find((c: any) => c.name === 'csrftoken')
+    if (csrfCookie && request.url().includes('/api/')) {
+      headers['X-CSRFToken'] = csrfCookie.value
+      headers['X-Requested-With'] = 'XMLHttpRequest'
+      headers['X-IG-App-ID'] = '238260118697367'
+      headers['X-Instagram-AJAX'] = '1'
+    }
+
+    await route.continue({ headers })
+  })
+
+  try {
 
     // Navigate to user profile
     console.log(`[SCRAPER] Navigating to @${username} profile...`)
@@ -895,11 +995,11 @@ export async function scrapeThreads(
     console.log('[SCRAPER] Profile extracted:', profile)
 
     // Scroll and collect posts
-    const limit = options.limit || 50
+    const limit = options.limit || 100
     let posts: ThreadsPost[] = []
     let lastHeight = 0
     let scrollAttempts = 0
-    const maxScrollAttempts = 10
+    const maxScrollAttempts = 15 // Increased for 100 posts
 
     console.log(`[SCRAPER] Collecting up to ${limit} posts...`)
 
@@ -1017,10 +1117,23 @@ export async function scrapeThreads(
     }
   } catch (error) {
     console.error('[SCRAPER] Error:', error)
+
+    // If session expired or invalid, clear context for retry
+    if (error instanceof Error && error.message.includes('Login failed')) {
+      console.log('[SCRAPER] Clearing invalid session context')
+      try {
+        await contextInstance?.close()
+      } catch (e) {
+        // Ignore
+      }
+      contextInstance = null
+      lastLoginTime = 0
+    }
+
     throw error
   } finally {
+    // Only close page, keep context alive for reuse
     await page.close()
-    await context.close()
   }
 }
 
