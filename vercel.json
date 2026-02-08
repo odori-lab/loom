@@ -8,10 +8,5 @@
       "maxDuration": 60,
       "memory": 1024
     }
-  },
-  "build": {
-    "env": {
-      "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "0"
-    }
   }
 }
