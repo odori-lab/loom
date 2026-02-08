@@ -10,7 +10,7 @@ Loom은 Threads 프로필의 포스트를 A5 PDF 책으로 변환하는 웹 서�
 - **Styling**: Tailwind CSS v4 (`@tailwindcss/postcss`)
 - **Auth / DB / Storage**: Supabase (Google OAuth, PostgreSQL, Storage)
 - **PDF**: Puppeteer (HTML → PDF 렌더링) + pdf-lib (후처리)
-- **Scraping**: Apify API (Threads 포스트 수집)
+- **Scraping**: Puppeteer 자체 구현 (Threads 로그인 + 무한 스크롤)
 - **i18n**: 자체 구현 (ko/en, React Context)
 - **Design**: Pencil `.pen` 파일 (`pencil/loom.pen`)
 
@@ -68,7 +68,8 @@ npm run lint      # ESLint 실행
 ```
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-APIFY_TOKEN=
+THREADS_USERNAME=
+THREADS_PASSWORD=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
