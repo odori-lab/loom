@@ -1,12 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['@sparticuz/chromium-min', 'playwright-core'],
-  outputFileTracingIncludes: {
-    '/api/scrape': ['node_modules/@sparticuz/chromium-min/**/*'],
-    '/api/generate-pdf': ['node_modules/@sparticuz/chromium-min/**/*'],
-    '/api/looms': ['node_modules/@sparticuz/chromium-min/**/*'],
-  },
+  serverExternalPackages: ['chrome-aws-lambda', 'puppeteer-core'],
   images: {
     remotePatterns: [
       {

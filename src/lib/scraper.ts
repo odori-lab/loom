@@ -1,6 +1,6 @@
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
-import { chromium } from 'playwright-core'
-import chromiumPkg from '@sparticuz/chromium-min'
+import puppeteer from 'puppeteer-core'
+import chromium from 'chrome-aws-lambda'
 
 interface ScrapeResult {
   posts: ThreadsPost[]
@@ -28,26 +28,26 @@ async function getBrowser() {
 
   if (isLocal) {
     // Local development - use installed Chrome
-    browserInstance = await chromium.launch({
+    browserInstance = await puppeteer.launch({
       headless: !debug, // Show browser in debug mode
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--disable-blink-features=AutomationControlled', // Hide automation
+        '--disable-blink-features=AutomationControlled',
         '--disable-features=IsolateOrigins,site-per-process',
       ],
       executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     })
   } else {
-    // Production (Vercel) - use AWS Lambda optimized chromium
-    browserInstance = await chromium.launch({
+    // Production (Vercel) - use chrome-aws-lambda
+    browserInstance = await puppeteer.launch({
       args: [
-        ...chromiumPkg.args,
+        ...chromium.args,
         '--disable-blink-features=AutomationControlled',
         '--disable-features=IsolateOrigins,site-per-process',
       ],
-      executablePath: await chromiumPkg.executablePath(),
-      headless: true,
+      executablePath: await chromium.executablePath,
+      headless: chromium.headless,
     })
   }
 
