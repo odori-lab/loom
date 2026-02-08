@@ -1,4 +1,5 @@
-import { chromium } from 'playwright'
+import { chromium } from 'playwright-core'
+import chromiumPkg from '@sparticuz/chromium'
 import { PDFDocument } from 'pdf-lib'
 import { generatePageHtml } from './generator'
 
@@ -11,18 +12,11 @@ async function getBrowser() {
     })
   }
 
-  // Production (Vercel) - use bundled chromium
+  // Production (Vercel) - use AWS Lambda optimized chromium
   return chromium.launch({
+    args: chromiumPkg.args,
+    executablePath: await chromiumPkg.executablePath(),
     headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--no-zygote',
-      '--disable-gpu',
-    ],
   })
 }
 
