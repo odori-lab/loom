@@ -3,6 +3,10 @@
     "src/app/api/generate-pdf/route.ts": {
       "maxDuration": 10,
       "memory": 1024
+    },
+    "src/app/api/looms/route.ts": {
+      "maxDuration": 10,
+      "memory": 1024
     }
   }
 }
