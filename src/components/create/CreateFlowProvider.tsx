@@ -15,7 +15,7 @@ import { Database } from '@/types/database'
 
 type Loom = Database['public']['Tables']['looms']['Row']
 
-const USE_MOCK_DATA = true
+const USE_MOCK_DATA = false
 const STEPS = ['username', 'select', 'complete'] as const
 
 interface CreateFlowProviderProps {
@@ -30,6 +30,7 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
   const [profile, setProfile] = useState<ThreadsProfile | null>(USE_MOCK_DATA ? MOCK_PROFILE : null)
   const [downloadUrl, setDownloadUrl] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
     () => new Set(USE_MOCK_DATA ? MOCK_POSTS.map(p => p.id) : [])
@@ -37,6 +38,8 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
   const [searchQuery, setSearchQuery] = useState('')
   const [currentSpread, setCurrentSpread] = useState(0)
+  const [currentUsername, setCurrentUsername] = useState('')
+  const [displayLimit, setDisplayLimit] = useState(10) // Start with 10 posts
 
   // Derived values
   const currentStepIndex = STEPS.indexOf(step)
@@ -50,11 +53,14 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
       )
     }
 
-    return result.toSorted((a, b) => {
+    const sorted = result.toSorted((a, b) => {
       const diff = new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
       return sortOrder === 'newest' ? diff : -diff
     })
-  }, [posts, searchQuery, sortOrder])
+
+    // Only show up to displayLimit posts for infinite scroll
+    return sorted.slice(0, displayLimit)
+  }, [posts, searchQuery, sortOrder, displayLimit])
 
   const selectedPosts = useMemo(() => {
     return posts
@@ -80,13 +86,15 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
       const res = await fetch('/api/scrape', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })
+        body: JSON.stringify({ username, limit: 100 }) // Fetch 100 posts upfront
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
 
       setPosts(data.posts)
       setProfile(data.profile)
+      setCurrentUsername(username)
+      setDisplayLimit(10) // Reset to show first 10
       setSelectedIds(new Set(data.posts.map((p: ThreadsPost) => p.id)))
       setStep('select')
     } catch (err: any) {
@@ -94,6 +102,19 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadMorePosts = () => {
+    // Client-side pagination: just increase display limit
+    if (displayLimit >= posts.length) return
+
+    setLoadingMore(true)
+
+    // Simulate loading delay for smooth UX
+    setTimeout(() => {
+      setDisplayLimit(prev => Math.min(prev + 10, posts.length))
+      setLoadingMore(false)
+    }, 300)
   }
 
   const generateLoom = async () => {
@@ -166,9 +187,12 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
     setStep('username')
   }
 
+  // Compute hasMore based on client-side pagination
+  const computedHasMore = displayLimit < posts.length
+
   const value: CreateFlowContextValue = {
-    state: { step, posts, profile, downloadUrl, loading, error, selectedIds, sortOrder, searchQuery, currentSpread },
-    actions: { submitUsername, generateLoom, createAnother, togglePost, toggleAll, setSortOrder, setSearchQuery, prevSpread, nextSpread, goBack },
+    state: { step, posts, profile, downloadUrl, loading, loadingMore, hasMore: computedHasMore, error, selectedIds, sortOrder, searchQuery, currentSpread },
+    actions: { submitUsername, generateLoom, createAnother, togglePost, toggleAll, setSortOrder, setSearchQuery, prevSpread, nextSpread, goBack, loadMorePosts },
     meta: { steps: STEPS, currentStepIndex, filteredAndSortedPosts, selectedPosts, pages, spreads, currentSpreadData: spreads[currentSpread], selectedCount: selectedIds.size, totalSpreads: spreads.length },
   }
 

@@ -20,7 +20,7 @@ Threads 포스트를 아름다운 A5 PDF 책으로 변환하는 서비스
 | Styling | Tailwind CSS v4 |
 | Auth / DB / Storage | Supabase (Google OAuth, PostgreSQL, Storage) |
 | PDF Generation | Puppeteer + pdf-lib |
-| Scraping | Apify API |
+| Scraping | Puppeteer (자체 구현, 무한 스크롤 지원) |
 | Design | Pencil (Lunaris design system) |
 
 ## Getting Started
@@ -53,8 +53,9 @@ npm install
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
-# Apify
-APIFY_TOKEN=your-apify-token
+# Threads Scraping
+THREADS_USERNAME=your_instagram_username
+THREADS_PASSWORD=your_instagram_password
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -102,7 +103,7 @@ src/
 │   ├── i18n/               # 다국어 지원
 │   ├── pdf/                # PDF 생성 엔진
 │   ├── supabase/           # Supabase 클라이언트
-│   └── scraper.ts          # Apify 스크래퍼
+│   └── scraper.ts          # Puppeteer 자체 스크래퍼
 └── types/                  # TypeScript 타입 정의
 ```
 

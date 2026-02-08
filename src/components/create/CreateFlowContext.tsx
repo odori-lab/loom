@@ -13,11 +13,13 @@ export interface CreateFlowState {
   profile: ThreadsProfile | null
   downloadUrl: string
   loading: boolean
+  loadingMore: boolean
   error: string
   selectedIds: Set<string>
   sortOrder: SortOrder
   searchQuery: string
   currentSpread: number
+  hasMore: boolean
 }
 
 export interface CreateFlowActions {
@@ -31,6 +33,7 @@ export interface CreateFlowActions {
   prevSpread: () => void
   nextSpread: () => void
   goBack: () => void
+  loadMorePosts: () => void
 }
 
 export interface CreateFlowMeta {
