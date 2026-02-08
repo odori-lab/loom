@@ -5,7 +5,7 @@ export const MOCK_PROFILE: ThreadsProfile = {
   displayName: 'Sol You',
   bio: 'Germany, Düsseldorf',
   followerCount: 284,
-  profileImageUrl: 'https://ui-avatars.com/api/?name=Sol+You&background=6366f1&color=fff&size=150'
+  profileImageUrl: '' // Remove image for now - react-pdf doesn't support dynamic avatar URLs
 }
 
 export const MOCK_POSTS: ThreadsPost[] = [

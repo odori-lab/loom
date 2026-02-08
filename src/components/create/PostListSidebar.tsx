@@ -1,7 +1,9 @@
 'use client'
 
+import { useRef, useEffect } from 'react'
 import { formatDate } from '@/lib/utils/format'
 import { CheckIcon, HeartIcon, CommentIcon, RepostIcon, ShareIcon } from '@/components/ui/Icons'
+import { Spinner } from '@/components/ui/Spinner'
 import { useCreateFlow } from './CreateFlowContext'
 import { SortOrder } from './CreateFlowContext'
 
@@ -11,10 +13,29 @@ interface PostListSidebarProps {
 
 export function PostListSidebar({ className }: PostListSidebarProps) {
   const {
-    state: { selectedIds, sortOrder, searchQuery, profile },
-    actions: { togglePost, toggleAll, setSortOrder, setSearchQuery },
+    state: { selectedIds, sortOrder, searchQuery, profile, loadingMore, hasMore },
+    actions: { togglePost, toggleAll, setSortOrder, setSearchQuery, loadMorePosts },
     meta: { filteredAndSortedPosts },
   } = useCreateFlow()
+
+  const loadMoreRef = useRef<HTMLDivElement>(null)
+
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!loadMoreRef.current || !hasMore || loadingMore) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMorePosts()
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    observer.observe(loadMoreRef.current)
+    return () => observer.disconnect()
+  }, [hasMore, loadingMore, loadMorePosts])
 
   if (!profile) return null
 
@@ -177,6 +198,29 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
             </div>
           </div>
         ))}
+
+        {/* Infinite scroll trigger */}
+        {hasMore && (
+          <div ref={loadMoreRef} className="p-6 flex items-center justify-center">
+            {loadingMore ? (
+              <Spinner size="md" className="text-gray-400" />
+            ) : (
+              <button
+                onClick={loadMorePosts}
+                className="text-sm text-gray-500 hover:text-gray-900"
+              >
+                Load more posts
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* End of list */}
+        {!hasMore && filteredAndSortedPosts.length > 0 && (
+          <div className="p-4 text-center text-xs text-gray-400">
+            All posts loaded
+          </div>
+        )}
       </div>
     </div>
   )
