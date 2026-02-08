@@ -1,5 +1,6 @@
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
-import { chromium } from 'playwright'
+import { chromium } from 'playwright-core'
+import chromiumPkg from '@sparticuz/chromium'
 
 interface ScrapeResult {
   posts: ThreadsPost[]
@@ -38,20 +39,15 @@ async function getBrowser() {
       executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     })
   } else {
-    // Production (Vercel) - use bundled chromium
+    // Production (Vercel) - use AWS Lambda optimized chromium
     browserInstance = await chromium.launch({
-      headless: true,
       args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu',
-        '--disable-blink-features=AutomationControlled', // Hide automation
+        ...chromiumPkg.args,
+        '--disable-blink-features=AutomationControlled',
         '--disable-features=IsolateOrigins,site-per-process',
       ],
+      executablePath: await chromiumPkg.executablePath(),
+      headless: true,
     })
   }
 
