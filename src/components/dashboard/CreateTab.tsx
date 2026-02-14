@@ -20,9 +20,9 @@ export function CreateTabContent() {
   }
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center">
-      <div className="w-full max-w-3xl mx-auto px-6">
-        <div className="flex items-center justify-center mb-16">
+    <div className="flex-1 flex flex-col items-center justify-center" style={{ animation: 'fadeIn 0.3s ease-out both' }}>
+      <div className="w-full max-w-3xl mx-auto px-6" key={step}>
+        <div className="flex items-center justify-center mb-16" style={{ animation: 'fadeInUp 0.5s ease-out both' }}>
           <ProgressIndicator />
         </div>
 

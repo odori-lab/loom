@@ -40,7 +40,7 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
   if (!profile) return null
 
   return (
-    <div className={className ?? "w-80 border-l border-gray-200 flex flex-col bg-white"}>
+    <div className={className ?? "w-80 border-l border-gray-200 flex flex-col bg-white"} style={{ animation: 'slideInLeft 0.35s ease-out both' }}>
       {/* Profile + Controls */}
       <div className="p-4 border-b border-gray-100 space-y-3">
         <div className="flex items-center gap-3">
@@ -89,7 +89,7 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
         <div className="flex items-center justify-between">
           <button
             onClick={toggleAll}
-            className="text-xs text-gray-500 hover:text-gray-900"
+            className="text-xs text-gray-500 hover:text-gray-900 active:scale-[0.96]"
           >
             {selectedIds.size === filteredAndSortedPosts.length ? 'Deselect all' : 'Select all'}
           </button>
@@ -100,8 +100,8 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
       </div>
 
       {/* Threads-style Post List */}
-      <div className="flex-1 overflow-y-auto">
-        {filteredAndSortedPosts.map(post => (
+      <div className="flex-1 overflow-y-auto cf-scroll-fade">
+        {filteredAndSortedPosts.map((post, index) => (
           <div
             key={post.id}
             onClick={() => togglePost(post.id)}
@@ -110,7 +110,10 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
                 ? 'bg-gray-50'
                 : 'hover:bg-gray-50/50'
             }`}
-            style={{ contentVisibility: 'auto' }}
+            style={{
+              animation: `fadeInUp 0.3s ease-out ${Math.min(index * 35, 350)}ms both`,
+              contentVisibility: 'auto',
+            }}
           >
             {/* Grid layout like actual Threads UI */}
             <div className="grid gap-x-3" style={{ gridTemplateColumns: '36px 1fr' }}>
@@ -165,7 +168,7 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
                     <img
                       src={post.imageUrls[0]}
                       alt=""
-                      className="w-full h-auto object-cover rounded-xl"
+                      className="w-full h-auto object-cover rounded-xl transition-transform duration-200 hover:scale-[1.03]"
                       style={{ maxHeight: '120px' }}
                     />
                     {post.imageUrls.length > 1 && (
@@ -207,7 +210,7 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
             ) : (
               <button
                 onClick={loadMorePosts}
-                className="text-sm text-gray-500 hover:text-gray-900"
+                className="text-sm text-gray-500 hover:text-gray-900 active:scale-[0.96]"
               >
                 Load more posts
               </button>
@@ -217,7 +220,7 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
 
         {/* End of list */}
         {!hasMore && filteredAndSortedPosts.length > 0 && (
-          <div className="p-4 text-center text-xs text-gray-400">
+          <div className="p-4 text-center text-xs text-gray-400" style={{ animation: 'fadeIn 0.3s ease-out both' }}>
             All posts loaded
           </div>
         )}

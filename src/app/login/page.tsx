@@ -22,14 +22,14 @@ function LoginContent() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
       <div className="w-full max-w-sm space-y-8 text-center">
-        <div className="space-y-2">
+        <div className="space-y-2 animate-fade-in-up">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">Loom</h1>
           <p className="text-gray-500">
             Turn your Threads into a beautiful book
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 animate-fade-in-up animate-delay-200">
           <button
             onClick={handleGoogleLogin}
             className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -56,7 +56,7 @@ function LoginContent() {
           </button>
         </div>
 
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-gray-400 animate-fade-in animate-delay-500">
           By continuing, you agree to our Terms of Service and Privacy Policy
         </p>
       </div>

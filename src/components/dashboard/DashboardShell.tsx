@@ -40,14 +40,14 @@ function DashboardContent() {
   return (
     <>
       {/* Looms tab */}
-      <div className={`flex-1 flex overflow-hidden ${activeTab !== 'looms' ? 'hidden' : ''}`}>
+      <div className={`flex-1 flex overflow-hidden ${activeTab !== 'looms' ? 'hidden' : '[animation:dashboard-panel-fade_0.2s_ease-out]'}`}>
         <LoomsTab />
         <LoomPreviewPanel />
       </div>
 
       {/* Create tab - always mounted, hidden via CSS to preserve state */}
       <CreateFlowProvider onComplete={addLoom}>
-        <div className={`flex-1 flex overflow-hidden ${activeTab !== 'create' ? 'hidden' : ''}`}>
+        <div className={`flex-1 flex overflow-hidden ${activeTab !== 'create' ? 'hidden' : '[animation:dashboard-panel-fade_0.2s_ease-out]'}`}>
           <CreateTabContent />
           <CreateTabRightPanel />
         </div>

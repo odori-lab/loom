@@ -40,7 +40,7 @@ export function Sidebar({ user }: SidebarProps) {
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors text-left ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-150 text-left ${
                 isActive
                   ? 'bg-gray-900 text-white'
                   : 'text-gray-500 hover:bg-gray-100'

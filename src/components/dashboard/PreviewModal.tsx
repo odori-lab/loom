@@ -355,7 +355,7 @@ function SpreadViewer({ url }: { url: string }) {
               onClick={prevSpread}
               onMouseDown={(e) => e.stopPropagation()}
               disabled={currentSpread === 0 || !!flipState}
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all z-10"
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.97] transition-all duration-150 z-10"
             >
               <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
             </button>
@@ -363,7 +363,7 @@ function SpreadViewer({ url }: { url: string }) {
               onClick={nextSpread}
               onMouseDown={(e) => e.stopPropagation()}
               disabled={currentSpread >= totalSpreads - 1 || !!flipState}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all z-10"
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.97] transition-all duration-150 z-10"
             >
               <ChevronRightIcon className="w-5 h-5 text-gray-600" />
             </button>
@@ -392,7 +392,7 @@ function SpreadViewer({ url }: { url: string }) {
           <div className="flex items-center gap-1 ml-2">
             <button
               onClick={zoomOut}
-              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 active:scale-[0.97] transition-all duration-150"
               title="Zoom out (-)"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -401,14 +401,14 @@ function SpreadViewer({ url }: { url: string }) {
             </button>
             <button
               onClick={resetZoom}
-              className="px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 rounded-lg transition-colors min-w-[48px] text-center"
+              className="px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 rounded-lg active:scale-[0.97] transition-all duration-150 min-w-[48px] text-center"
               title="Reset zoom (0)"
             >
               {Math.round(scale * 100)}%
             </button>
             <button
               onClick={zoomIn}
-              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 active:scale-[0.97] transition-all duration-150"
               title="Zoom in (+)"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -439,9 +439,9 @@ export function PreviewModal() {
   if (!previewModalOpen || !selectedLoom) return null
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col">
+    <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col animate-fade-in" style={{ animationDuration: '0.15s' }}>
       {/* Header */}
-      <div className="h-14 px-6 flex items-center justify-between bg-white border-b border-gray-200 shrink-0">
+      <div className="h-14 px-6 flex items-center justify-between bg-white border-b border-gray-200 shrink-0 animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
             <span className="text-xs font-bold text-white">
@@ -457,7 +457,7 @@ export function PreviewModal() {
         </div>
         <button
           onClick={closePreviewModal}
-          className="p-2 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 active:scale-[0.97] transition-all duration-150"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

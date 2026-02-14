@@ -56,7 +56,7 @@ export function LoomsTab() {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center py-16 px-8">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center shadow-sm">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center shadow-sm" style={{ animation: 'dashboard-float 3s ease-in-out infinite' }}>
             <BookOpenIcon className="w-10 h-10 text-gray-400" />
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">No Looms yet</h3>
@@ -65,7 +65,7 @@ export function LoomsTab() {
           </p>
           <button
             onClick={() => setActiveTab('create')}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 hover:scale-105 transition-all shadow-lg shadow-gray-900/20"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 hover:scale-105 transition-all shadow-lg shadow-gray-900/20 active:scale-[0.96]"
           >
             <PlusIcon className="w-5 h-5" />
             Create Your First Loom
@@ -103,24 +103,25 @@ export function LoomsTab() {
       {/* Grid */}
       <div className="flex-1 overflow-y-auto p-6">
         <div className="flex flex-wrap gap-3">
-          {filteredLooms.map(loom => (
+          {filteredLooms.map((loom, index) => (
             <div
               key={loom.id}
               onClick={() => selectLoom(loom)}
-              className={`w-[170px] cursor-pointer rounded-xl border-2 transition-all overflow-hidden ${
+              style={{ animationDelay: `${index * 40}ms` }}
+              className={`w-[170px] cursor-pointer rounded-xl border-2 transition-all overflow-hidden [animation:dashboard-card-enter_0.3s_ease-out_both] active:scale-[0.97] ${
                 selectedLoom?.id === loom.id
                   ? 'border-gray-900 shadow-sm'
                   : 'border-transparent hover:border-gray-200'
               }`}
             >
               {/* Gradient thumbnail */}
-              <div className="h-[110px] bg-gradient-to-br from-purple-400 via-pink-400 to-orange-300 relative">
+              <div className="h-[110px] bg-gradient-to-br from-purple-400 via-pink-400 to-orange-300 relative bg-[length:200%_200%] hover:[animation:dashboard-gradient-shift_3s_ease_infinite]">
                 {/* Action buttons */}
                 <div className="absolute top-1.5 right-1.5 flex gap-1">
                   <button
                     onClick={(e) => handleDownload(e, loom.id)}
                     disabled={downloadingId === loom.id}
-                    className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg text-gray-500 hover:text-gray-900 hover:bg-white transition-all disabled:opacity-50"
+                    className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg text-gray-500 hover:text-gray-900 hover:bg-white transition-all disabled:opacity-50 active:scale-[0.96]"
                     title="Download"
                   >
                     {downloadingId === loom.id ? (
@@ -135,7 +136,7 @@ export function LoomsTab() {
                       selectLoom(loom)
                       openPreviewModal()
                     }}
-                    className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg text-gray-500 hover:text-gray-900 hover:bg-white transition-all"
+                    className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg text-gray-500 hover:text-gray-900 hover:bg-white transition-all active:scale-[0.96]"
                     title="Preview"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,7 +150,7 @@ export function LoomsTab() {
                       deleteLoom(loom.id)
                     }}
                     disabled={deletingId === loom.id}
-                    className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg text-gray-500 hover:text-red-500 hover:bg-white transition-all disabled:opacity-50"
+                    className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg text-gray-500 hover:text-red-500 hover:bg-white transition-all disabled:opacity-50 active:scale-[0.96]"
                     title="Delete"
                   >
                     {deletingId === loom.id ? (
