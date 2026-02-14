@@ -7,6 +7,7 @@ export interface ThreadsPost {
   replyCount: number
   repostCount: number
   postedAt: Date
+  threadId?: string
 }
 
 export interface ThreadsProfile {

@@ -1,14 +1,36 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useMemo } from 'react'
 import { formatDate } from '@/lib/utils/format'
 import { CheckIcon, HeartIcon, CommentIcon, RepostIcon, ShareIcon } from '@/components/ui/Icons'
 import { Spinner } from '@/components/ui/Spinner'
 import { useCreateFlow } from './CreateFlowContext'
 import { SortOrder } from './CreateFlowContext'
+import { ThreadsPost } from '@/types/threads'
 
 interface PostListSidebarProps {
   className?: string
+}
+
+// Helper to determine thread position for a post
+function getThreadPosition(
+  post: ThreadsPost,
+  index: number,
+  posts: ThreadsPost[]
+): 'none' | 'first' | 'middle' | 'last' {
+  if (!post.threadId) return 'none'
+
+  const prevPost = index > 0 ? posts[index - 1] : null
+  const nextPost = index < posts.length - 1 ? posts[index + 1] : null
+
+  const hasPrevInThread = prevPost?.threadId === post.threadId
+  const hasNextInThread = nextPost?.threadId === post.threadId
+
+  if (!hasPrevInThread && hasNextInThread) return 'first'
+  if (hasPrevInThread && hasNextInThread) return 'middle'
+  if (hasPrevInThread && !hasNextInThread) return 'last'
+
+  return 'none' // Single post with threadId but no adjacent thread members
 }
 
 export function PostListSidebar({ className }: PostListSidebarProps) {
@@ -17,6 +39,13 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
     actions: { togglePost, toggleAll, setSortOrder, setSearchQuery, loadMorePosts },
     meta: { filteredAndSortedPosts },
   } = useCreateFlow()
+
+  // Compute thread positions for all posts
+  const threadPositions = useMemo(() => {
+    return filteredAndSortedPosts.map((post, index) =>
+      getThreadPosition(post, index, filteredAndSortedPosts)
+    )
+  }, [filteredAndSortedPosts])
 
   const loadMoreRef = useRef<HTMLDivElement>(null)
 
@@ -101,106 +130,143 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
 
       {/* Threads-style Post List */}
       <div className="flex-1 overflow-y-auto cf-scroll-fade">
-        {filteredAndSortedPosts.map((post, index) => (
-          <div
-            key={post.id}
-            onClick={() => togglePost(post.id)}
-            className={`px-3 py-3 border-b border-gray-100 cursor-pointer transition-colors ${
-              selectedIds.has(post.id)
-                ? 'bg-gray-50'
-                : 'hover:bg-gray-50/50'
-            }`}
-            style={{
-              animation: `fadeInUp 0.3s ease-out ${Math.min(index * 35, 350)}ms both`,
-              contentVisibility: 'auto',
-            }}
-          >
-            {/* Grid layout like actual Threads UI */}
-            <div className="grid gap-x-3" style={{ gridTemplateColumns: '36px 1fr' }}>
-              {/* Profile Image - spans all rows */}
-              <div className="row-span-full pt-0.5">
-                {profile.profileImageUrl ? (
-                  <img
-                    src={profile.profileImageUrl}
-                    alt=""
-                    className="w-9 h-9 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                    <span className="text-sm font-bold text-white">
-                      {profile.username[0].toUpperCase()}
-                    </span>
-                  </div>
-                )}
-              </div>
+        {filteredAndSortedPosts.map((post, index) => {
+          const threadPosition = threadPositions[index]
+          const isInThread = threadPosition !== 'none'
 
-              {/* Header: Username + Time + Checkbox */}
-              <div className="flex items-center gap-1.5 leading-[1.4]">
-                <span className="text-[13px] font-semibold text-gray-900">
-                  {profile.username}
-                </span>
-                <span className="text-[13px] text-gray-400">
-                  {formatDate(new Date(post.postedAt))}
-                </span>
-                <div className="flex-1" />
-                <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
-                  selectedIds.has(post.id)
-                    ? 'bg-black border-black'
-                    : 'border-gray-300'
-                }`}>
-                  {selectedIds.has(post.id) && (
-                    <CheckIcon className="w-3 h-3 text-white" />
+          return (
+            <div
+              key={post.id}
+              onClick={() => togglePost(post.id)}
+              className={`px-3 cursor-pointer transition-colors ${
+                selectedIds.has(post.id)
+                  ? 'bg-gray-50'
+                  : 'hover:bg-gray-50/50'
+              } ${
+                // Remove bottom border for posts that continue a thread
+                threadPosition === 'first' || threadPosition === 'middle'
+                  ? 'border-b-0 pb-0'
+                  : 'border-b border-gray-100'
+              } ${
+                // Reduce top padding for thread continuation posts
+                threadPosition === 'middle' || threadPosition === 'last'
+                  ? 'pt-0'
+                  : 'pt-3'
+              } ${
+                // Add bottom padding for posts that don't continue
+                threadPosition === 'last' || threadPosition === 'none'
+                  ? 'pb-3'
+                  : ''
+              }`}
+              style={{
+                animation: `fadeInUp 0.3s ease-out ${Math.min(index * 35, 350)}ms both`,
+                contentVisibility: 'auto',
+              }}
+            >
+              {/* Grid layout like actual Threads UI */}
+              <div className="grid gap-x-3" style={{ gridTemplateColumns: '36px 1fr' }}>
+                {/* Profile Image Column - with thread connector */}
+                <div className="row-span-full pt-0.5 flex flex-col items-center">
+                  {/* Thread connector line from above (for middle/last posts) */}
+                  {(threadPosition === 'middle' || threadPosition === 'last') && (
+                    <div className="w-0.5 bg-gray-300 h-2 -mt-0.5 mb-1 rounded-full" />
+                  )}
+
+                  {/* Profile image */}
+                  {profile.profileImageUrl ? (
+                    <img
+                      src={profile.profileImageUrl}
+                      alt=""
+                      className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-white">
+                        {profile.username[0].toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Thread connector line below (for first/middle posts) */}
+                  {(threadPosition === 'first' || threadPosition === 'middle') && (
+                    <div className="w-0.5 bg-gray-300 flex-1 mt-1 min-h-[8px] rounded-full" />
                   )}
                 </div>
-              </div>
 
-              {/* Post Content */}
-              <div className="mt-0.5">
-                <p className="text-[13px] text-gray-900 leading-[1.4] line-clamp-3 whitespace-pre-line">
-                  {post.content}
-                </p>
-              </div>
-
-              {/* Image Preview - col 2 */}
-              {post.imageUrls.length > 0 && (
-                <div className="col-start-2 mt-2">
-                  <div className="relative overflow-hidden rounded-xl" style={{ maxHeight: '120px' }}>
-                    <img
-                      src={post.imageUrls[0]}
-                      alt=""
-                      className="w-full h-auto object-cover rounded-xl transition-transform duration-200 hover:scale-[1.03]"
-                      style={{ maxHeight: '120px' }}
-                    />
-                    {post.imageUrls.length > 1 && (
-                      <div className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-md">
-                        +{post.imageUrls.length - 1}
-                      </div>
+                {/* Header: Username + Time + Checkbox */}
+                <div className="flex items-center gap-1.5 leading-[1.4]">
+                  <span className="text-[13px] font-semibold text-gray-900">
+                    {profile.username}
+                  </span>
+                  <span className="text-[13px] text-gray-400">
+                    {formatDate(new Date(post.postedAt))}
+                  </span>
+                  {/* Thread indicator badge */}
+                  {isInThread && threadPosition === 'first' && (
+                    <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
+                      thread
+                    </span>
+                  )}
+                  <div className="flex-1" />
+                  <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
+                    selectedIds.has(post.id)
+                      ? 'bg-black border-black'
+                      : 'border-gray-300'
+                  }`}>
+                    {selectedIds.has(post.id) && (
+                      <CheckIcon className="w-3 h-3 text-white" />
                     )}
                   </div>
                 </div>
-              )}
 
-              {/* Engagement Stats - col 2 */}
-              <div className="col-start-2 mt-2 flex items-center gap-3">
-                <div className="flex items-center gap-1 text-gray-400">
-                  <HeartIcon />
-                  {post.likeCount > 0 && <span className="text-[11px]">{post.likeCount}</span>}
+                {/* Post Content */}
+                <div className="mt-0.5">
+                  <p className="text-[13px] text-gray-900 leading-[1.4] line-clamp-3 whitespace-pre-line">
+                    {post.content}
+                  </p>
                 </div>
-                <div className="flex items-center gap-1 text-gray-400">
-                  <CommentIcon />
-                  {post.replyCount > 0 && <span className="text-[11px]">{post.replyCount}</span>}
-                </div>
-                <div className="flex items-center gap-1 text-gray-400">
-                  <RepostIcon />
-                  {post.repostCount > 0 && <span className="text-[11px]">{post.repostCount}</span>}
-                </div>
-                <div className="flex items-center text-gray-400">
-                  <ShareIcon />
+
+                {/* Image Preview - col 2 */}
+                {post.imageUrls.length > 0 && (
+                  <div className="col-start-2 mt-2">
+                    <div className="relative overflow-hidden rounded-xl" style={{ maxHeight: '120px' }}>
+                      <img
+                        src={post.imageUrls[0]}
+                        alt=""
+                        className="w-full h-auto object-cover rounded-xl transition-transform duration-200 hover:scale-[1.03]"
+                        style={{ maxHeight: '120px' }}
+                      />
+                      {post.imageUrls.length > 1 && (
+                        <div className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-md">
+                          +{post.imageUrls.length - 1}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Engagement Stats - col 2 */}
+                <div className="col-start-2 mt-2 flex items-center gap-3">
+                  <div className="flex items-center gap-1 text-gray-400">
+                    <HeartIcon />
+                    {post.likeCount > 0 && <span className="text-[11px]">{post.likeCount}</span>}
+                  </div>
+                  <div className="flex items-center gap-1 text-gray-400">
+                    <CommentIcon />
+                    {post.replyCount > 0 && <span className="text-[11px]">{post.replyCount}</span>}
+                  </div>
+                  <div className="flex items-center gap-1 text-gray-400">
+                    <RepostIcon />
+                    {post.repostCount > 0 && <span className="text-[11px]">{post.repostCount}</span>}
+                  </div>
+                  <div className="flex items-center text-gray-400">
+                    <ShareIcon />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
 
         {/* Infinite scroll trigger */}
         {hasMore && (
