@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Database } from '@/types/database'
 
 type Loom = Database['public']['Tables']['looms']['Row']
-type DashboardTab = 'looms' | 'create'
+type DashboardTab = 'looms' | 'create' | 'setting'
 
 interface DashboardContextValue {
   activeTab: DashboardTab
@@ -41,7 +41,8 @@ interface DashboardProviderProps {
 export function DashboardProvider({ initialLooms, children }: DashboardProviderProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const initialTab = searchParams.get('tab') === 'create' ? 'create' : 'looms'
+  const tabParam = searchParams.get('tab')
+  const initialTab: DashboardTab = tabParam === 'create' ? 'create' : tabParam === 'setting' ? 'setting' : 'looms'
 
   const [activeTab, setActiveTabState] = useState<DashboardTab>(initialTab)
   const [looms, setLooms] = useState(initialLooms)
@@ -53,7 +54,7 @@ export function DashboardProvider({ initialLooms, children }: DashboardProviderP
 
   const setActiveTab = useCallback((tab: DashboardTab) => {
     setActiveTabState(tab)
-    const url = tab === 'create' ? '/dashboard?tab=create' : '/dashboard'
+    const url = tab === 'looms' ? '/dashboard' : `/dashboard?tab=${tab}`
     router.replace(url, { scroll: false })
   }, [router])
 

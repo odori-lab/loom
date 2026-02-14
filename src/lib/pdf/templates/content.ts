@@ -13,6 +13,24 @@ export function generateContentPageFromChunks(chunks: PostChunk[], profile: Thre
   `
 }
 
+// Generate thread indicator HTML
+function generateThreadIndicator(chunk: PostChunk): string {
+  if (!chunk.threadPosition || !chunk.threadTotal || chunk.threadTotal <= 1) {
+    return ''
+  }
+
+  // Reply arrow icon
+  return `
+    <span class="post-thread-indicator">
+      <svg viewBox="0 0 16 16">
+        <path d="M6 3L3 6L6 9" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 6H10C11.6569 6 13 7.34315 13 9V13" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      ${chunk.threadPosition}/${chunk.threadTotal}
+    </span>
+  `
+}
+
 // Generate HTML for a post chunk (possibly partial) - Threads-style layout
 function generateChunkHtml(chunk: PostChunk, profile: ThreadsProfile): string {
   const { post, contentStart, contentEnd, showHeader, showStats, showImages } = chunk
@@ -68,6 +86,12 @@ function generateChunkHtml(chunk: PostChunk, profile: ThreadsProfile): string {
 
   const statsHtml = showStats ? statsContent : continuesIndicator
 
+  // Thread indicator for self-reply chains
+  const threadIndicatorHtml = generateThreadIndicator(chunk)
+
+  // Determine if post is part of a thread (not the first post in the thread)
+  const isThreadReply = chunk.threadPosition && chunk.threadPosition > 1
+
   // Threads-style layout: header row (grid) + content (full width)
   const headerRowHtml = showHeader ? `
     <div class="post-row-header">
@@ -75,12 +99,21 @@ function generateChunkHtml(chunk: PostChunk, profile: ThreadsProfile): string {
       <div class="post-header">
         <span class="post-username">${escapeHtml(post.username)}</span>
         <span class="post-date">${dateStr}</span>
+        ${threadIndicatorHtml}
       </div>
     </div>
   ` : (chunk.showContinued ? '<div class="post-continuation">(...continued)</div>' : '')
 
+  // Build CSS classes
+  const postClasses = [
+    'post',
+    !chunk.isFirstChunk ? 'post-continuation-chunk' : '',
+    !chunk.isLastChunk ? 'post-continues-chunk' : '',
+    isThreadReply ? 'post-threaded' : ''
+  ].filter(Boolean).join(' ')
+
   return `
-    <div class="post${!chunk.isFirstChunk ? ' post-continuation-chunk' : ''}${!chunk.isLastChunk ? ' post-continues-chunk' : ''}">
+    <div class="${postClasses}">
       ${headerRowHtml}
       <div class="post-text">${escapeHtml(chunkContent)}</div>
       ${imagesHtml}

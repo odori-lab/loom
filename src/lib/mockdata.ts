@@ -1,380 +1,1057 @@
-import { ThreadsPost, ThreadsProfile } from '@/types/threads'
+// Auto-generated from zuck profile scrape
+import { ThreadsPost, ThreadsProfile } from "@/types/threads"
 
 export const MOCK_PROFILE: ThreadsProfile = {
-  username: 'whatthesol',
-  displayName: 'Sol You',
-  bio: 'Germany, Düsseldorf',
-  followerCount: 284,
-  profileImageUrl: '' // Remove image for now - react-pdf doesn't support dynamic avatar URLs
-}
+  username: "zuck",
+  displayName: "zuck",
+  bio: "",
+  followerCount: 0,
+  profileImageUrl: "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-19/550174606_17925811725103224_8363667901743352243_n.jpg?stp=dst-jpg_s320x320_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4xMDgwLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QH7uOXI9L-33nUA-tup1uUSY1CS5GRU7j8bVfMyUoZWnAmCZ3p7XFlSHIjYntMOFD4&_nc_ohc=gWujjj3-yowQ7kNvwGvCUH3&_nc_gid=MlnLu7svvkP7PMq6-Sf2Vw&edm=APs17CUBAAAA&ccb=7-5&oh=00_Afs5CSfphAtAUBniJNtAP6TXwIhJlU2qtbCqCWDhwPCWAw&oe=69962F6C&_nc_sid=10d13b",
+};
 
 export const MOCK_POSTS: ThreadsPost[] = [
   {
-    id: '3823934700691949717_63898026708',
-    username: 'whatthesol',
-    content: `
-    우리 집 앞에 '유미' 라는 아시아 마트가 생겼다.
-집 앞에 아시아 마트라니!
-
-신나서 들어가 보니 약간 소상공인 느낌이다. 
-베트남 가족이 운영하는데 물건도 좀 비어 있고, 
-진짜 열심히 일하는데도 어딘가 부족한 느낌이 있다.
-
-설상가상으로 근처, 걸어서 몇 분 거리에 
-크게 한인 마트가 들어섰다. 
-딱 봐도 브랜딩, 인테리어부터 자본의 냄새가 나고 
-상당히 fancy하다.
-
-유미한테 저기 아시아 마트 크게 들어오는 거 알고 있냐고 물어봤더니 괜찮다고는 하는데, 
-내심 걱정되는 표정이다.
-거대 자본이 소상공인을 잡아먹는 뻔한 스토리가 나올까 봐 걱정됐다.
-
-그렇게 벌써 1년이 지났다.
-
-내가 걱정했던 것과 달리 유미는 특유의 붙임성과 친근함으로 많은 단골 고객을 만들며 번창하고 있다.
-나중에 알고 보니 유미 가족이 독일에 잘되는 큰 식당도 여러 개 가지고 있는 부자 집이라는 거.
-
-그 fancy한 한인마트 사장님도 너무 좋으신 분이다 
-
-내가 생각하던 그런 드라마는 없었다 .
-    우리 집 앞에 '유미' 라는 아시아 마트가 생겼다.
-집 앞에 아시아 마트라니!
-
-신나서 들어가 보니 약간 소상공인 느낌이다. 
-베트남 가족이 운영하는데 물건도 좀 비어 있고, 
-진짜 열심히 일하는데도 어딘가 부족한 느낌이 있다.
-
-설상가상으로 근처, 걸어서 몇 분 거리에 
-크게 한인 마트가 들어섰다. 
-딱 봐도 브랜딩, 인테리어부터 자본의 냄새가 나고 
-상당히 fancy하다.
-
-유미한테 저기 아시아 마트 크게 들어오는 거 알고 있냐고 물어봤더니 괜찮다고는 하는데, 
-내심 걱정되는 표정이다.
-거대 자본이 소상공인을 잡아먹는 뻔한 스토리가 나올까 봐 걱정됐다.
-
-그렇게 벌써 1년이 지났다.
-
-내가 걱정했던 것과 달리 유미는 특유의 붙임성과 친근함으로 많은 단골 고객을 만들며 번창하고 있다.
-나중에 알고 보니 유미 가족이 독일에 잘되는 큰 식당도 여러 개 가지고 있는 부자 집이라는 거.
-
-그 fancy한 한인마트 사장님도 너무 좋으신 분이다 
-
-내가 생각하던 그런 드라마는 없었다 .`,
+    id: "zuck-1771063751140-0",
+    username: "zuck",
+    content: "Meta is planning to build tens of gigawatts this decade, and hundreds of gigawatts or more over time. How we engineer, invest, and partner to build this infrastructure will become a strategic advantage.",
     imageUrls: [],
-    likeCount: 60,
-    replyCount: 6,
-    repostCount: 0,
-    postedAt: new Date(1770068560 * 1000)
-  },
-  {
-    id: '3823934700691949717_63898026705',
-    username: 'whatthesol',
-    content: `우리 집 앞에 '유미' 라는 아시아 마트가 생겼다.
-집 앞에 아시아 마트라니!
-
-신나서 들어가 보니 약간 소상공인 느낌이다. 
-베트남 가족이 운영하는데 물건도 좀 비어 있고, 
-진짜 열심히 일하는데도 어딘가 부족한 느낌이 있다.
-
-설상가상으로 근처, 걸어서 몇 분 거리에 
-크게 한인 마트가 들어섰다. 
-딱 봐도 브랜딩, 인테리어부터 자본의 냄새가 나고 
-상당히 fancy하다.
-
-유미한테 저기 아시아 마트 크게 들어오는 거 알고 있냐고 물어봤더니 괜찮다고는 하는데, 
-내심 걱정되는 표정이다.
-거대 자본이 소상공인을 잡아먹는 뻔한 스토리가 나올까 봐 걱정됐다.
-
-그렇게 벌써 1년이 지났다.
-
-내가 걱정했던 것과 달리 유미는 특유의 붙임성과 친근함으로 많은 단골 고객을 만들며 번창하고 있다.
-나중에 알고 보니 유미 가족이 독일에 잘되는 큰 식당도 여러 개 가지고 있는 부자 집이라는 거.
-
-그 fancy한 한인마트 사장님도 너무 좋으신 분이다 
-
-내가 생각하던 그런 드라마는 없었다 .`,
-    imageUrls: [],
-    likeCount: 60,
-    replyCount: 6,
-    repostCount: 0,
-    postedAt: new Date(1770068560 * 1000)
-  },
-  {
-    id: '3819620492328319992_63898026705',
-    username: 'whatthesol',
-    content: `초등학교 2학년쯤 엄마한테 물었다.
-"엄마, 왜 TV에 나오는 노래는 전부 사랑 노래야?"
-
-나는 사랑 노래 말고 김흥국 아저씨의 '호랑나비' 같은 노래가 더 좋고,
-이런 노래가 더 많이 나왔으면 좋겠다고 했다.
-
-지금 생각해 보니 '호랑나비'도 결국 사랑 노래였다는 생각이 든다.`,
-    imageUrls: [],
-    likeCount: 5,
+    likeCount: 0,
     replyCount: 0,
     repostCount: 0,
-    postedAt: new Date(1769554266 * 1000)
+    postedAt: new Date("2026-01-12T18:00:30.000Z"),
+    threadId: "thread-1771063751140-3sfl2nu2l",
   },
   {
-    id: '3819283407121705057_63898026705',
-    username: 'whatthesol',
-    content: `독일에서 디자이너로 살아남기 
-
-오늘 회사 사람들에게 한국의 맛을 보여주기 위해 새벽부터 일어나 김밥을 엄청 쌌다. 
-와이프 점심 도시락도 같이 쌌는데, 두 줄 싸려고 하니 세 줄 싸 달란다.
-세 줄을 어떻게 먹냐고 했더니, 한 줄은 중간에 까먹을 거란다.
-중학교 때 점심시간까지 기다리기 힘들어 꼭 중간에 도시락 까먹는 애들 있었는데. 
-
-김밥은 추억을 떠올리게 한다`,
+    id: "zuck-1771063751140-1",
+    username: "zuck",
+    content: "Santosh will continue to lead our technical architecture, software stack, silicon program, developer productivity, and building and operating our global datacenter fleet and network.",
     imageUrls: [],
-    likeCount: 15,
-    replyCount: 1,
-    repostCount: 0,
-    postedAt: new Date(1769514083 * 1000)
-  },
-  {
-    id: '3818479842371357453_63898026705',
-    username: 'whatthesol',
-    content: `독일에 사는 사람들이 연초 부터 한해 휴가 계획이 다 짜여져 있는 이유를 이제 좀 알것 같다. 
-
-- 회사 시스템 자체가 "미리 제출" 구조
-- 아이들 방학이 완전히 고정되어 있기 때문
-- 가격 차이가 너무 크고, 늦으면 자리가 없음
-- 눈치 보지 않고 휴가를 확정할 수 있는 문화
-- 사람들 자체가 장기 플래닝에 익숙함
-
-댓글로 알려주신 분들 감사합니다.`,
-    imageUrls: [],
-    likeCount: 14,
-    replyCount: 4,
-    repostCount: 0,
-    postedAt: new Date(1769418290 * 1000)
-  },
-  {
-    id: '3817937932934234193_63898026705',
-    username: 'whatthesol',
-    content: `독일 사람들은 아직 1월인데도 벌써 한 해 휴가 계획이 다 짜여 있다.
-어떻게 그렇게 되는 거지?`,
-    imageUrls: [],
-    likeCount: 57,
-    replyCount: 33,
-    repostCount: 0,
-    postedAt: new Date(1769353690 * 1000)
-  },
-  {
-    id: '3817115860909738657_63898026705',
-    username: 'whatthesol',
-    content: `오늘 철길 밑을 건너는데,
-다리밑에 사람이 자고 있다.
-
-수염이 덥수룩한 남자가 자고 있는데,
-강아지 인형을 꼭 끌어안고 자고 있다.
-
-그거 그 이케아에서 파는 그 베이지색 강아지 인형.`,
-    imageUrls: [],
-    likeCount: 21,
+    likeCount: 0,
     replyCount: 0,
     repostCount: 0,
-    postedAt: new Date(1769255691 * 1000)
+    postedAt: new Date("2026-01-12T18:00:30.000Z"),
+    threadId: "thread-1771063751140-3sfl2nu2l",
   },
   {
-    id: '3816958485196181927_63898026705',
-    username: 'whatthesol',
-    content: `독일에서 디자이너로 살아 남기 
-
-지난 중국 출장 기간에
-중국 디자인 스튜디오 매니저 지샹과 주말에 홍푸강변을 걸었다.
-
-거대한 중국의 새로운 시대를 상징하는 듯한 스카이스크래퍼들을 보면서
-
-지샹이가 말했다.
-
-"브로(brother)… 중국에서 일해라. 네가 원하기만 하면 자리는 마련해 주겠다."
-
-라고 말했다.
-
-크…… 노을빛에 반짝이던 그 말이 참 낭만적이라고 생각했다.`,
+    id: "zuck-1771063751140-2",
+    username: "zuck",
+    content: "Dina has been a valuable member of our board and will be an even more critical player as she joins our management team. She brings deep experience in finance, economic development, and government. She'll be involved in all of Meta's work, with a particular focus on partnering with governments and sovereigns to build, deploy, invest in, and finance Meta's AI and infrastructure.  번역하기 1/2",
     imageUrls: [],
-    likeCount: 7,
-    replyCount: 1,
+    likeCount: 0,
+    replyCount: 0,
     repostCount: 0,
-    postedAt: new Date(1769236930 * 1000)
+    postedAt: new Date("2026-01-12T13:46:31.000Z"),
+    threadId: "thread-1771063751140-3sfl2nu2l",
   },
   {
-    id: '3816630433186626968_63898026705',
-    username: 'whatthesol',
-    content: `생각해 보니까 요즘 같은 시기에는
-뮤지컬이나 연극을 보는 것이 이익인 것 같아.
-
-넷플릭스, 유튜브, 릴스 같은 대량 생산 콘텐츠들을
-주로 화면으로 보다가,
-
-진짜 인간들이 해주는 실시간 연기를 본다는 게
-정말 엄청난 호사랄까.
-
-연기자들과 관객이
-하나의 공간, 한 시대에 만나는 놀라운 경험.
-
-약간 비싸긴 하지만,
-충분히 가치 있다.`,
+    id: "zuck-1771063751140-3",
+    username: "zuck",
+    content: "I'm excited to work with Dina to make sure we deliver personal superintelligence in a way that benefits the billions of people who use our products, as well as the communities, states, and countries we're investing in. \nabout.fb.com/news…  번역하기 2/2",
     imageUrls: [],
-    likeCount: 122,
-    replyCount: 5,
-    repostCount: 3,
-    postedAt: new Date(1769197824 * 1000)
-  },
-  {
-    id: '3814916906541390030_63898026705',
-    username: 'whatthesol',
-    content: `지난번 김치 잠글때 
-배추김치, 깍두기, 파김치, 오이소박이까지 냉장고가 가득했는데, 
-
-결국 오이소박이 빼고는 다 먹었다.
-
-오랜만에 오이소박이 뚜껑을 열었더니
-버섯이 자라나 있다.
-
-김치류라고 다 평생 가는 건 아닌가 보다.`,
-    imageUrls: [],
-    likeCount: 7,
-    replyCount: 2,
+    likeCount: 0,
+    replyCount: 0,
     repostCount: 0,
-    postedAt: new Date(1768993555 * 1000)
+    postedAt: new Date("2026-01-12T13:46:31.000Z"),
+    threadId: "thread-1771063751140-3sfl2nu2l",
   },
   {
-    id: '3812622947924372465_63898026705',
-    username: 'whatthesol',
-    content: `와이프와 이케아에 갔다. 
-뭐 살 게 있어서 간 건 아니고, 그냥 심심하면 한 번씩 가서 둘러보곤 한다.
-
-오늘 액자 하나가 4.99유로 특가인데, 와이프가 달려들어 최고의 액자를 고르기 위해 심사숙고 중이다. 
-다 같은 공산품인 것 같지만 그렇지가 않단다. 
-도색 마감, 흠집 등등 사소한 디테일까지 꼼꼼하게 완벽을 추구한다.
-
-너란 여자, 참으로 신비하다.
-
-몇 유로짜리 액자 하나 사는 데도 저렇게 신중하게 고르고 또 고르는 사람인데, 
-그렇게 고르고 골라 결혼한 사람이 나라니…
-
-난 완벽이란 것과 거리가 좀 심하게 많이 멀리 있는 사람인데.`,
-    imageUrls: [],
-    likeCount: 23,
-    replyCount: 3,
+    id: "zuck-1771063751140-4",
+    username: "zuck",
+    content: "Open sourcing SAM Audio -- our new model that lets you separate audio sources in your content with simple prompts. This makes it easier for anyone to edit sound in their videos, and I'm excited to see what people create with it.  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/601330849_17936343852103224_8572558228779856604_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDkwMC5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGASzDMsF4OpkOmG3V7wGtCtWS5E6DrdnQ2cqIH6NqCtsERR71exQRfGe16ff3Lu80&_nc_ohc=2RvBIf_nt0IQ7kNvwFP2y32&_nc_gid=MlnLu7svvkP7PMq6-Sf2Vw&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=Mzc4OTAwNzUxODUxODMyNjUwNw%3D%3D.3-ccb7-5&oh=00_AfsYCVMKj3H9k2FSR3iOLh8Xvl4A2-TfDdZI2mY4VgPytw&oe=699634A2&_nc_sid=10d13b", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/600038697_17936343834103224_3228245036242216247_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDkwMC5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGASzDMsF4OpkOmG3V7wGtCtWS5E6DrdnQ2cqIH6NqCtsERR71exQRfGe16ff3Lu80&_nc_ohc=RK5e1JOmxywQ7kNvwGSKXks&_nc_gid=MlnLu7svvkP7PMq6-Sf2Vw&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=Mzc4OTAwNzQ3MDA4MjQ5ODE3MQ%3D%3D.3-ccb7-5&oh=00_AfvBMa3RySHDO3uMjSA1lBPIkY8BsSnXbByup9Z0SsSaYw&oe=69962887&_nc_sid=10d13b", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/590432600_17936343876103224_8213605950665805454_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDkwMC5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGASzDMsF4OpkOmG3V7wGtCtWS5E6DrdnQ2cqIH6NqCtsERR71exQRfGe16ff3Lu80&_nc_ohc=cRqbH2DmRs0Q7kNvwET5RM6&_nc_gid=MlnLu7svvkP7PMq6-Sf2Vw&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=Mzc4OTAwNzU2MTgzNzA2MjIyMQ%3D%3D.3-ccb7-5&oh=00_AftFRyECPlSqlnSPDUfA2ppTxzKMIhvjTcYahzkUQWksoA&oe=699614EB&_nc_sid=10d13b"],
+    likeCount: 0,
+    replyCount: 0,
     repostCount: 0,
-    postedAt: new Date(1768720094 * 1000)
+    postedAt: new Date("2025-12-16T17:18:28.000Z"),
   },
   {
-    id: '3811859877602060569_63898026705',
-    username: 'whatthesol',
-    content: `난 넷플릭스 계정을 나, 와이프, 장인어른 이렇게 공유 중이다.
-
-오늘 갑자기 '솔로지옥'이 보고 싶어졌다. 그 풋풋함을 느끼고 싶달까.
-
-근데 와이프한테 이걸 보는 게 들키면 놀림당할 것 같았다.
-
-그래서 장인어른 프로필로 들어가 '솔로지옥'을 시청했다.`,
+    id: "zuck-1771063751140-5",
+    username: "zuck",
+    content: "Today we're establishing a new creative studio in Reality Labs led by Alan Dye, who has spent nearly 20 years leading design at Apple.  번역하기 1/5",
     imageUrls: [],
-    likeCount: 2294,
-    replyCount: 105,
-    repostCount: 10,
-    postedAt: new Date(1768629129 * 1000)
-  },
-  {
-    id: '3811359573236255305_63898026705',
-    username: 'whatthesol',
-    content: `독일에서 디자이너로 살아남기
-
-금요일 오후 갑작스러운 타운홀 미팅에서 
-
-회사 restructuring에 대해 이야기가 나왔다.
-
-꽤 많은 헤드카운트를 줄여야 된다고 했고, 한 25% 정도.
-
-2주 동안 희망퇴직자들을 먼저 받는다고 했다.
-
-다행히도 우리 부서는 포함되지 않아 사실 안도했다.
-
-미팅이 끝나고, 우리 팀만 다시 모였다.
-
-우리 팀 보스 볼커가 말했다.
-
-우리 팀은 이번 이슈에서, 
-생각했던 것보다 훨씬 좋은 방향으로 흘러가고 있어, 
-안심하고 우리의 계획대로 계속 나아가면 될 것 같다.
-
-만약에나 그 토픽이 돌고 돌아 다시 우리 팀에 돌아온다면, 내가 상대적으로 은퇴가 가까웠으니, 내가 나가는 게 맞는 것 같다.
-
-테네리페에 있을 테니 언제든 방문해도 좋다라고 말했다.
-
-참 말을 착하게 한다.`,
-    imageUrls: [],
-    likeCount: 12,
-    replyCount: 1,
+    likeCount: 0,
+    replyCount: 0,
     repostCount: 0,
-    postedAt: new Date(1768569488 * 1000)
+    postedAt: new Date("2025-12-03T22:27:15.000Z"),
+    threadId: "thread-1771063751140-6r1ixqszk",
   },
   {
-    id: '3811332076738205617_63898026705',
-    username: 'whatthesol',
-    content: `오늘은 금요일이다.
-일 마치고 와이프 회사 앞에서 기다리다가
-저녁 먹고 같이 집에 가기로 했다.
-
-저녁은 감자튀김 먹기로 했다.
-마늘기름에 튀긴 감자튀김에 살사, 과카몰리 올려 주고
-소시지 하나 곁드리면 진짜 맛나지.
-
-던킨 가서 도넛 하나씩으로 마무리하고
-
-자라 망고 한 번씩 들렀다가
-집에 앞에서 맥주 한잔 때리고,
-
-씻고 한국 드라마 좀 보다 자야겠다.`,
+    id: "zuck-1771063751140-6",
+    username: "zuck",
+    content: "The new studio will bring together design, fashion, and technology to define the next generation of our products and experiences. Our idea is to treat intelligence as a new design material and imagine what becomes possible when it is abundant, capable, and human-centered. We plan to elevate design within Meta, and pull together a talented group with a combination of craft, creative vision, systems thinking, and deep experience building iconic products that bridge hardware and software.  번역하기 2/5",
     imageUrls: [],
-    likeCount: 3,
-    replyCount: 2,
+    likeCount: 0,
+    replyCount: 0,
     repostCount: 0,
-    postedAt: new Date(1768566210 * 1000)
+    postedAt: new Date("2025-12-03T22:27:15.000Z"),
+    threadId: "thread-1771063751140-6r1ixqszk",
   },
   {
-    id: '3806222635869169291_63898026705',
-    username: 'whatthesol',
-    content: `회사에 친한 인디언 컬리그 하나 있는데, 은근히 느끼하게 야한 농담 하는걸 좋아한다.
-
-하루는 내가 새로 산 일립티컬 트레이너를 자랑했더니,
-자기도 집에 비슷한 게 있어서 베란다에 두고 쓴다고 하더라.
-비 맞고 해서 그런지 탈 때마다 끼익끼익 소리가 나는데,
-
-밤에 타면 이웃들이 그 소리 듣고 다른 걸로 오해한다고 하면서
-느끼하게 웃는다`,
+    id: "zuck-1771063751140-7",
+    username: "zuck",
+    content: "Inspired by all of you who started \"dear threads algo\" requests, we're going to test a new feature where if you post \"dear algo\" it will actually put more of that content in your feed!  번역하기",
     imageUrls: [],
-    likeCount: 2,
-    replyCount: 1,
+    likeCount: 0,
+    replyCount: 0,
     repostCount: 0,
-    postedAt: new Date(1767957118 * 1000)
+    postedAt: new Date("2025-12-03T20:00:59.000Z"),
+    threadId: "thread-1771063751140-6r1ixqszk",
   },
   {
-    id: '3805490823639388039_63898026705',
-    username: 'whatthesol',
-    content: `점심 먹으면서 유튜브를 보는데
-정치망으로 물고기를 잡는데
-인기 많은 병어가 잡혔다.
-
-병어는 크게 덕자와 덕대, 이렇게 두 가지로 나뉜다고 한다.
-
-덕자 병어, 그리고 덕대 병어.
-생긴 게 좀 다르다고 한다.
-
-그리고 덕대의 '대' 자가 큰 대(大) 자인가 했더니
-덕대가 훨씬 크게 자란단다.
-그런데 덕자가 인기는 더 있다고 한다.
-
-유튜브에서 별걸 다 배운다`,
-    imageUrls: [],
-    likeCount: 1,
-    replyCount: 1,
+    id: "zuck-1771063752646-8",
+    username: "zuck",
+    content: "horizon.meta.com/world…",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/583744796_17933338617103224_2928428535484831218_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNzIweDQyMi5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=53GC-fR9qaEQ7kNvwFlmx3F&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=Mzc3MDE4MzQ5MDE5NDI2NzcwNw%3D%3D.3-ccb7-5&oh=00_AfuhOJo3lGF5Htz5bevO6rx9Wuvi81jgP4pNq3V6d1sFqA&oe=699608B7&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
     repostCount: 0,
-    postedAt: new Date(1767869879 * 1000)
-  }
-]
+    postedAt: new Date("2025-11-20T17:57:03.000Z"),
+  },
+  {
+    id: "zuck-1771063752646-9",
+    username: "zuck",
+    content: "These models will show up across different features on Facebook Marketplace and our Edits and Meta AI apps soon. Check it out here: aidemos.meta.com/segme…  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/583076901_17933220897103224_6436067587638386787_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDkwMC5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=12NxP4TP11YQ7kNvwG-XPef&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=Mzc2OTE4MzI2NzQ5ODA1ODMxNA%3D%3D.3-ccb7-5&oh=00_AftpNRT8fvNOYiDMkPngri4X9NWjiXich_lkHvP0RMgkIg&oe=69961265&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/583700935_17933220921103224_5144851712241468819_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDkwMC5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=7hLE3NW8_3EQ7kNvwGZEMRA&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=Mzc2OTE4MzQzNDU4MjM2NDAzNw%3D%3D.3-ccb7-5&oh=00_AfsVwmujveRABYCplOdLAFnuuyZfis_qP_G1OGBXj1ZMZA&oe=699633FA&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/584605740_17933220972103224_2870913347767542236_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDkwMC5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=Ls7mbikTONYQ7kNvwHmEF0l&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=Mzc2OTE4MzIwNjY5NzQ2Njk1NA%3D%3D.3-ccb7-5&oh=00_AfsAK65aUpL4jpJBnH2jXz_o11UkHdguUSBAVvlGfVUU-Q&oe=699625E8&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/583017280_17933220933103224_6538455619773470486_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDkwMC5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=ajwDEvIfv60Q7kNvwF0xjLF&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=Mzc2OTE4MzQ3NTY4NjUxMjMwMQ%3D%3D.3-ccb7-5&oh=00_AfvzCQa_nJ6NM6bggSsHUqdP4yMdLf3cFbNsucTtVY9zGg&oe=699632C7&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-11-19T15:53:39.000Z"),
+  },
+  {
+    id: "zuck-1771063752646-11",
+    username: "zuck",
+    content: "Highly recommend working with your wife.  번역하기 2/2",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/573543521_17931816171103224_9106712976628062526_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMjY3Mng0MDA4LnNkci5mODI3ODcuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=4AjZ7VrrU6IQ7kNvwEDRFjr&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=Mzc1OTk5NTQyMTM1NjMxMDA2NQ%3D%3D.3-ccb7-5&oh=00_Afv10AnEoNJrsXVyBZFu2e-cjFW8bPUkueSghiFBmGbviQ&oe=69962663&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-11-06T16:26:44.000Z"),
+    threadId: "thread-1771063752646-hy2ykxd8q",
+  },
+  {
+    id: "zuck-1771063752646-10",
+    username: "zuck",
+    content: "to help make this happen:",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-11-06T14:30:09.000Z"),
+    threadId: "thread-1771063752646-hy2ykxd8q",
+  },
+  {
+    id: "zuck-1771063754153-10",
+    username: "zuck",
+    content: "Oakley Meta Vanguard glasses just landed. Available now -- let's go! 🔥  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/567314974_17929971078103224_7195906974583249777_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTM2NXgyMDQ4LnNkci5mODI3ODcuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=dOn5eKTqaSUQ7kNvwGQBGKR&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=Mzc0ODI4OTkzNTA5NjAwOTc4Mw%3D%3D.3-ccb7-5&oh=00_Afs4ItJl1BkFogZkAoplXcLdns9fm2uo9UM7wPIrl5PBIw&oe=69960266&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/568655859_17929971096103224_8934839506089515468_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTU2MXgxMjQ5LnNkci5mODI3ODcuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=zWMoRIGeeSgQ7kNvwFbNu0i&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=Mzc0ODI4OTkzNTA2MjQxMjY3Nw%3D%3D.3-ccb7-5&oh=00_Aft4QcgZE0UrdQX8zrZU0dzgNuUh25QpUM2KsirxO-GAdg&oe=69960DA6&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/567635215_17929971081103224_9118262197624714565_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzYweDk0OS5zZHIuZjgyNzg3LmRlZmF1bHRfaW1hZ2UuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=iOhB2OfZ1jAQ7kNvwF5URaz&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=Mzc0ODI4OTkzNTA5NTk3NzA2Mw%3D%3D.3-ccb7-5&oh=00_Afv_AsDmfhdak_dCOgWUdK4eBd6AiL5aMv2TDff5J34Drw&oe=6996021F&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/567314981_17929971120103224_2083989995230422551_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjA0OHgxMzY1LnNkci5mODI3ODcuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=e70DnSvVckwQ7kNvwEzZDeu&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=Mzc0ODI4OTkzNTA5NTk4MDA0Mg%3D%3D.3-ccb7-5&oh=00_AfslEZMFDlrhcTUqUcSJxth_BDYWgOjsXuyREATYa8kK3g&oe=69960FF8&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-10-21T12:50:02.000Z"),
+  },
+  {
+    id: "zuck-1771063754153-11",
+    username: "zuck",
+    content: "Spent the day with our Reality Labs research teams. Excited about the progress we're making to bring personal superintelligence to glasses!  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/558979514_17927950989103224_6355772325364147936_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjgzNngyMjY5LnNkci5mODI3ODcuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=nzgFq4s3Ft4Q7kNvwEqZawF&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzczNTMyNjY3NDEzMDE1NDIzMw%3D%3D.3-ccb7-5&oh=00_Afs9jHwxdJOZ-8dVX7kidwsYTHe95tf63k4HaZNOptYVxw&oe=69960239&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/558932567_17927950998103224_2325253517018707618_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjk4OHgyMzkxLnNkci5mODI3ODcuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=z_xqTi3FCUMQ7kNvwEWD4Wl&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzczNTMyNjY3NDIzMDgwNTg4OQ%3D%3D.3-ccb7-5&oh=00_AftZAz2jWWW80TcJtYLb9VHNzElt2fM4_0DvvB3s8cWvfA&oe=6996105F&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/559194583_17927951010103224_953866252288711543_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDU3Ni5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=MXuplMkx-HMQ7kNvwEpnzY1&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzczNTMyNTEyMzczOTI0MzQ3Ng%3D%3D.3-ccb7-5&oh=00_Afv1rl8EyXtCycHMX4PM1XIquQheHGodyAHwPZIDJ8NlwQ&oe=69962D2E&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-10-03T15:34:21.000Z"),
+  },
+  {
+    id: "zuck-1771063755660-6",
+    username: "zuck",
+    content: "Huge milestone for AI and wearables. Meta Ray-Ban Display available today.  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/557075194_17927601303103224_2180831549844730651_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNzIweDkwMC5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=3OOkQvXOoKQQ7kNvwEWoT0v&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzczMzIwMTg3ODM1Mjc1NDAyNA%3D%3D.3-ccb7-5&oh=00_AfvMlWbKalwnY1Iha8CBxnEuIlxnbMaqq7zT8v9k5aPksA&oe=69962597&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-09-30T17:13:16.000Z"),
+  },
+  {
+    id: "zuck-1771063755660-8",
+    username: "zuck",
+    content: "Some fun vibes:  번역하기 2/3",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/552979042_17926846194103224_3833542324897480750_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDEyODAuc2RyLmY4Mjc4Ny5kZWZhdWx0X2NvdmVyX2ZyYW1lLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=2HNgqe5O1bYQ7kNvwEj8Zll&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzcyOTY0Njk3MzAxMzM0MzY1Mw%3D%3D.3-ccb7-5&oh=00_AftaaZRp8g07F8rUXQXdlk-vcdWrIiB3zTUxQxfpu4KgKA&oe=69963862&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/554316676_17926846179103224_1724581211087162230_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDEyODAuc2RyLmY4Mjc4Ny5kZWZhdWx0X2NvdmVyX2ZyYW1lLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=2bwiNBukBXgQ7kNvwHf64Nt&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzcyOTY0NjkzMTIyOTcyMDQxMA%3D%3D.3-ccb7-5&oh=00_AfsU6pUTFf_O4hYxmFA0mC0ZZsLEh47nErbxWqZyxS3nyg&oe=699628E2&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/554613969_17926846209103224_2944086845489484499_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNDgweDg2MC5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=z6mNQO1yHK4Q7kNvwHLObPV&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzcyOTY0NzAxODQ3MTI0NzMyMA%3D%3D.3-ccb7-5&oh=00_AfspzNOGGgLwYGmIIDWggynrMi4qZPGGdgNMqfFtgi0kHg&oe=699625DD&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/553026081_17926846224103224_2815751356691148414_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNDgweDgzMi5zZHIuZjgyNzg3LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=5xolb805QVkQ7kNvwE2231B&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzcyOTY0NzA2NDU5MTc2NzE2OQ%3D%3D.3-ccb7-5&oh=00_AftF3nTMpoo7ElT7xHqWhPIr_gJgVA1Ikys6CJq2RaWssg&oe=699637EF&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-09-25T19:30:13.000Z"),
+    threadId: "thread-1771063755660-0n1oboh3d",
+  },
+  {
+    id: "zuck-1771063755660-7",
+    username: "zuck",
+    content: "⁠Introducing Vibes -- a feed of expressive AI-generated videos from artists and creators in the Meta AI app. Create and remix videos with leading models and music for free.  번역하기 1/3",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-09-25T19:29:35.000Z"),
+    threadId: "thread-1771063755660-0n1oboh3d",
+  },
+  {
+    id: "zuck-1771063757166-7",
+    username: "zuck",
+    content: "Fun milestone update for anyone keeping count: Instagram now has 3 billion monthly actives!  번역하기",
+    imageUrls: ["https://media.tenor.co/A4NWdcTqtrUAAAAd/billions-breaking-bad.gif"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-09-24T14:57:51.000Z"),
+    threadId: "thread-1771063757165-0fh4x3zey",
+  },
+  {
+    id: "zuck-1771063757166-9",
+    username: "zuck",
+    content: "First up, our next generation of Ray-Ban Meta glasses with even higher video quality and double the battery life.  번역하기 2/5",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/550236772_17925811863103224_32031166109109871_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMjM0NngyMzQ2LnNkci5mODI3ODcuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=mGHanTC_rpwQ7kNvwG6V0Rc&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzcyNDAyNDEyNDU3OTczNDM5Mg%3D%3D.3-ccb7-5&oh=00_AftZfeOlBEE8puJGZr4bb3MtJaPCuSUFv8QfMWyzUOXadw&oe=69961FB5&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-09-18T01:18:11.000Z"),
+    threadId: "thread-1771063757165-0fh4x3zey",
+  },
+  {
+    id: "zuck-1771063757166-8",
+    username: "zuck",
+    content: "First up, our next generation of Ray-Ban Meta glasses with even higher video quality and double the battery life.  번역하기 2/5",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/550236772_17925811863103224_32031166109109871_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMjM0NngyMzQ2LnNkci5mODI3ODcuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGDph1TrtXQUcx2DVrVLS19ooLMgjteek4kJGJuI2wkOmkN-cMkBpl0SsoD_Not9YI&_nc_ohc=mGHanTC_rpwQ7kNvwG6V0Rc&_nc_gid=3diILkqhzeQTXeL8Z9R06A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzcyNDAyNDEyNDU3OTczNDM5Mg%3D%3D.3-ccb7-5&oh=00_AftZfeOlBEE8puJGZr4bb3MtJaPCuSUFv8QfMWyzUOXadw&oe=69961FB5&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-09-18T01:18:07.000Z"),
+    threadId: "thread-1771063757165-0fh4x3zey",
+  },
+  {
+    id: "zuck-1771063758671-7",
+    username: "zuck",
+    content: "09/17 = 👌✍️🫰🤏🫱✊",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-09-17T00:01:25.000Z"),
+    threadId: "thread-1771063758671-0n479k2lt",
+  },
+  {
+    id: "zuck-1771063758671-8",
+    username: "zuck",
+    content: "My personal challenge for 2016 is to build a simple AI to run my home and help me with my work. You can think of it kind of like Jarvis in Iron Man. \n\nI'm going to start by exploring what technology is already out there. Then I'll start teaching it to understand my voice to control everything in our home -- music, lights, temperature and so on. I'll teach it to let friends in by looking at their faces when they ring the doorbell. I'll teach it to let me know if anything is going on in Max's room that I need to check on when I'm not with her. On the work side, it'll help me visualize data in VR to help me build better services and lead my organizations more effectively.\n\nEvery challenge has a theme, and this year's theme is invention.\n\nAt Facebook I spend a lot of time working with engineers to build new things. Some of the most rewarding work involves getting deep into the details of technical projects. I do this with Internet.org when we discuss the physics of building solar-powered planes and satellites to beam down internet access. I do this with Oculus when we get into the details of the controllers or the software we're designing. I do this with Messenger when we discuss our AI to answer any question you have. But it's a different kind of rewarding to build things yourself, so this year my personal challenge is to do that.\n\nThis should be a fun intellectual challenge to code this for myself. I'm looking forward to sharing what I learn over the course of the year.",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-09-04T17:18:39.000Z"),
+  },
+  {
+    id: "zuck-1771063758671-9",
+    username: "zuck",
+    content: "Threads on the up and up -- just passed 400M monthly actives on here 🔥  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-08-12T16:09:44.000Z"),
+  },
+  {
+    id: "zuck-1771063758671-10",
+    username: "zuck",
+    content: "We're building personal superintelligence for everyone. Read about our vision here: meta.com/super…  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-07-30T13:01:47.000Z"),
+  },
+  {
+    id: "zuck-1771063758672-12",
+    username: "zuck",
+    content: "To avoid any confusion, there is no change in Yann’s role. He will continue to be Chief Scientist for FAIR! 2/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-07-25T22:38:27.000Z"),
+    threadId: "thread-1771063758671-3vex158cl",
+  },
+  {
+    id: "zuck-1771063758671-11",
+    username: "zuck",
+    content: "Just shared internally that @zhao.shengjia will be Chief Scientist of Meta Superintelligence Labs! 🚀  번역하기 1/2",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/524229843_17919242334103224_2030943664562003818_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjA4MHgxMzg3LnNkci5mODI3ODcuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHBNBDIFV_Mo3wZIaIWJdi2z3_kPdPD85MvTpOGYemCLUrPRj5Zzvy5SzDwh1vNfNI&_nc_ohc=wZjrGaHUT7MQ7kNvwEX_49a&_nc_gid=0uSZy72JCiPZbLbIiFD26g&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzY4NDcyMDk3NjUyNjQyMTEzMA%3D%3D.3-ccb7-5&oh=00_AfvmqnCQ19ZLYNv2CczE17zQQ2ETdI16q_mOTzo55CYaFg&oe=6996037E&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/524484602_17919242325103224_5932440066803887822_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTA4MHgxNDUxLnNkci5mODI3ODcuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHBNBDIFV_Mo3wZIaIWJdi2z3_kPdPD85MvTpOGYemCLUrPRj5Zzvy5SzDwh1vNfNI&_nc_ohc=9n7lWNmsVf8Q7kNvwG9v4fl&_nc_gid=0uSZy72JCiPZbLbIiFD26g&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzY4NDcyMDk3NjI0MTIwNzU0Mw%3D%3D.3-ccb7-5&oh=00_Aftbzjl_j48-APAWjMdazYTOV-EMIV0tujFhRgO6luSIBw&oe=69960E84&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-07-25T19:49:52.000Z"),
+    threadId: "thread-1771063758671-3vex158cl",
+  },
+  {
+    id: "zuck-1771063760177-11",
+    username: "zuck",
+    content: "That video about Dustin Poirier's career was really well done. This is going to be an emotional night.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-07-20T00:43:14.000Z"),
+  },
+  {
+    id: "zuck-1771063760178-13",
+    username: "zuck",
+    content: "SemiAnalysis just reported that Meta is on track to be the first lab to bring a 1GW+ supercluster online. 💪  번역하기 2/4",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-07-14T15:00:40.000Z"),
+    threadId: "thread-1771063760177-vbqa16inl",
+  },
+  {
+    id: "zuck-1771063760177-12",
+    username: "zuck",
+    content: "For our superintelligence effort, I'm focused on building the most elite and talent-dense team in the industry. We're also going to invest hundreds of billions of dollars into compute to build superintelligence. We have the capital from our business to do this.  번역하기 1/4",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-07-14T15:00:36.000Z"),
+    threadId: "thread-1771063760177-vbqa16inl",
+  },
+  {
+    id: "zuck-1771063760178-14",
+    username: "zuck",
+    content: "Happy 4th of July!",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/516001230_957910613060760_9073405871104481378_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNjQweDExMzYuc2RyLmY3MTg3OC5kZWZhdWx0X2NvdmVyX2ZyYW1lLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHBNBDIFV_Mo3wZIaIWJdi2z3_kPdPD85MvTpOGYemCLUrPRj5Zzvy5SzDwh1vNfNI&_nc_ohc=YYBJ39XGo4wQ7kNvwExG4a0&_nc_gid=0uSZy72JCiPZbLbIiFD26g&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzY2OTUxODk0OTUzNjIwNjEyNw%3D%3D.3-ccb7-5&oh=00_AfsF0FJfNeK3O33dHtrp1t5L8nOVYa7OBNd5gEK16pCttg&oe=69962586&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-07-04T20:26:13.000Z"),
+    threadId: "thread-1771063760177-vbqa16inl",
+  },
+  {
+    id: "zuck-1771063761683-10",
+    username: "zuck",
+    content: "Can confirm: it comes in black. Quest 3S @xbox Edition out now 💪  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/511549860_17915386440103224_5135384440804725435_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNDgweDQ4MC5zZHIuZjc1NzYxLmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHBNBDIFV_Mo3wZIaIWJdi2z3_kPdPD85MvTpOGYemCLUrPRj5Zzvy5SzDwh1vNfNI&_nc_ohc=f_3E2jCtTOYQ7kNvwG5XRMk&_nc_gid=0uSZy72JCiPZbLbIiFD26g&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzY2MjA0MDgxNjkyNDY0ODc0OA%3D%3D.3-ccb7-5&oh=00_Afu9XjKZG3qXcnlmW3mMvfNJu3e972aotZy43Y7841bw9g&oe=69961EC4&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/511550418_17915386455103224_5596001294313521954_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDcyMC5zZHIuZjc1NzYxLmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHBNBDIFV_Mo3wZIaIWJdi2z3_kPdPD85MvTpOGYemCLUrPRj5Zzvy5SzDwh1vNfNI&_nc_ohc=fDe7XOImkzYQ7kNvwFv3Blr&_nc_gid=0uSZy72JCiPZbLbIiFD26g&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzY2MjA0MDg1NTg4OTczNTgxMw%3D%3D.3-ccb7-5&oh=00_AfvJDm_6tSKSmlIK1xzWK3QLunWkaNjWxuPtYJUCLabZEw&oe=699625FF&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-06-24T12:53:10.000Z"),
+  },
+  {
+    id: "zuck-1771063761684-11",
+    username: "zuck",
+    content: "New @oakleymeta glasses otw, now built for action. Let's go 💪  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/503433114_17914890414103224_7563538917957381607_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjE2MHgyNzAwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHBNBDIFV_Mo3wZIaIWJdi2z3_kPdPD85MvTpOGYemCLUrPRj5Zzvy5SzDwh1vNfNI&_nc_ohc=9QTs4i3QvsMQ7kNvwFQa4I-&_nc_gid=0uSZy72JCiPZbLbIiFD26g&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzY1OTE0MDQ2NjE2OTIyOTk5Mg%3D%3D.3-ccb7-5&oh=00_Aft4BDjubO-oBLNUsGCtfbjpDz7J_4e3Ug-5dM04IlqERw&oe=6996154A&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/503989958_17914890390103224_5307313850656069944_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjE2MHgyNzAwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHBNBDIFV_Mo3wZIaIWJdi2z3_kPdPD85MvTpOGYemCLUrPRj5Zzvy5SzDwh1vNfNI&_nc_ohc=3lhmfMc8-qcQ7kNvwFLka72&_nc_gid=0uSZy72JCiPZbLbIiFD26g&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzY1OTE0MDQ2NjI0NDYwMDc2OA%3D%3D.3-ccb7-5&oh=00_Afsbq-xC_gMYYHqiFdrIk9kvkicV0JKIiQsfLiaTYyVL6g&oe=6996035B&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/503612898_17914890402103224_8130197339528805611_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjE2MHgyNzAwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHBNBDIFV_Mo3wZIaIWJdi2z3_kPdPD85MvTpOGYemCLUrPRj5Zzvy5SzDwh1vNfNI&_nc_ohc=MeTZ_JYpkZ0Q7kNvwERiYMo&_nc_gid=0uSZy72JCiPZbLbIiFD26g&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzY1OTE0MDQ2NjIzNjM5NDg1Ng%3D%3D.3-ccb7-5&oh=00_AftwkUkEi4tZW2wQHQSjsw9Tc4q-3ObzImkFa0YvhlOI_A&oe=69962A33&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/509212754_17914890411103224_1327245418630794866_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjE2MHgyNzAwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QHBNBDIFV_Mo3wZIaIWJdi2z3_kPdPD85MvTpOGYemCLUrPRj5Zzvy5SzDwh1vNfNI&_nc_ohc=o9CD0uZh6fgQ7kNvwEB5JR2&_nc_gid=0uSZy72JCiPZbLbIiFD26g&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzY1OTE0MDQ2NjIyNzkxNTIyOQ%3D%3D.3-ccb7-5&oh=00_AfsH5l5Iq7wI9eoQMcSmBZPcx23BG_E46xsFtdCH8-ymYg&oe=69960944&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-06-20T12:45:58.000Z"),
+  },
+  {
+    id: "zuck-1771063761684-12",
+    username: "zuck",
+    content: "Spoiler alert: We're testing a way for you to hide spoilers in your Threads posts.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-06-16T16:57:11.000Z"),
+  },
+  {
+    id: "zuck-1771063761684-13",
+    username: "zuck",
+    content: "We're starting to test DMs on Threads. If you get access to this -- slide through!  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/504864743_17913672534103224_4475647943243423297_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNDgweDM1Mi5zZHIuZjc1NzYxLmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFqsRdvuC8NQZD7z_1LT2SpyVYH91nEb4YJk-SiH3pS1GtpZsJHgKbrl-uRey0Ufr0&_nc_ohc=Kj8T0iTF9Y4Q7kNvwGn4zac&_nc_gid=SvvUofacKAEr6qGUnKt0-A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzY1MTk4NjIzODg2Njc3OTY4Mg%3D%3D.3-ccb7-5&oh=00_AfuaF5dAZLOlmLEzlwRXcSSlTER0PUlagYsdC2xxmaQ1pQ&oe=699600DF&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-06-10T15:57:44.000Z"),
+  },
+  {
+    id: "zuck-1771063763190-10",
+    username: "zuck",
+    content: "Working with @constellationenergy to enable 1.1GW of clean nuclear energy in Illinois. This will bring emission-free energy to support building the world's leading AI models. Proud to help advance America's clean energy leadership.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-06-03T11:56:23.000Z"),
+  },
+  {
+    id: "zuck-1771063763190-12",
+    username: "zuck",
+    content: "Here's the model if you want to check it out: github.com/faceb…  번역하기 2/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-05-14T16:04:18.000Z"),
+    threadId: "thread-1771063763190-6yfck79vz",
+  },
+  {
+    id: "zuck-1771063763190-11",
+    username: "zuck",
+    content: "Our AI research team just open sourced a new model and dataset that will unlock advancements in material and molecular science, speeding up discoveries in fields like medicine, tech and energy. Excited to see what types of applications this will enable.  번역하기 1/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-05-14T16:04:13.000Z"),
+    threadId: "thread-1771063763190-6yfck79vz",
+  },
+  {
+    id: "zuck-1771063763190-13",
+    username: "zuck",
+    content: "Hosted our first ever LlamaCon today for AI developers. Thanks to Ali, Satya and everyone who joined us! 🦙  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/494492439_17908389837103224_1852721432785290759_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMzUzMHgyMjE0LnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFqsRdvuC8NQZD7z_1LT2SpyVYH91nEb4YJk-SiH3pS1GtpZsJHgKbrl-uRey0Ufr0&_nc_ohc=j67kSMVPZmsQ7kNvwG9GSVk&_nc_gid=SvvUofacKAEr6qGUnKt0-A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzYyMTg4NjQyMjU4MTQzMDg5Ng%3D%3D.3-ccb7-5&oh=00_AfsmZ1KfwK-ESva8XchM1H963agCTjTSEQtBc3T7FWxYBQ&oe=69962D3D&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/491452977_17908389864103224_4918430098947447991_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDEyODAuc2RyLmY3NTc2MS5kZWZhdWx0X2NvdmVyX2ZyYW1lLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFqsRdvuC8NQZD7z_1LT2SpyVYH91nEb4YJk-SiH3pS1GtpZsJHgKbrl-uRey0Ufr0&_nc_ohc=wl_1RXsnD2YQ7kNvwGJnpNE&_nc_gid=SvvUofacKAEr6qGUnKt0-A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzYyMTg4NTIyMjY5MTY0OTE3Mw%3D%3D.3-ccb7-5&oh=00_Aft1VIBVASiyM6v1-i6Q7W7mRf5r6OCiBFdDATbp-5JG8g&oe=69962BE1&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/494754924_17908389840103224_3452487150020507651_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjA0OHgyNTYwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFqsRdvuC8NQZD7z_1LT2SpyVYH91nEb4YJk-SiH3pS1GtpZsJHgKbrl-uRey0Ufr0&_nc_ohc=vJNcA67g0mAQ7kNvwFmElJg&_nc_gid=SvvUofacKAEr6qGUnKt0-A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzYyMTg4NjQyMjU4MTMxMDM3OA%3D%3D.3-ccb7-5&oh=00_Aftd13O5gCVkolyr_Bm2CbIi8vOA9Bz1FfNEdodGcre9aQ&oe=699634F7&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-04-30T03:08:49.000Z"),
+  },
+  {
+    id: "zuck-1771063763190-14",
+    username: "zuck",
+    content: "Tune in to my conversation with @satyanadella at LlamaCon today. Starting soon -- llama.com/live  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-04-29T23:09:35.000Z"),
+  },
+  {
+    id: "zuck-1771063764696-9",
+    username: "zuck",
+    content: "Talking with @databricksinc co-founder and CEO Ali Ghodsi live from LlamaCon at 10:45am. Tune in here -- llama.com/live  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-04-29T17:14:43.000Z"),
+  },
+  {
+    id: "zuck-1771063764697-10",
+    username: "zuck",
+    content: "Llama is headed to space. It'll be used on the ISS so astronauts can operate AI locally and get things done faster. One small step for AI, and one giant leap for Llamakind!  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/491442415_17907837570103224_2494519518128805379_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMTI4MHgxMjgwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFqsRdvuC8NQZD7z_1LT2SpyVYH91nEb4YJk-SiH3pS1GtpZsJHgKbrl-uRey0Ufr0&_nc_ohc=AYE7kQ5BcAUQ7kNvwFi7OPP&_nc_gid=SvvUofacKAEr6qGUnKt0-A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzYxODUyODE0NDc3MDA5MDQ5Ng%3D%3D.3-ccb7-5&oh=00_Afs-pRmgwA3HQr_fieR31HINy9ogAqrVbVoouSTZhuvABg&oe=69960DE7&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-04-25T11:56:31.000Z"),
+  },
+  {
+    id: "zuck-1771063764697-11",
+    username: "zuck",
+    content: "Open sourcing some good research today that helps AI systems understand perception, localization, and reasoning. Two  releases I'm excited about: Meta Perception Encoder that excels in image and video tasks, serving as eyes that enable AI systems to interpret visual information and understand the world, and Meta Locate 3D that can understand and locate 3D objects in space. Glad to get these out to the community.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-04-17T15:54:24.000Z"),
+  },
+  {
+    id: "zuck-1771063764697-12",
+    username: "zuck",
+    content: "Looking forward to two great fireside chats at LlamaCon: one with Microsoft CEO @satyanadella about AI development, and one with Databricks CEO Ali Ghodsi about open source AI!  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/488925761_17906022354103224_7109665995663658324_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTQ0MHgxMDgwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFqsRdvuC8NQZD7z_1LT2SpyVYH91nEb4YJk-SiH3pS1GtpZsJHgKbrl-uRey0Ufr0&_nc_ohc=6GS-4b2ht7oQ7kNvwGTIkOs&_nc_gid=SvvUofacKAEr6qGUnKt0-A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzYwNzc3NTI4NjYyNTkzMjgwMA%3D%3D.3-ccb7-5&oh=00_AfsG2VZuFvSOADwzVpY3CnODnReDzYPVBaee0H97jDpbRQ&oe=69962D3C&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/488633515_17906022357103224_1013693654994010954_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTQ0MXgxMDgwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFqsRdvuC8NQZD7z_1LT2SpyVYH91nEb4YJk-SiH3pS1GtpZsJHgKbrl-uRey0Ufr0&_nc_ohc=zmfz8okQKzwQ7kNvwEru9_o&_nc_gid=SvvUofacKAEr6qGUnKt0-A&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzYwNzc3NTI4NjYxNzY0NTE5OA%3D%3D.3-ccb7-5&oh=00_AfsncrFXOcjRXM7aWn_NwkrzUKIA7YdqSnoRTfuab5yZdA&oe=699623BC&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-04-10T15:52:31.000Z"),
+  },
+  {
+    id: "zuck-1771063766202-10",
+    username: "zuck",
+    content: "For fun, here's Llama 4's performance (highest) vs cost (lowest)!  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/489436378_17905470393103224_8937822557133776800_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMjg2MngxOTE4LnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGYrcDsyHpF0P_9nrdWylQhSqtxysoXMoL0bX2Qhq5PeHd6o2Jpp-oiP4SMo7a-34Y&_nc_ohc=THQF-drBqs4Q7kNvwE98TjP&_nc_gid=Ti1OZsdkqrl7gSICxExpjQ&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzYwNDI1NDA2ODU3Njk2NjIzNg%3D%3D.3-ccb7-5&oh=00_Aftv1Fkv6JESS5mvW4jaLGjsrB1Pc1_o7c9yEvQiNphBJQ&oe=69962244&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-04-05T19:16:28.000Z"),
+  },
+  {
+    id: "zuck-1771063766202-12",
+    username: "zuck",
+    content: "Llama 4 Scout:\n•⁠ 17B x 16 experts\n•⁠ Natively multi-modal\n•⁠ 10M token context length\n•⁠ Runs on a single GPU\n•⁠ Highest performing small model  번역하기 2/5",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-04-05T18:58:37.000Z"),
+    threadId: "thread-1771063766202-t3rne6ktk",
+  },
+  {
+    id: "zuck-1771063766202-11",
+    username: "zuck",
+    content: "Llama 4 Scout:\n•⁠ 17B x 16 experts\n•⁠ Natively multi-modal\n•⁠ 10M token context length\n•⁠ Runs on a single GPU\n•⁠ Highest performing small model  번역하기 2/5",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-04-05T18:58:34.000Z"),
+    threadId: "thread-1771063766202-t3rne6ktk",
+  },
+  {
+    id: "zuck-1771063766202-14",
+    username: "zuck",
+    content: "Also, a lot of people asked to only allow quotes and replies from their followers. You can now customize this per post to control who chimes in on your posts.  번역하기 2/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-03-20T16:47:38.000Z"),
+    threadId: "thread-1771063766202-t3rne6ktk",
+  },
+  {
+    id: "zuck-1771063766202-13",
+    username: "zuck",
+    content: "New update we're testing -- show people what you're into by adding topics to your profile.  번역하기 1/2",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/485111305_17903603232103224_6244208739929784436_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMTU3MngxMzI4LnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGYrcDsyHpF0P_9nrdWylQhSqtxysoXMoL0bX2Qhq5PeHd6o2Jpp-oiP4SMo7a-34Y&_nc_ohc=Rrffq15akaAQ7kNvwEJUv0m&_nc_gid=Ti1OZsdkqrl7gSICxExpjQ&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzU5MjU4MjY5NTc3MjYxOTQ5Mw%3D%3D.3-ccb7-5&oh=00_AfvfV_9XtlYcLCqEkRYn-N5Pdg4OtusND5wIqqQwS_tZgQ&oe=69962C1D&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-03-20T16:47:32.000Z"),
+    threadId: "thread-1771063766202-t3rne6ktk",
+  },
+  {
+    id: "zuck-1771063767708-9",
+    username: "zuck",
+    content: "Me finding out Llama hit 1 BILLION downloads.  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/484982469_17903356665103224_7401945691727512481_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNDgweDM2MC5zZHIuZjc1NzYxLmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGYrcDsyHpF0P_9nrdWylQhSqtxysoXMoL0bX2Qhq5PeHd6o2Jpp-oiP4SMo7a-34Y&_nc_ohc=DlYPBhRD1_wQ7kNvwHxn__J&_nc_gid=Ti1OZsdkqrl7gSICxExpjQ&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzU5MTAzOTAxMzQ0MTQxNDUzMQ%3D%3D.3-ccb7-5&oh=00_AftQfoE5DXdwAErgLWDiyj2P2W9Afht-tKTwljWc4aIbkw&oe=69960C22&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-03-18T13:48:37.000Z"),
+  },
+  {
+    id: "zuck-1771063767708-10",
+    username: "zuck",
+    content: "First race since knee surgery! 💪 Messing around with our new Edits app. \n@mikaelashiffrin, any tips?  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/482498062_17901452106103224_3495291742907012821_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNzIweDE0MTguc2RyLmY3NTc2MS5kZWZhdWx0X2NvdmVyX2ZyYW1lLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGYrcDsyHpF0P_9nrdWylQhSqtxysoXMoL0bX2Qhq5PeHd6o2Jpp-oiP4SMo7a-34Y&_nc_ohc=HWEssCh7fjwQ7kNvwHsOYfF&_nc_gid=Ti1OZsdkqrl7gSICxExpjQ&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzU4MDMzOTMyMDYwMTA2NzA4MQ%3D%3D.3-ccb7-5&oh=00_AfuGXYuVpRuRmw7dKQcVcJGLNdw4q5ICDhGVuEdxFjBBaQ&oe=69963169&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-03-03T19:22:29.000Z"),
+  },
+  {
+    id: "zuck-1771063769213-8",
+    username: "zuck",
+    content: "LlamaCon is a new event for developers building with Llama. See you there!  번역하기 2/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-02-18T16:27:47.000Z"),
+    threadId: "thread-1771063769213-5grs72nfe",
+  },
+  {
+    id: "zuck-1771063769213-7",
+    username: "zuck",
+    content: "Save the date 🗓\nLlamaCon: Apr 29\nConnect: Sept 17-18  번역하기 1/2",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/480019007_17899741425103224_320651642526644771_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNTc2eDEwMjQuc2RyLmY3NTc2MS5kZWZhdWx0X2NvdmVyX2ZyYW1lLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGYrcDsyHpF0P_9nrdWylQhSqtxysoXMoL0bX2Qhq5PeHd6o2Jpp-oiP4SMo7a-34Y&_nc_ohc=mRmQfywt3XAQ7kNvwGwF_TG&_nc_gid=Ti1OZsdkqrl7gSICxExpjQ&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzU3MDgyODAwNzMzNTg4NjY3Mg%3D%3D.3-ccb7-5&oh=00_AfuZB3f7FaGG_Frzfm1hdMc9a8usrUcHJNHdrI9fXLfi8g&oe=69960671&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-02-18T16:27:40.000Z"),
+    threadId: "thread-1771063769213-5grs72nfe",
+  },
+  {
+    id: "zuck-1771063769213-9",
+    username: "zuck",
+    content: "One more turn -- Civ VII coming to Quest this spring.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-02-08T17:33:15.000Z"),
+  },
+  {
+    id: "zuck-1771063770719-7",
+    username: "zuck",
+    content: "10 years of FAIR-Paris and progress never slowed down. Celebrating with a few new open source releases and updates on our work across robotics, language and how we’re using AI to expand our understanding of the brain. \nai.meta.com/blog…  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/476915885_935183005488124_7724984480758994772_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNjQweDM2MC5zZHIuZjcxODc4LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=104&_nc_oc=Q6cZ2QGYrcDsyHpF0P_9nrdWylQhSqtxysoXMoL0bX2Qhq5PeHd6o2Jpp-oiP4SMo7a-34Y&_nc_ohc=iwYxti0Qk5YQ7kNvwGorFt8&_nc_gid=Ti1OZsdkqrl7gSICxExpjQ&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzU2MjgxNzgwNDU3NjQ5MDQzNQ%3D%3D.3-ccb7-5&oh=00_AfurF8E7O48klP5u6W_cnvMaY8V4tc3La6pTanPupeL7aw&oe=6996346C&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-02-07T15:42:17.000Z"),
+  },
+  {
+    id: "zuck-1771063770719-8",
+    username: "zuck",
+    content: "10 years of FAIR-Paris and progress never slowed down. Celebrating with a few new open source releases and updates on our work across robotics, language and how we’re using AI to expand our understanding of the brain. \nai.meta.com/blog…  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/476915885_935183005488124_7724984480758994772_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNjQweDM2MC5zZHIuZjcxODc4LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=104&_nc_oc=Q6cZ2QGYrcDsyHpF0P_9nrdWylQhSqtxysoXMoL0bX2Qhq5PeHd6o2Jpp-oiP4SMo7a-34Y&_nc_ohc=iwYxti0Qk5YQ7kNvwGorFt8&_nc_gid=Ti1OZsdkqrl7gSICxExpjQ&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzU2MjgxNzgwNDU3NjQ5MDQzNQ%3D%3D.3-ccb7-5&oh=00_AfurF8E7O48klP5u6W_cnvMaY8V4tc3La6pTanPupeL7aw&oe=6996346C&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-02-07T15:16:05.000Z"),
+  },
+  {
+    id: "zuck-1771063770720-9",
+    username: "zuck",
+    content: "Now you can make your custom feeds public and follow feeds made by your favorite people on Threads!  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/476204839_18489456403058217_2658949845506230797_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNzIweDE1NjAuc2RyLmY3NTc2MS5kZWZhdWx0X2NvdmVyX2ZyYW1lLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=109&_nc_oc=Q6cZ2QGYrcDsyHpF0P_9nrdWylQhSqtxysoXMoL0bX2Qhq5PeHd6o2Jpp-oiP4SMo7a-34Y&_nc_ohc=-XNe2Z4EFuEQ7kNvwH8gZzU&_nc_gid=Ti1OZsdkqrl7gSICxExpjQ&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzU2MDcyNDY0NDM4OTEwNzM3OQ%3D%3D.3-ccb7-5&oh=00_AfsnJMMPMwSNIW-Y9VoTApHHWfP_zm5U01QuKzqplsMDaA&oe=6996359C&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-02-04T17:53:01.000Z"),
+  },
+  {
+    id: "zuck-1771063772226-7",
+    username: "zuck",
+    content: "Mesa, open for business.  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/475560726_18488588701058217_4061025667827827629_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMjczMngxODIwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=109&_nc_oc=Q6cZ2QGYrcDsyHpF0P_9nrdWylQhSqtxysoXMoL0bX2Qhq5PeHd6o2Jpp-oiP4SMo7a-34Y&_nc_ohc=AVebEsgo5NIQ7kNvwH5um95&_nc_gid=Ti1OZsdkqrl7gSICxExpjQ&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzU1NzA3NTYwNzQwNzY3NjUyOA%3D%3D.3-ccb7-5&oh=00_AfuXmGY2WXAd8_O9YU2yI_bnB2Wh6HAY3hm65Cj_c77ePg&oe=69961612&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-01-30T17:01:17.000Z"),
+  },
+  {
+    id: "zuck-1771063773732-8",
+    username: "zuck",
+    content: "We'll bring online ~1GW of compute in '25 and we'll end the year with more than 1.3 million GPUs. We're planning to invest $60-65B in capex this year while also growing our AI teams significantly, and we have the capital to continue investing in the years ahead. This is a massive effort, and over the coming years it will drive our core products and business, unlock historic innovation, and extend American technology leadership. Let's go build! 💪  번역하기 2/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-01-24T14:00:56.000Z"),
+    threadId: "thread-1771063773732-bboqz8bei",
+  },
+  {
+    id: "zuck-1771063773732-7",
+    username: "zuck",
+    content: "This will be a defining year for AI. In 2025, I expect Meta AI will be the leading assistant serving more than 1 billion people, Llama 4 will become the leading state of the art model, and we'll build an AI engineer that will start contributing increasing amounts of code to our R&D efforts. To power this, Meta is building a 2GW+ datacenter that is so large it would cover a significant part of Manhattan.  번역하기 1/2",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/475093077_18487567237058217_5512252728089414808_n.webp?efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMTkyMXg5NjEuc2RyLmY3NTc2MS5kZWZhdWx0X2ltYWdlLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=109&_nc_oc=Q6cZ2QGyIFcTHKc0S8f5_BlZtwgoErP5I2AMSA9yLq2m7dLttb5IlHqEoamlcciB5ngdKoY&_nc_ohc=TFeV0KFk5UAQ7kNvwGfVdn_&_nc_gid=_zgnDg5Gs4r7VAYlJizVaA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzU1MjYzNjEzNDI2NjE4MDQ5Ng%3D%3D.3-ccb7-5&oh=00_AfsIuA_VNh3tYYnRdipq5pEYmm5H_dtVVPNLx4MoCSaqbQ&oe=6996207B&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-01-24T14:00:51.000Z"),
+    threadId: "thread-1771063773732-bboqz8bei",
+  },
+  {
+    id: "zuck-1771063773733-10",
+    username: "zuck",
+    content: "Meta is giving to the relief efforts and Priscilla and I are personally as well. Meta also activated Safety Check and so far more than 400k people have used it to let friends and family know they're safe.  번역하기 2/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-01-09T22:03:25.000Z"),
+    threadId: "thread-1771063773732-bboqz8bei",
+  },
+  {
+    id: "zuck-1771063773732-9",
+    username: "zuck",
+    content: "Praying for everyone in LA right now. Really tough to see all the videos and photos of the devastation. I hope you all stay safe out there ❤️  번역하기 1/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-01-09T21:50:37.000Z"),
+    threadId: "thread-1771063773732-bboqz8bei",
+  },
+  {
+    id: "zuck-1771063773733-12",
+    username: "zuck",
+    content: "1/ Replace fact-checkers with Community Notes, starting in the US.  번역하기 2/8",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-01-07T11:58:16.000Z"),
+    threadId: "thread-1771063773732-bboqz8bei",
+  },
+  {
+    id: "zuck-1771063773733-11",
+    username: "zuck",
+    content: "It's time to get back to our roots around free expression and giving people voice on our platforms. Here's what we're going to do:  번역하기 1/8",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2025-01-07T11:58:13.000Z"),
+    threadId: "thread-1771063773732-bboqz8bei",
+  },
+  {
+    id: "zuck-1771063775239-10",
+    username: "zuck",
+    content: "Threads strong momentum continues -- now 300M+ monthly actives and 100M+ daily actives 💪  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-12-16T22:47:18.000Z"),
+    threadId: "thread-1771063775238-9qmm9ye9u",
+  },
+  {
+    id: "zuck-1771063775239-11",
+    username: "zuck",
+    content: "Probably would have been better off keeping it standing 😂  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/470644395_1116182123372412_7695728700695454948_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjA4MHgxNDM1LnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGyIFcTHKc0S8f5_BlZtwgoErP5I2AMSA9yLq2m7dLttb5IlHqEoamlcciB5ngdKoY&_nc_ohc=N9mms42x9pwQ7kNvwGiHEoZ&_nc_gid=_zgnDg5Gs4r7VAYlJizVaA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzUyMzkxNzI5OTk2NTI3NTYyMg%3D%3D.3-ccb7-5&oh=00_Afue1CvZwy42YRzI2ATZ0hVYgNWSPnIMTEcg_1-Kk5PfkQ&oe=6996251A&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/470113093_2552632508460792_7596575631800067376_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjA4MHgxNDU4LnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QGyIFcTHKc0S8f5_BlZtwgoErP5I2AMSA9yLq2m7dLttb5IlHqEoamlcciB5ngdKoY&_nc_ohc=hl_e0xVWE60Q7kNvwGn3BTE&_nc_gid=_zgnDg5Gs4r7VAYlJizVaA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzUyMzkxNzI5OTk5MDUyMzY1OA%3D%3D.3-ccb7-5&oh=00_Aft5hq9ufvsf7rWtzB2-wd90kVZ3A84FWmI_BfBz1__96A&oe=69962BE9&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-12-15T23:01:40.000Z"),
+  },
+  {
+    id: "zuck-1771063775239-12",
+    username: "zuck",
+    content: "Last big AI update of the year:\n•⁠ ⁠Meta AI now has nearly 600M monthly actives\n•⁠ ⁠Releasing Llama 3.3 70B text model that performs similarly to our 405B\n•⁠ ⁠Building 2GW+ data center to train future Llama models\nNext stop: Llama 4. Let's go! 🚀  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-12-06T16:41:57.000Z"),
+  },
+  {
+    id: "zuck-1771063775239-13",
+    username: "zuck",
+    content: "Next step towards making Threads fully interoperable in the fediverse: now you'll be able to follow people from other fediverse servers who liked, followed or replied to federated profiles on Threads.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-12-04T17:00:11.000Z"),
+  },
+  {
+    id: "zuck-1771063775239-14",
+    username: "zuck",
+    content: "Testing the option to choose any feed -- For You, following, or a custom one -- as your default. Also making this more visible in the app. Interested to see how and if people use this.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-11-25T17:33:54.000Z"),
+  },
+  {
+    id: "zuck-1771063775240-15",
+    username: "zuck",
+    content: "Starting to test a new way to create dedicated feeds for your favorite topics and profiles. Enjoy!  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-11-15T15:02:52.000Z"),
+  },
+  {
+    id: "zuck-1771063776745-12",
+    username: "zuck",
+    content: "August did it best ngl  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/466462241_449356408183434_3660995460304852326_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTUzNngyMDQ4LnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=106&_nc_oc=Q6cZ2QGyIFcTHKc0S8f5_BlZtwgoErP5I2AMSA9yLq2m7dLttb5IlHqEoamlcciB5ngdKoY&_nc_ohc=P8pE1WfdYPgQ7kNvwHveGxH&_nc_gid=_zgnDg5Gs4r7VAYlJizVaA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQ5OTQ1NjY2ODEyMTgxNDE2Mg%3D%3D.3-ccb7-5&oh=00_AfvVg5GMHBWCpLsQnLpAyYUu9MG8iw2tFt8CZa32AgJ8ig&oe=69960E7E&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/466376250_1660375271187694_4688113289411235946_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTUzNngyMDQ4LnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=110&_nc_oc=Q6cZ2QGyIFcTHKc0S8f5_BlZtwgoErP5I2AMSA9yLq2m7dLttb5IlHqEoamlcciB5ngdKoY&_nc_ohc=-332QoEpat0Q7kNvwG9PHTv&_nc_gid=_zgnDg5Gs4r7VAYlJizVaA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQ5OTQ1NjY2ODEyMTc5NTMyMw%3D%3D.3-ccb7-5&oh=00_AfughA1cKkuKlEpJVZvjElD53i2UFGqtUjacbXiuGcIp5g&oe=69962ECA&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-11-12T05:02:45.000Z"),
+  },
+  {
+    id: "zuck-1771063778252-13",
+    username: "zuck",
+    content: "Congratulations to President Trump on a decisive victory. We have great opportunities ahead of us as a country. Looking forward to working with you and your administration.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-11-06T16:50:50.000Z"),
+  },
+  {
+    id: "zuck-1771063778252-14",
+    username: "zuck",
+    content: "Open sourcing a bunch of research on touch perception, dexterity, and human interaction with robots, as part of our AI work. Being able to interact with people in physical and virtual spaces is going to make robots a lot more useful and it's an important step on the path to AGI. Check out our new advanced dexterous robot hand in action. I'm pretty excited about this.  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/465410642_18471433216058217_4881665630866965236_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDU3Ni5zZHIuZjc1NzYxLmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=109&_nc_oc=Q6cZ2QEcfhxW84z1iRpUccdDkMXtwxje9Tr2vKUGTsJMF2GHYLPZ4JVJJKclSZ3zYbHtJIU&_nc_ohc=9iuG47oGQbQQ7kNvwF48NKL&_nc_gid=pVayOCUPSe4Q9oE-EBgyzg&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQ5MTA5MDU3MzM1ODUyNzc0MA%3D%3D.3-ccb7-5&oh=00_AfuwZPNYwe2KXA9Igx-jFpne9GUBhzWPvYdjEsK6W-CPOw&oe=69961F79&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/465186803_18471433240058217_6883893393234770573_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzIweDU3Ni5zZHIuZjc1NzYxLmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=109&_nc_oc=Q6cZ2QEcfhxW84z1iRpUccdDkMXtwxje9Tr2vKUGTsJMF2GHYLPZ4JVJJKclSZ3zYbHtJIU&_nc_ohc=UHIenVvM26sQ7kNvwEurzkH&_nc_gid=pVayOCUPSe4Q9oE-EBgyzg&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQ5MTA5MDYxOTY4MDM1NjM4Nw%3D%3D.3-ccb7-5&oh=00_Afvs9Wgy6tnkqUbJbByN8hYNZ8wNmemEqL80RxgFUWfTcQ&oe=69962697&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-10-31T16:01:31.000Z"),
+  },
+  {
+    id: "zuck-1771063778252-15",
+    username: "zuck",
+    content: "Threads now has almost 275M monthly actives and more than 1M daily sign-ups 🔥  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-10-30T21:58:50.000Z"),
+  },
+  {
+    id: "zuck-1771063778252-16",
+    username: "zuck",
+    content: "Releasing quantized versions of our Llama 1B and 3B on device models. Reduced model size, better memory efficiency and 3x faster for easier app development. 💪  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-10-24T14:58:05.000Z"),
+  },
+  {
+    id: "zuck-1771063778253-18",
+    username: "zuck",
+    content: "ICYMI, meet the new @metaquest 3S -- high quality mixed reality for just $299.  번역하기 2/7",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/461313469_494802043440633_6770128911993355362_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMjQwMHgzMDAwLnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=109&_nc_oc=Q6cZ2QEcfhxW84z1iRpUccdDkMXtwxje9Tr2vKUGTsJMF2GHYLPZ4JVJJKclSZ3zYbHtJIU&_nc_ohc=Frq-bR-WV0UQ7kNvwEGKHbp&_nc_gid=pVayOCUPSe4Q9oE-EBgyzg&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQ2NTA2NTk1OTA2MzY3OTkyMg%3D%3D.3-ccb7-5&oh=00_AfvFXXiX2cPMAivLX8XLO7Wfq3qH9w0hjW82AV2rhsc13g&oe=69960912&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-09-25T18:14:32.000Z"),
+    threadId: "thread-1771063778253-28580idbq",
+  },
+  {
+    id: "zuck-1771063778253-17",
+    username: "zuck",
+    content: "ICYMI, meet the new @metaquest 3S -- high quality mixed reality for just $299.  번역하기 2/7",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/461313469_494802043440633_6770128911993355362_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMjQwMHgzMDAwLnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=109&_nc_oc=Q6cZ2QEcfhxW84z1iRpUccdDkMXtwxje9Tr2vKUGTsJMF2GHYLPZ4JVJJKclSZ3zYbHtJIU&_nc_ohc=Frq-bR-WV0UQ7kNvwEGKHbp&_nc_gid=pVayOCUPSe4Q9oE-EBgyzg&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQ2NTA2NTk1OTA2MzY3OTkyMg%3D%3D.3-ccb7-5&oh=00_AfvFXXiX2cPMAivLX8XLO7Wfq3qH9w0hjW82AV2rhsc13g&oe=69960912&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-09-25T18:14:27.000Z"),
+    threadId: "thread-1771063778253-28580idbq",
+  },
+  {
+    id: "zuck-1771063779760-11",
+    username: "zuck",
+    content: "Good to see dozens of European CEOs, academics, and leaders sign this letter calling for a better approach to AI regulation. The potential of AI is massive and we hope the EU doesn't limit the economic growth and scientific progress this technology can unlock. EUneedsAI.com  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-09-19T16:01:18.000Z"),
+    threadId: "thread-1771063779760-z75gz1mjh",
+  },
+  {
+    id: "zuck-1771063779760-13",
+    username: "zuck",
+    content: "Introducing Instagram Teen Accounts: Built-In Protections for Teens, Peace of Mind for Parents",
+    imageUrls: ["https://about.fb.com/wp-content/uploads/2024/09/Introducing-Teen-Accounts_Header.jpg?w=1200"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-09-17T12:50:50.000Z"),
+    threadId: "thread-1771063779760-z75gz1mjh",
+  },
+  {
+    id: "zuck-1771063779760-12",
+    username: "zuck",
+    content: "We're introducing Instagram Teen Accounts, so teens get built-in protections that limit who they're messaging and what content they see. These are big changes to give parents confidence their teens are having safe experiences online.  번역하기 1/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-09-17T12:50:46.000Z"),
+    threadId: "thread-1771063779760-z75gz1mjh",
+  },
+  {
+    id: "zuck-1771063781266-9",
+    username: "zuck",
+    content: "Fun night with @acquired.fm at the Chase Center talking lessons from the early days and what's coming in the next decade of social, technology and AI 💪  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/459230146_1719823322182841_1594694733412613201_n.heic?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTQ0MHg3OTIuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QEcfhxW84z1iRpUccdDkMXtwxje9Tr2vKUGTsJMF2GHYLPZ4JVJJKclSZ3zYbHtJIU&_nc_ohc=gtK7fB6kKpoQ7kNvwFE7qbW&_nc_gid=pVayOCUPSe4Q9oE-EBgyzg&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQ1NDgwODk3NTkwMjY0NzM1Mw%3D%3D.3-ccb7-5&oh=00_AfuaCxwXzpy99dgTX-8rsphUOrqdobi_cbxtg80MfZwZwg&oe=69963303&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/459346574_829082192741768_918151867864432424_n.heic?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTIzMng3OTIuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=108&_nc_oc=Q6cZ2QEcfhxW84z1iRpUccdDkMXtwxje9Tr2vKUGTsJMF2GHYLPZ4JVJJKclSZ3zYbHtJIU&_nc_ohc=uec5GfV_LowQ7kNvwHhAxa8&_nc_gid=pVayOCUPSe4Q9oE-EBgyzg&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQ1NDgwODk3NTc3Njg5Njg1MQ%3D%3D.3-ccb7-5&oh=00_AfuqslqdlgpNpSszpEztHhpqKsCkm2X0SyPDDbpetTzLjg&oe=69961C47&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/459150611_724316689850006_7731346860300618170_n.heic?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTE5MXg3OTIuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QEcfhxW84z1iRpUccdDkMXtwxje9Tr2vKUGTsJMF2GHYLPZ4JVJJKclSZ3zYbHtJIU&_nc_ohc=AzthPyB_8xkQ7kNvwE7xcC4&_nc_gid=pVayOCUPSe4Q9oE-EBgyzg&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQ1NDgwODk3NTQ1ODA1NDg4Mg%3D%3D.3-ccb7-5&oh=00_AftU7_MmkZgubMoylLQhRaaig2n9pe_ufnklDhP_lpYDLw&oe=69961F91&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-09-11T14:35:46.000Z"),
+  },
+  {
+    id: "zuck-1771063781267-11",
+    username: "zuck",
+    content: "More on Llama adoption here: ai.meta.com/blog…  번역하기 2/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-08-29T13:59:38.000Z"),
+    threadId: "thread-1771063781267-l4xjhzhqm",
+  },
+  {
+    id: "zuck-1771063781267-10",
+    username: "zuck",
+    content: "Llama is growing even faster than I expected: almost 350M downloads (>20M in the last month!) and a 10x jump in monthly usage since the start of the year. Excited to share the next set of updates and Llama models soon. Thanks to everyone building with us 💪  번역하기 1/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-08-29T13:59:35.000Z"),
+    threadId: "thread-1771063781267-l4xjhzhqm",
+  },
+  {
+    id: "zuck-1771063781267-12",
+    username: "zuck",
+    content: "@eldsjal and I wrote a piece for the Economist about how Europe would benefit from embracing open source AI: about.fb.com/news…  번역하기",
+    imageUrls: ["https://about.fb.com/wp-content/uploads/2024/08/MZ-Economist-Open-Letter_Header.jpg?w=1200"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-08-23T13:59:50.000Z"),
+  },
+  {
+    id: "zuck-1771063782772-9",
+    username: "zuck",
+    content: "Excited for this one, @stylebender! Glad it's not me standing across from you... MMA  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/528792846_1453895939138412_8667124161508223551_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNDgweDg1NC5zZHIuZjcxODc4LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=c8HNXoxapPoQ7kNvwG8uf0k&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQzNjA5ODkzMTA5OTQ1MjYwMg%3D%3D.3-ccb7-5&oh=00_AftCLuelevnUC-1Iy_qPRPeJsED8Ob6qJdgvz1k9_46rpA&oe=69960AA4&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-08-16T19:02:26.000Z"),
+  },
+  {
+    id: "zuck-1771063782773-10",
+    username: "zuck",
+    content: "We're bringing post insights and the ability to save multiple drafts to Threads on web. The option to schedule posts is coming soon too.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-08-15T16:58:07.000Z"),
+  },
+  {
+    id: "zuck-1771063782773-11",
+    username: "zuck",
+    content: "Fun visit to @southparkcommons to talk with the community of founders they've assembled building with Llama. They also had actual llamas there...  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t39.30808-6/454254727_18454871974058217_1962062746603551777_n.jpg?stp=dst-jpegr_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMTUwMHgyMDAwLmhkci5mMzA4MDguZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=109&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=C_4MXHwDDNoQ7kNvwFKCNBU&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8AAAAA&ccb=7-5&ig_cache_key=MzQyOTA4MzQzNjYxNTcyMTQ1MQ%3D%3D.3-ccb7-5&oh=00_AftsyoMgQk2Mb8ukGuD-Qx5DzfNaRI63ziuf5Dw9_fNCQQ&oe=699635E8&_nc_sid=b0e1a0&se=-1"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-08-07T02:43:42.000Z"),
+  },
+  {
+    id: "zuck-1771063784279-7",
+    username: "zuck",
+    content: "Did a Q&A with Jensen at SIGGRAPH to talk about open source, AI agents, and smart glasses. But more importantly I got him a new black shearling + leather coat. Next we've got to get this guy a chain.  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/453467264_1212219440212228_7525828074195648786_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMTIwMHgxNjAwLnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=104&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=Aw4l8ro-MzgQ7kNvwFvzkc5&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQyMzE5NDQxNDU2NDIzMTk0Mw%3D%3D.3-ccb7-5&oh=00_AftwSnwqt2YZCb9K44rhQUGUF5qPUpLoxAqbHaq08Jo2Iw&oe=69960E2F&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-29T23:43:15.000Z"),
+  },
+  {
+    id: "zuck-1771063784279-8",
+    username: "zuck",
+    content: "Congrats @leetothekiefer on winning Olympic fencing gold again! So proud and happy for you 💪🇺🇸  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-28T20:28:42.000Z"),
+  },
+  {
+    id: "zuck-1771063784280-10",
+    username: "zuck",
+    content: "Which one has the most drip? Updating my default.  번역하기 2/2",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-23T19:58:09.000Z"),
+    threadId: "thread-1771063784279-tuczp2sxw",
+  },
+  {
+    id: "zuck-1771063784279-9",
+    username: "zuck",
+    content: "Made these with Meta AI and they're pretty good.  번역하기 1/2",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/452807187_392097037225995_7086511561700717923_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzY4eDc2OC5zZHIuZjI5MzUwLmRlZmF1bHRfaW1hZ2UuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=103&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=izdfwJWUAbkQ7kNvwGSn80M&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxODczMjQxNDI2MzQzNTk2NQ%3D%3D.3-ccb7-5&oh=00_Aft_k2lyty9p3cVBYdMjR5xQI7ytLlzYVTf0R1Pb_EmPPQ&oe=69961498&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/452470760_1014734406584164_2278907413480222280_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzY4eDc2OC5zZHIuZjI5MzUwLmRlZmF1bHRfaW1hZ2UuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=104&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=3UOdAalxT98Q7kNvwFDqi2U&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxODczMjQxNDI3MTgzODU5MQ%3D%3D.3-ccb7-5&oh=00_Afu8wLzckp3KITclvdsm5B6BYnNEsAlNZK9jnQV8qxBiVw&oe=69962A0C&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/452706607_876065801224644_49037438185378852_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzY4eDc2OC5zZHIuZjI5MzUwLmRlZmF1bHRfaW1hZ2UuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=sWu9y3FoJV0Q7kNvwG4k2Mo&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxODczMjQxNDQzOTcxMjQ0MQ%3D%3D.3-ccb7-5&oh=00_Aft98bpP4j26agiv27y8Ry7BZC7RKOlr12MEJmvZ8G83xA&oe=69960E16&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/452512164_1509336799697365_7661523371758493866_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uNzY4eDc2OC5zZHIuZjI5MzUwLmRlZmF1bHRfaW1hZ2UuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=101&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=IhHkdZJnIJgQ7kNvwGXPTkY&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxODczMjQxNDE0NjAwMzI5OQ%3D%3D.3-ccb7-5&oh=00_AfvRhPA_Uwje5AH2NryuLJxGZyjUQPYMCZ7Jpr7RJ3vlBQ&oe=69960E84&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-23T19:58:04.000Z"),
+    threadId: "thread-1771063784279-tuczp2sxw",
+  },
+  {
+    id: "zuck-1771063785787-7",
+    username: "zuck",
+    content: "Exclusive: Meta just released Llama 3.1 405B — the first-ever open-sourced frontier AI model, beating top closed models like GPT-4o across several benchmarks.I sat down with Mark Zuckerberg, diving into why this marks a major moment in AI history.Read the conversation below:  번역하기 1/2",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/531405167_997257589073114_1111542162121696575_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNjQweDM2MC5zZHIuZjcxODc4LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=hZFB1ux6_yoQ7kNvwG3NbFJ&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxODU4MjE4MjE4NTUzMTUzMw%3D%3D.3-ccb7-5&oh=00_Afsao_dcojwDOXaJMgZW2FU9nJz0XmPQcM_UFe9JPW8HkA&oe=69961FB8&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-23T15:17:38.000Z"),
+  },
+  {
+    id: "zuck-1771063785787-8",
+    username: "zuck",
+    content: "Exclusive: Meta just released Llama 3.1 405B — the first-ever open-sourced frontier AI model, beating top closed models like GPT-4o across several benchmarks.I sat down with Mark Zuckerberg, diving into why this marks a major moment in AI history.Read the conversation below:  번역하기 1/2",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/531405167_997257589073114_1111542162121696575_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNjQweDM2MC5zZHIuZjcxODc4LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=hZFB1ux6_yoQ7kNvwG3NbFJ&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxODU4MjE4MjE4NTUzMTUzMw%3D%3D.3-ccb7-5&oh=00_Afsao_dcojwDOXaJMgZW2FU9nJz0XmPQcM_UFe9JPW8HkA&oe=69961FB8&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-23T14:59:55.000Z"),
+  },
+  {
+    id: "zuck-1771063785787-9",
+    username: "zuck",
+    content: "Open Source AI is the Path Forward  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/452529267_1172673780634930_2525382229271672232_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjU1MHg0MjAwLnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=110&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=xjANRUeZt8wQ7kNvwH06nJH&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxODU3OTYzMDM3MjYzNzIwMg%3D%3D.3-ccb7-5&oh=00_AftaldGXwp9wwxC0kipZYGFL6__2RlvdS_IxzjX5a9z0mQ&oe=69960824&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/452269097_857230352407295_496460996266904755_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjU1MHg0MjAwLnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=111&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=HNTAGINdfnsQ7kNvwHVy11m&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxODU3OTYzMDM4MTAwMDA5Nw%3D%3D.3-ccb7-5&oh=00_Afu1PUPBcUEugUpR7uMCPr2SN9p0uS_CluBgleEFsSfgLg&oe=69960D6E&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/452706995_1122455685488256_2464743829533804337_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjU1MHg0MjAwLnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=PjWSpQDurUAQ7kNvwGkMwkI&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxODU3OTYzMDM1NTc1NDcxOA%3D%3D.3-ccb7-5&oh=00_AfsgbDJCCteDRbA1SZPoYE7l1HKDGtLxit4cqFoiAwYR8w&oe=69961F10&_nc_sid=b0e1a0", "https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/452558911_521840817079458_1992766959456901846_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMjU1MHg0MjAwLnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=106&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=tb0NENG53TAQ7kNvwEYQqvC&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxODU3OTYzMDM2NDAzNDk1Mg%3D%3D.3-ccb7-5&oh=00_AfvjMJR9hZCDGPtp7Qw95ZWzm6TdQVrPgaOWsf98rhjJTA&oe=69962E5F&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-23T14:54:31.000Z"),
+  },
+  {
+    id: "zuck-1771063787293-7",
+    username: "zuck",
+    content: "Serene row before a big week.  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/452372662_1061853835558181_1228649987021502392_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMjA0OHgxMzMyLnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=105&_nc_oc=Q6cZ2QFeqYEf52LrXuiXO-_xc2bPVq0-sDnUSS8inUt_j-GBVq5GAfur5CupaykoxNxMvmI&_nc_ohc=qEwQAr4o8y8Q7kNvwG0TYi1&_nc_gid=aGD4cKxw_zyNrT3kiPB-oA&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQxNzI2ODA5OTYwNTk2OTc2Mw%3D%3D.3-ccb7-5&oh=00_AfuDb4M1ADECpMqMQstGdG_9zUFzeZz2mXDZ7fgVARreyQ&oe=699623F4&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-21T19:28:44.000Z"),
+  },
+  {
+    id: "zuck-1771063787294-8",
+    username: "zuck",
+    content: "Praying for a quick recovery for President Trump. This is such a sad day for our country. Political violence undermines democracy and must always be condemned.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-14T01:38:19.000Z"),
+  },
+  {
+    id: "zuck-1771063788800-7",
+    username: "zuck",
+    content: "More windows on Quest. Boom.  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/529760390_1482664326221350_3886598738255495066_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uNzIweDcyMC5zZHIuZjcxODc4LmRlZmF1bHRfY292ZXJfZnJhbWUuYzIifQ&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=110&_nc_oc=Q6cZ2QFLwF74i1oiVh-Vg-LnjXmvctuOCF3ybBLESqkZAqmWzxaK1i_cMDLPDqwWmEo-ATs&_nc_ohc=Ljbar5bmcDQQ7kNvwEGRrd5&_nc_gid=Pi_01rEaiGDIm-lTRNVbkw&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzQwNDE0OTY4MzM4MDQyNTMwMQ%3D%3D.3-ccb7-5&oh=00_AfsciAXyAod_O-vxOu6ZwS-rB5yriMMSbzvE0Ho3xazdsQ&oe=69961858&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-03T17:04:57.000Z"),
+  },
+  {
+    id: "zuck-1771063788800-8",
+    username: "zuck",
+    content: "Threads now has more than 175M monthly actives. What a year.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-07-03T13:56:27.000Z"),
+  },
+  {
+    id: "zuck-1771063788800-9",
+    username: "zuck",
+    content: "Starting today, people using Threads in 100+ countries can turn on sharing to the fediverse. 🌎  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/448981732_353392280875178_2052394721277107859_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMTA4MHg3ODMuc2RyLmYyOTM1MC5kZWZhdWx0X2ltYWdlLmMyIn0&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=102&_nc_oc=Q6cZ2QFLwF74i1oiVh-Vg-LnjXmvctuOCF3ybBLESqkZAqmWzxaK1i_cMDLPDqwWmEo-ATs&_nc_ohc=wF-0BG0hxQsQ7kNvwGTWW99&_nc_gid=Pi_01rEaiGDIm-lTRNVbkw&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzM5ODMxNzk1ODAwMzk0OTI5Ng%3D%3D.3-ccb7-5&oh=00_AfvN5VhIhJZ4vlIOZteheYFWKeY-XrA-9wSSJ9Kh-de9tw&oe=69960114&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-06-25T15:58:11.000Z"),
+  },
+  {
+    id: "zuck-1771063788800-10",
+    username: "zuck",
+    content: "The Threads API is now widely available, and coming to more of you soon.  번역하기",
+    imageUrls: [],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-06-18T06:59:04.000Z"),
+  },
+  {
+    id: "zuck-1771063790307-9",
+    username: "zuck",
+    content: "Testing pinned columns on Threads for web.  번역하기",
+    imageUrls: ["https://scontent-ssn1-1.cdninstagram.com/v/t51.29350-15/436355672_1344316512903732_4957925320633111302_n.webp?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuRkVFRC5pbWFnZV91cmxnZW4uMjg4MHgxNDg4LnNkci5mMjkzNTAuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_oc=Q6cZ2QFLwF74i1oiVh-Vg-LnjXmvctuOCF3ybBLESqkZAqmWzxaK1i_cMDLPDqwWmEo-ATs&_nc_ohc=U-Z-fEuyoT4Q7kNvwHTRknK&_nc_gid=Pi_01rEaiGDIm-lTRNVbkw&edm=AAGeoI8BAAAA&ccb=7-5&ig_cache_key=MzM2OTMyNzIwNDM0NzIzMDA5Mw%3D%3D.3-ccb7-5&oh=00_Afs9swcj0rWBsyL0GaUaRoPYi7jZdyOiACgQt6iX_CgtlA&oe=699604C5&_nc_sid=b0e1a0"],
+    likeCount: 0,
+    replyCount: 0,
+    repostCount: 0,
+    postedAt: new Date("2024-05-16T15:58:44.000Z"),
+  },
+];

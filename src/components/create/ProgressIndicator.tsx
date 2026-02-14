@@ -10,11 +10,11 @@ export function ProgressIndicator({ compact = false }: { compact?: boolean }) {
       {steps.map((s, i) => (
         <div key={s} className="flex items-center">
           <div
-            className={`flex items-center justify-center font-medium transition-all ${
+            className={`flex items-center justify-center font-medium transition-all duration-200 ${
               compact ? 'w-6 h-6 text-xs rounded-lg' : 'w-8 h-8 text-sm rounded-xl'
             } ${
               step === s
-                ? 'bg-gray-900 text-white shadow-sm'
+                ? 'bg-gray-900 text-white shadow-sm scale-110'
                 : i < currentStepIndex
                 ? 'bg-green-500 text-white'
                 : 'bg-gray-100 text-gray-400'
@@ -29,7 +29,7 @@ export function ProgressIndicator({ compact = false }: { compact?: boolean }) {
             )}
           </div>
           {i < 2 && (
-            <div className={`mx-1 ${compact ? 'w-6 h-0.5' : 'w-10 h-0.5'} ${
+            <div className={`mx-1 ${compact ? 'w-6 h-0.5' : 'w-10 h-0.5'} transition-colors duration-300 ${
               i < currentStepIndex ? 'bg-green-500' : 'bg-gray-200'
             }`} />
           )}

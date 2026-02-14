@@ -1,51 +1,42 @@
-import puppeteer from 'puppeteer-core'
-import chromium from 'chrome-aws-lambda'
-import { PDFDocument } from 'pdf-lib'
 import { generatePageHtml } from './generator'
 
-async function getBrowser() {
-  if (process.env.NODE_ENV === 'development') {
-    return puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    })
+function getWorkerConfig() {
+  const url = process.env.LOOM_WORKER_URL
+  if (!url) {
+    throw new Error(
+      'LOOM_WORKER_URL environment variable is not set. ' +
+      'Set it to the base URL of the loom-worker service (e.g. http://localhost:3001).'
+    )
   }
-
-  // Production (Vercel) - use chrome-aws-lambda
-  return puppeteer.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath,
-    headless: chromium.headless,
-  })
+  const apiKey = process.env.WORKER_API_KEY
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (apiKey) {
+    headers['Authorization'] = `Bearer ${apiKey}`
+  }
+  return { url: url.replace(/\/+$/, ''), headers }
 }
 
 export async function renderPagesToPdf(pages: string[]): Promise<Buffer> {
-  const browser = await getBrowser()
+  const { url: workerUrl, headers } = getWorkerConfig()
 
-  const mergedPdf = await PDFDocument.create()
+  // Wrap each page content in full HTML document
+  const fullPages = pages.map((pageContent) => generatePageHtml(pageContent))
 
-  for (const pageContent of pages) {
-    const page = await browser.newPage()
+  console.log(`[PDF] Sending ${fullPages.length} pages to worker for rendering...`)
 
-    const htmlContent = generatePageHtml(pageContent)
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
+  const response = await fetch(`${workerUrl}/generate-pdf`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ pages: fullPages }),
+  })
 
-    const pdfBuffer = await page.pdf({
-      width: '148mm',
-      height: '210mm',
-      printBackground: true,
-      margin: { top: '0', right: '0', bottom: '0', left: '0' },
-    })
-
-    const pagePdf = await PDFDocument.load(pdfBuffer)
-    const [copiedPage] = await mergedPdf.copyPages(pagePdf, [0])
-    mergedPdf.addPage(copiedPage)
-
-    await page.close()
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+    throw new Error(
+      `Worker PDF generation failed (${response.status}): ${errorData.error || errorData.message || 'Unknown error'}`
+    )
   }
 
-  await browser.close()
-
-  return Buffer.from(await mergedPdf.save())
+  const arrayBuffer = await response.arrayBuffer()
+  return Buffer.from(arrayBuffer)
 }

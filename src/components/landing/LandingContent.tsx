@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { User } from '@supabase/supabase-js'
@@ -8,15 +9,54 @@ import { UserMenu } from '@/components/auth/UserMenu'
 import { LoginButton } from '@/components/auth/LoginButton'
 import { LanguageToggle } from '@/components/LanguageToggle'
 
+function useScrollAnimation() {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('landing-visible')
+          }
+        })
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    )
+    const elements = node.querySelectorAll('.landing-scroll-animate, .landing-scroll-animate-scale, .landing-step-connector')
+    elements.forEach((el) => observer.observe(el))
+    return () => { elements.forEach((el) => observer.unobserve(el)) }
+  }, [])
+  return ref
+}
+
+function useParallax() {
+  const handleScroll = useCallback(() => {
+    const scrollY = window.scrollY
+    const blobs = document.querySelectorAll<HTMLElement>('[data-parallax]')
+    blobs.forEach((blob) => {
+      const speed = parseFloat(blob.dataset.parallax || '0.3')
+      blob.style.transform = `translateY(${scrollY * speed}px)`
+    })
+  }, [])
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [handleScroll])
+}
+
 interface LandingContentProps {
   user: User | null
 }
 
 export function LandingContent({ user }: LandingContentProps) {
   const { t } = useI18n()
+  const scrollRef = useScrollAnimation()
+  useParallax()
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div ref={scrollRef} className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -47,10 +87,10 @@ export function LandingContent({ user }: LandingContentProps) {
       {/* Hero Section */}
       <section className="relative py-32 px-6 overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-200 rounded-full blur-3xl opacity-30 animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-200 rounded-full blur-3xl opacity-30" data-parallax="-0.1" style={{ animation: 'landing-float-slow 8s ease-in-out infinite' }} />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-30" data-parallax="-0.08" style={{ animation: 'landing-float-delayed 10s ease-in-out infinite 2s' }} />
         </div>
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-4xl mx-auto text-center landing-hero-enter">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600 mb-8">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             Threads to PDF in seconds
@@ -67,7 +107,7 @@ export function LandingContent({ user }: LandingContentProps) {
           </p>
           <Link
             href={user ? "/dashboard?tab=create" : "/login?redirect=/dashboard?tab=create"}
-            className="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-full font-medium text-lg hover:bg-gray-800 hover:scale-105 transition-all shadow-lg shadow-gray-900/20"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-full font-medium text-lg hover:bg-gray-800 hover:scale-105 transition-all shadow-lg shadow-gray-900/20 landing-press-scale"
           >
             {t('hero.cta')}
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +120,7 @@ export function LandingContent({ user }: LandingContentProps) {
       {/* How it Works */}
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 landing-scroll-animate">
             <span className="inline-block px-3 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-600 mb-4">
               Simple Process
             </span>
@@ -94,8 +134,8 @@ export function LandingContent({ user }: LandingContentProps) {
               { step: 1, title: t('howItWorks.step1.title'), desc: t('howItWorks.step1.description'), color: 'purple' },
               { step: 2, title: t('howItWorks.step2.title'), desc: t('howItWorks.step2.description'), color: 'blue' },
               { step: 3, title: t('howItWorks.step3.title'), desc: t('howItWorks.step3.description'), color: 'green' },
-            ].map((item) => (
-              <div key={item.step} className="relative group">
+            ].map((item, index) => (
+              <div key={item.step} className={`relative group landing-scroll-animate landing-stagger-${index + 1}${index < 2 ? ' landing-step-connector' : ''}`}>
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50 rounded-3xl -z-10 group-hover:scale-105 transition-transform" />
                 <div className="p-8">
                   <div className={`w-14 h-14 mb-6 rounded-2xl bg-gradient-to-br ${
@@ -117,7 +157,7 @@ export function LandingContent({ user }: LandingContentProps) {
       {/* Features */}
       <section className="py-24 px-6 bg-gray-50">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 landing-scroll-animate">
             <span className="inline-block px-3 py-1 bg-white rounded-full text-sm font-medium text-gray-600 mb-4 shadow-sm">
               Features
             </span>
@@ -173,8 +213,8 @@ export function LandingContent({ user }: LandingContentProps) {
                 bg: 'bg-orange-50'
               }
             ].map((feature, i) => (
-              <div key={i} className="group p-6 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all">
-                <div className={`w-12 h-12 mb-5 rounded-xl ${feature.bg} flex items-center justify-center`}>
+              <div key={i} className={`group p-6 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all landing-feature-card landing-scroll-animate landing-stagger-${i + 1}`}>
+                <div className={`w-12 h-12 mb-5 rounded-xl ${feature.bg} flex items-center justify-center landing-feature-icon`}>
                   <div className={`bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`}>
                     {feature.icon}
                   </div>
@@ -190,7 +230,7 @@ export function LandingContent({ user }: LandingContentProps) {
       {/* CTA */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-12 md:p-16 text-center">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-12 md:p-16 text-center landing-scroll-animate-scale">
             <div className="absolute inset-0 -z-10">
               <div className="absolute top-0 left-1/4 w-64 h-64 bg-purple-500 rounded-full blur-3xl opacity-20" />
               <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-blue-500 rounded-full blur-3xl opacity-20" />
@@ -203,7 +243,7 @@ export function LandingContent({ user }: LandingContentProps) {
             </p>
             <Link
               href={user ? "/dashboard?tab=create" : "/login?redirect=/dashboard?tab=create"}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-white text-gray-900 rounded-full font-medium text-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-lg"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white text-gray-900 rounded-full font-medium text-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-lg landing-press-scale"
             >
               {t('cta.button')}
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +255,7 @@ export function LandingContent({ user }: LandingContentProps) {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t border-gray-100">
+      <footer className="py-8 px-6 border-t border-gray-100 landing-scroll-animate">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <span className="text-sm text-gray-500">
             {t('footer.copyright')}
