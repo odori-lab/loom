@@ -4,9 +4,11 @@ import { useState } from 'react'
 import { Spinner } from '@/components/ui/Spinner'
 import { ArrowRightIcon } from '@/components/ui/Icons'
 import { useCreateFlow } from './CreateFlowContext'
+import { useI18n } from '@/lib/i18n/context'
 
 export function UsernameStep() {
-  const { state: { loading }, actions: { submitUsername } } = useCreateFlow()
+  const { state: { loading, error }, actions: { submitUsername } } = useCreateFlow()
+  const { t } = useI18n()
   const [username, setUsername] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -16,20 +18,20 @@ export function UsernameStep() {
   }
 
   return (
-    <div className="max-w-md mx-auto text-center">
+    <div className="max-w-md mx-auto text-center" style={{ animation: 'fadeInUp 0.5s ease-out both' }}>
       <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
         <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
       </div>
 
-      <h1 className="text-4xl font-bold text-gray-900 mb-3">Create a Loom</h1>
-      <p className="text-lg text-gray-500 mb-10">
-        Enter a Threads username to get started
+      <h1 className="text-4xl font-bold text-gray-900 mb-3" style={{ animation: 'fadeInUp 0.5s ease-out 0.08s both' }}>{t('create.title')}</h1>
+      <p className="text-lg text-gray-500 mb-10" style={{ animation: 'fadeInUp 0.5s ease-out 0.16s both' }}>
+        {t('create.username.description')}
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative">
+      <form onSubmit={handleSubmit} className="space-y-4" style={{ animation: 'fadeInUp 0.5s ease-out 0.24s both' }}>
+        <div className="relative" style={error ? { animation: 'shake 0.4s ease-in-out' } : undefined}>
           <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-lg font-medium">@</span>
           <input
             type="text"
@@ -44,24 +46,30 @@ export function UsernameStep() {
         <button
           type="submit"
           disabled={!username.trim() || loading}
-          className="w-full py-4 bg-gray-900 text-white rounded-2xl font-medium text-lg hover:bg-gray-800 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3 shadow-lg shadow-gray-900/20"
+          className="w-full py-4 bg-gray-900 text-white rounded-2xl font-medium text-lg hover:bg-gray-800 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3 shadow-lg shadow-gray-900/20 relative overflow-hidden active:scale-[0.96]"
         >
+          {loading && (
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
+              style={{ animation: 'shimmer 1.5s infinite linear', backgroundSize: '200% 100%' }}
+            />
+          )}
           {loading ? (
             <>
               <Spinner size="md" className="text-white" />
-              Loading posts...
+              {t('create.username.loading')}
             </>
           ) : (
             <>
-              Continue
+              {t('create.username.continue')}
               <ArrowRightIcon />
             </>
           )}
         </button>
       </form>
 
-      <p className="mt-8 text-sm text-gray-400">
-        We'll fetch the latest posts from this Threads profile
+      <p className="mt-8 text-sm text-gray-400" style={{ animation: 'fadeInUp 0.5s ease-out 0.32s both' }}>
+        {t('create.username.helper')}
       </p>
     </div>
   )

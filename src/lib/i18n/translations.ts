@@ -47,6 +47,20 @@ export const translations = {
     'login.google': 'Google로 계속하기',
     'login.terms': '계속하면 서비스 약관 및 개인정보 처리방침에 동의하는 것입니다',
 
+    // Dashboard
+    'dashboard.looms': '내 Loom',
+    'dashboard.create': '만들기',
+    'dashboard.search': '검색...',
+    'dashboard.newest': '최신순',
+    'dashboard.oldest': '오래된순',
+    'dashboard.empty.title': '아직 Loom이 없습니다',
+    'dashboard.empty.description': 'Threads 포스트를 아름다운 PDF로 변환하세요',
+    'dashboard.empty.cta': '첫 Loom 만들기',
+    'dashboard.preview.select': 'Loom을 선택해서 미리보기',
+    'dashboard.preview.hint': '그리드에서 항목을 클릭하세요',
+    'dashboard.preview.loading': '미리보기 로딩 중...',
+    'dashboard.preview.error': '미리보기를 불러오지 못했습니다',
+
     // My Page
     'my.title': '내 Looms',
     'my.createNew': '새로 만들기',
@@ -57,13 +71,17 @@ export const translations = {
     'my.delete': '삭제',
 
     // Create Page
+    'create.title': 'Loom 만들기',
     'create.step1': '사용자명',
     'create.step2': '선택',
     'create.step3': '완료',
     'create.username.title': 'Threads 사용자명을 입력하세요',
+    'create.username.description': 'Threads 사용자명을 입력해서 시작하세요',
     'create.username.placeholder': '예: zuck',
     'create.username.button': '포스트 가져오기',
+    'create.username.continue': '계속',
     'create.username.loading': '포스트 가져오는 중...',
+    'create.username.helper': '이 Threads 프로필의 최근 포스트를 가져옵니다',
     'create.select.title': '포함할 포스트를 선택하세요',
     'create.select.selectAll': '전체 선택',
     'create.select.deselectAll': '전체 해제',
@@ -71,9 +89,42 @@ export const translations = {
     'create.select.generate': 'Loom 생성',
     'create.select.generating': '생성 중...',
     'create.complete.title': 'Loom이 준비되었습니다!',
+    'create.complete.description': 'PDF가 생성되어 라이브러리에 저장되었습니다',
     'create.complete.download': 'PDF 다운로드',
     'create.complete.another': '다른 Loom 만들기',
     'create.complete.viewAll': '내 Looms 보기',
+
+    // Create - BookPreview
+    'create.preview.back': '뒤로',
+    'create.preview.generatePdf': 'PDF 생성',
+    'create.preview.generating': '생성 중...',
+    'create.preview.spread': '스프레드',
+    'create.preview.selectPosts': '포스트를 선택해서 미리보기',
+    'create.preview.posts': '개 포스트',
+    'create.preview.failedPdf': 'PDF를 불러오지 못했습니다',
+
+    // Create - PostListSidebar
+    'create.posts.search': '검색...',
+    'create.posts.new': '최신',
+    'create.posts.old': '오래된순',
+    'create.posts.selectAll': '전체 선택',
+    'create.posts.deselectAll': '전체 해제',
+    'create.posts.posts': '개 포스트',
+    'create.posts.loadMore': '더 불러오기',
+    'create.posts.allLoaded': '모든 포스트를 불러왔습니다',
+
+    // Settings
+    'setting.title': '설정',
+    'setting.account': '계정',
+    'setting.signInMethod': '로그인 방법',
+    'setting.signOut': '로그아웃',
+    'setting.language': '언어',
+
+    // Dashboard - extra
+    'dashboard.loom': 'loom',
+    'dashboard.looms_count': 'looms',
+    'dashboard.settings': '설정',
+    'dashboard.deleteConfirm': '이 Loom을 삭제하시겠습니까?',
   },
   en: {
     // Header
@@ -121,6 +172,20 @@ export const translations = {
     'login.google': 'Continue with Google',
     'login.terms': 'By continuing, you agree to our Terms of Service and Privacy Policy',
 
+    // Dashboard
+    'dashboard.looms': 'Looms',
+    'dashboard.create': 'Create',
+    'dashboard.search': 'Search...',
+    'dashboard.newest': 'Newest',
+    'dashboard.oldest': 'Oldest',
+    'dashboard.empty.title': 'No Looms yet',
+    'dashboard.empty.description': 'Transform your Threads posts into beautiful PDFs',
+    'dashboard.empty.cta': 'Create Your First Loom',
+    'dashboard.preview.select': 'Select a Loom to preview',
+    'dashboard.preview.hint': 'Click on any item from the grid',
+    'dashboard.preview.loading': 'Loading preview...',
+    'dashboard.preview.error': 'Failed to load preview',
+
     // My Page
     'my.title': 'My Looms',
     'my.createNew': 'Create New',
@@ -131,13 +196,17 @@ export const translations = {
     'my.delete': 'Delete',
 
     // Create Page
+    'create.title': 'Create a Loom',
     'create.step1': 'Username',
     'create.step2': 'Select',
     'create.step3': 'Complete',
     'create.username.title': 'Enter a Threads username',
+    'create.username.description': 'Enter a Threads username to get started',
     'create.username.placeholder': 'e.g. zuck',
     'create.username.button': 'Fetch Posts',
+    'create.username.continue': 'Continue',
     'create.username.loading': 'Fetching posts...',
+    'create.username.helper': "We'll fetch the latest posts from this Threads profile",
     'create.select.title': 'Select posts to include',
     'create.select.selectAll': 'Select All',
     'create.select.deselectAll': 'Deselect All',
@@ -145,9 +214,42 @@ export const translations = {
     'create.select.generate': 'Generate Loom',
     'create.select.generating': 'Generating...',
     'create.complete.title': 'Your Loom is ready!',
+    'create.complete.description': 'Your PDF has been generated and saved to your library',
     'create.complete.download': 'Download PDF',
     'create.complete.another': 'Create Another',
     'create.complete.viewAll': 'View My Looms',
+
+    // Create - BookPreview
+    'create.preview.back': 'Back',
+    'create.preview.generatePdf': 'Generate PDF',
+    'create.preview.generating': 'Generating...',
+    'create.preview.spread': 'Spread',
+    'create.preview.selectPosts': 'Select posts to preview',
+    'create.preview.posts': 'posts',
+    'create.preview.failedPdf': 'Failed to load PDF',
+
+    // Create - PostListSidebar
+    'create.posts.search': 'Search...',
+    'create.posts.new': 'New',
+    'create.posts.old': 'Old',
+    'create.posts.selectAll': 'Select all',
+    'create.posts.deselectAll': 'Deselect all',
+    'create.posts.posts': 'posts',
+    'create.posts.loadMore': 'Load more posts',
+    'create.posts.allLoaded': 'All posts loaded',
+
+    // Settings
+    'setting.title': 'Settings',
+    'setting.account': 'Account',
+    'setting.signInMethod': 'Sign-in method',
+    'setting.signOut': 'Sign out',
+    'setting.language': 'Language',
+
+    // Dashboard - extra
+    'dashboard.loom': 'loom',
+    'dashboard.looms_count': 'looms',
+    'dashboard.settings': 'Settings',
+    'dashboard.deleteConfirm': 'Are you sure you want to delete this Loom?',
   }
 } as const
 

@@ -275,6 +275,33 @@ export const PDF_STYLES = `
     border-bottom: none;
   }
 
+  /* Threaded post styles */
+  .post-threaded {
+    border-left: 2px solid #e0e0e0;
+    padding-left: 12px;
+    margin-left: 4px;
+  }
+
+  .post-thread-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 7.5pt;
+    color: #888;
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+  }
+
+  .post-thread-indicator svg {
+    width: 10px;
+    height: 10px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
   /* Last Page */
   .page.last-page {
     display: flex;

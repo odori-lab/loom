@@ -3,17 +3,34 @@ interface SpinnerProps {
   className?: string
 }
 
-const sizeClasses = {
-  sm: 'w-4 h-4 border-2',
-  md: 'w-5 h-5 border-2',
-  lg: 'w-8 h-8 border-2',
+const dotSizes = {
+  sm: 'w-1 h-1',
+  md: 'w-1.5 h-1.5',
+  lg: 'w-2 h-2',
+} as const
+
+const gapSizes = {
+  sm: 'gap-1',
+  md: 'gap-1.5',
+  lg: 'gap-2',
 } as const
 
 export function Spinner({ size = 'md', className = '' }: SpinnerProps) {
   return (
-    <div
-      className={`${sizeClasses[size]} border-current/30 border-t-current rounded-full animate-spin ${className}`}
-    />
+    <div className={`flex items-center ${gapSizes[size]} ${className}`}>
+      <div
+        className={`${dotSizes[size]} rounded-full bg-current animate-pulse-soft`}
+        style={{ animationDelay: '0ms' }}
+      />
+      <div
+        className={`${dotSizes[size]} rounded-full bg-current animate-pulse-soft`}
+        style={{ animationDelay: '200ms' }}
+      />
+      <div
+        className={`${dotSizes[size]} rounded-full bg-current animate-pulse-soft`}
+        style={{ animationDelay: '400ms' }}
+      />
+    </div>
   )
 }
 

@@ -24,7 +24,7 @@ export function UserMenu({ user }: UserMenuProps) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+        className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 active:scale-[0.97] transition-all duration-150"
       >
         {user.user_metadata.avatar_url ? (
           <img
@@ -47,7 +47,7 @@ export function UserMenu({ user }: UserMenuProps) {
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-20">
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-20 animate-scale-in origin-top-right">
             <div className="px-4 py-3 border-b">
               <p className="text-sm font-medium text-gray-900 truncate">
                 {user.user_metadata.full_name || user.email}
