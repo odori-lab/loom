@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import { useDashboard } from './DashboardContext'
+import { useI18n } from '@/lib/i18n/context'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/components/ui/Icons'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
@@ -35,6 +36,7 @@ function buildSpreads(numPages: number): SpreadData[] {
 }
 
 function SpreadViewer({ url }: { url: string }) {
+  const { t } = useI18n()
   const [numPages, setNumPages] = useState<number>(0)
   const [currentSpread, setCurrentSpread] = useState(0)
   const [scale, setScale] = useState(1)
@@ -312,14 +314,7 @@ function SpreadViewer({ url }: { url: string }) {
         <Document
           file={url}
           onLoadSuccess={({ numPages: n }) => setNumPages(n)}
-          loading={
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full border-4 border-gray-200 border-t-gray-900 animate-spin" />
-                <p className="text-sm text-gray-500">Loading PDF...</p>
-              </div>
-            </div>
-          }
+          loading={<div />}
           error={
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
@@ -328,7 +323,7 @@ function SpreadViewer({ url }: { url: string }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <p className="text-gray-500">Failed to load PDF</p>
+                <p className="text-gray-500">{t('create.preview.failedPdf')}</p>
               </div>
             </div>
           }
@@ -375,7 +370,7 @@ function SpreadViewer({ url }: { url: string }) {
       {totalSpreads > 0 && (
         <div className="h-16 px-8 flex items-center gap-4 bg-white border-t border-gray-200 shrink-0">
           <span className="text-sm text-gray-400 whitespace-nowrap min-w-[110px]">
-            Spread {currentSpread + 1} / {totalSpreads}
+            {t('create.preview.spread')} {currentSpread + 1} / {totalSpreads}
           </span>
           <input
             type="range"
@@ -423,6 +418,7 @@ function SpreadViewer({ url }: { url: string }) {
 }
 
 export function PreviewModal() {
+  const { t } = useI18n()
   const { previewModalOpen, previewUrl, loadingPreview, selectedLoom, closePreviewModal } = useDashboard()
 
   // Escape key to close modal
@@ -452,7 +448,7 @@ export function PreviewModal() {
             <h2 className="text-sm font-semibold text-gray-900">
               {selectedLoom.thread_display_name || `@${selectedLoom.thread_username}`}
             </h2>
-            <p className="text-xs text-gray-500">{selectedLoom.post_count} posts</p>
+            <p className="text-xs text-gray-500">{selectedLoom.post_count} {t('create.preview.posts')}</p>
           </div>
         </div>
         <button
@@ -470,7 +466,7 @@ export function PreviewModal() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="w-12 h-12 mx-auto mb-4 rounded-full border-4 border-gray-200 border-t-gray-900 animate-spin" />
-            <p className="text-sm text-gray-500">Loading preview...</p>
+            <p className="text-sm text-gray-500">{t('dashboard.preview.loading')}</p>
           </div>
         </div>
       ) : previewUrl ? (
@@ -483,7 +479,7 @@ export function PreviewModal() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <p className="text-gray-500">Failed to load preview</p>
+            <p className="text-gray-500">{t('dashboard.preview.error')}</p>
           </div>
         </div>
       )}

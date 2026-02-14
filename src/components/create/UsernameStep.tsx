@@ -4,9 +4,11 @@ import { useState } from 'react'
 import { Spinner } from '@/components/ui/Spinner'
 import { ArrowRightIcon } from '@/components/ui/Icons'
 import { useCreateFlow } from './CreateFlowContext'
+import { useI18n } from '@/lib/i18n/context'
 
 export function UsernameStep() {
   const { state: { loading, error }, actions: { submitUsername } } = useCreateFlow()
+  const { t } = useI18n()
   const [username, setUsername] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -23,9 +25,9 @@ export function UsernameStep() {
         </svg>
       </div>
 
-      <h1 className="text-4xl font-bold text-gray-900 mb-3" style={{ animation: 'fadeInUp 0.5s ease-out 0.08s both' }}>Create a Loom</h1>
+      <h1 className="text-4xl font-bold text-gray-900 mb-3" style={{ animation: 'fadeInUp 0.5s ease-out 0.08s both' }}>{t('create.title')}</h1>
       <p className="text-lg text-gray-500 mb-10" style={{ animation: 'fadeInUp 0.5s ease-out 0.16s both' }}>
-        Enter a Threads username to get started
+        {t('create.username.description')}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4" style={{ animation: 'fadeInUp 0.5s ease-out 0.24s both' }}>
@@ -55,11 +57,11 @@ export function UsernameStep() {
           {loading ? (
             <>
               <Spinner size="md" className="text-white" />
-              Loading posts...
+              {t('create.username.loading')}
             </>
           ) : (
             <>
-              Continue
+              {t('create.username.continue')}
               <ArrowRightIcon />
             </>
           )}
@@ -67,7 +69,7 @@ export function UsernameStep() {
       </form>
 
       <p className="mt-8 text-sm text-gray-400" style={{ animation: 'fadeInUp 0.5s ease-out 0.32s both' }}>
-        We'll fetch the latest posts from this Threads profile
+        {t('create.username.helper')}
       </p>
     </div>
   )

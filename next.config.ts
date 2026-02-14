@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['chrome-aws-lambda', 'puppeteer-core'],
   images: {
     remotePatterns: [
       {

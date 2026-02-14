@@ -93,6 +93,38 @@ export const translations = {
     'create.complete.download': 'PDF 다운로드',
     'create.complete.another': '다른 Loom 만들기',
     'create.complete.viewAll': '내 Looms 보기',
+
+    // Create - BookPreview
+    'create.preview.back': '뒤로',
+    'create.preview.generatePdf': 'PDF 생성',
+    'create.preview.generating': '생성 중...',
+    'create.preview.spread': '스프레드',
+    'create.preview.selectPosts': '포스트를 선택해서 미리보기',
+    'create.preview.posts': '개 포스트',
+    'create.preview.failedPdf': 'PDF를 불러오지 못했습니다',
+
+    // Create - PostListSidebar
+    'create.posts.search': '검색...',
+    'create.posts.new': '최신',
+    'create.posts.old': '오래된순',
+    'create.posts.selectAll': '전체 선택',
+    'create.posts.deselectAll': '전체 해제',
+    'create.posts.posts': '개 포스트',
+    'create.posts.loadMore': '더 불러오기',
+    'create.posts.allLoaded': '모든 포스트를 불러왔습니다',
+
+    // Settings
+    'setting.title': '설정',
+    'setting.account': '계정',
+    'setting.signInMethod': '로그인 방법',
+    'setting.signOut': '로그아웃',
+    'setting.language': '언어',
+
+    // Dashboard - extra
+    'dashboard.loom': 'loom',
+    'dashboard.looms_count': 'looms',
+    'dashboard.settings': '설정',
+    'dashboard.deleteConfirm': '이 Loom을 삭제하시겠습니까?',
   },
   en: {
     // Header
@@ -186,6 +218,38 @@ export const translations = {
     'create.complete.download': 'Download PDF',
     'create.complete.another': 'Create Another',
     'create.complete.viewAll': 'View My Looms',
+
+    // Create - BookPreview
+    'create.preview.back': 'Back',
+    'create.preview.generatePdf': 'Generate PDF',
+    'create.preview.generating': 'Generating...',
+    'create.preview.spread': 'Spread',
+    'create.preview.selectPosts': 'Select posts to preview',
+    'create.preview.posts': 'posts',
+    'create.preview.failedPdf': 'Failed to load PDF',
+
+    // Create - PostListSidebar
+    'create.posts.search': 'Search...',
+    'create.posts.new': 'New',
+    'create.posts.old': 'Old',
+    'create.posts.selectAll': 'Select all',
+    'create.posts.deselectAll': 'Deselect all',
+    'create.posts.posts': 'posts',
+    'create.posts.loadMore': 'Load more posts',
+    'create.posts.allLoaded': 'All posts loaded',
+
+    // Settings
+    'setting.title': 'Settings',
+    'setting.account': 'Account',
+    'setting.signInMethod': 'Sign-in method',
+    'setting.signOut': 'Sign out',
+    'setting.language': 'Language',
+
+    // Dashboard - extra
+    'dashboard.loom': 'loom',
+    'dashboard.looms_count': 'looms',
+    'dashboard.settings': 'Settings',
+    'dashboard.deleteConfirm': 'Are you sure you want to delete this Loom?',
   }
 } as const
 

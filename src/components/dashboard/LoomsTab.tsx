@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { useDashboard } from './DashboardContext'
 import { SpinnerSvg } from '@/components/ui/Spinner'
 import { TrashIcon, PlusIcon, BookOpenIcon, SearchIcon, DownloadIcon } from '@/components/ui/Icons'
+import { useI18n } from '@/lib/i18n/context'
 
 type SortOrder = 'newest' | 'oldest'
 
@@ -17,6 +18,7 @@ function formatDate(dateString: string) {
 
 export function LoomsTab() {
   const { looms, selectedLoom, deletingId, selectLoom, deleteLoom, setActiveTab, openPreviewModal } = useDashboard()
+  const { t } = useI18n()
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
@@ -59,16 +61,16 @@ export function LoomsTab() {
           <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center shadow-sm" style={{ animation: 'dashboard-float 3s ease-in-out infinite' }}>
             <BookOpenIcon className="w-10 h-10 text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Looms yet</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('dashboard.empty.title')}</h3>
           <p className="text-gray-500 mb-8 max-w-sm">
-            Transform your Threads posts into beautiful PDFs
+            {t('dashboard.empty.description')}
           </p>
           <button
             onClick={() => setActiveTab('create')}
             className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 hover:scale-105 transition-all shadow-lg shadow-gray-900/20 active:scale-[0.96]"
           >
             <PlusIcon className="w-5 h-5" />
-            Create Your First Loom
+            {t('dashboard.empty.cta')}
           </button>
         </div>
       </div>
@@ -78,35 +80,35 @@ export function LoomsTab() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Controls */}
-      <div className="h-16 px-6 py-4 flex gap-4 items-center border-b border-gray-100">
-        <div className="relative">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-3 py-2 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 w-48 h-8"
-          />
-        </div>
+      <div className="h-12 px-6 flex gap-3 items-center justify-end">
+        <p className="text-xs text-gray-400">{looms.length} {looms.length === 1 ? t('dashboard.loom') : t('dashboard.looms_count')}</p>
         <select
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-          className="px-3 py-1 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 h-8"
+          className="px-2 py-1 bg-gray-100 border-0 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-gray-300 h-7"
         >
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
+          <option value="newest">{t('dashboard.newest')}</option>
+          <option value="oldest">{t('dashboard.oldest')}</option>
         </select>
-        <p className="text-sm text-gray-500">{looms.length} {looms.length === 1 ? 'loom' : 'looms'}</p>
+        <div className="relative">
+          <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <input
+            type="text"
+            placeholder={t('dashboard.search')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8 pr-3 py-1 bg-gray-100 border-0 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-gray-300 w-40 h-7"
+          />
+        </div>
       </div>
 
       {/* Grid */}
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="flex flex-wrap gap-3">
+        <div className="grid grid-cols-[repeat(auto-fill,170px)] gap-3 justify-center">
           {filteredLooms.map((loom, index) => (
             <div
               key={loom.id}
-              onClick={() => selectLoom(loom)}
+              onClick={() => { selectLoom(loom); openPreviewModal() }}
               style={{ animationDelay: `${index * 40}ms` }}
               className={`w-[170px] cursor-pointer rounded-xl border-2 transition-all overflow-hidden [animation:dashboard-card-enter_0.3s_ease-out_both] active:scale-[0.97] ${
                 selectedLoom?.id === loom.id
@@ -129,20 +131,6 @@ export function LoomsTab() {
                     ) : (
                       <DownloadIcon className="w-3.5 h-3.5" />
                     )}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      selectLoom(loom)
-                      openPreviewModal()
-                    }}
-                    className="p-1.5 bg-white/80 backdrop-blur-sm rounded-lg text-gray-500 hover:text-gray-900 hover:bg-white transition-all active:scale-[0.96]"
-                    title="Preview"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
                   </button>
                   <button
                     onClick={(e) => {

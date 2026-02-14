@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { CheckIcon, DownloadIcon, PlusIcon } from '@/components/ui/Icons'
 import { useCreateFlow } from './CreateFlowContext'
+import { useI18n } from '@/lib/i18n/context'
 
 interface CompleteStepProps {
   onViewLooms?: () => void
@@ -29,6 +30,7 @@ function generateConfettiPieces(count: number) {
 
 export function CompleteStep({ onViewLooms }: CompleteStepProps) {
   const { state: { downloadUrl }, actions: { createAnother } } = useCreateFlow()
+  const { t } = useI18n()
   const confettiPieces = useMemo(() => generateConfettiPieces(24), [])
 
   return (
@@ -62,9 +64,9 @@ export function CompleteStep({ onViewLooms }: CompleteStepProps) {
         </div>
       </div>
 
-      <h1 className="text-4xl font-bold text-gray-900 mb-3" style={{ animation: 'fadeInUp 0.5s ease-out 0.35s both' }}>Your Loom is ready!</h1>
+      <h1 className="text-4xl font-bold text-gray-900 mb-3" style={{ animation: 'fadeInUp 0.5s ease-out 0.35s both' }}>{t('create.complete.title')}</h1>
       <p className="text-lg text-gray-500 mb-10" style={{ animation: 'fadeInUp 0.5s ease-out 0.42s both' }}>
-        Your PDF has been generated and saved to your library
+        {t('create.complete.description')}
       </p>
 
       <div className="space-y-3">
@@ -76,7 +78,7 @@ export function CompleteStep({ onViewLooms }: CompleteStepProps) {
           style={{ animation: 'fadeInUp 0.4s ease-out 0.5s both' }}
         >
           <DownloadIcon />
-          Download PDF
+          {t('create.complete.download')}
         </a>
 
         <button
@@ -87,7 +89,7 @@ export function CompleteStep({ onViewLooms }: CompleteStepProps) {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
-          View My Looms
+          {t('create.complete.viewAll')}
         </button>
 
         <button
@@ -96,7 +98,7 @@ export function CompleteStep({ onViewLooms }: CompleteStepProps) {
           style={{ animation: 'fadeInUp 0.4s ease-out 0.66s both' }}
         >
           <PlusIcon />
-          Create Another
+          {t('create.complete.another')}
         </button>
       </div>
     </div>
