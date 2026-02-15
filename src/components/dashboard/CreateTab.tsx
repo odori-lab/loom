@@ -35,11 +35,15 @@ export function CreateTabContent() {
   )
 }
 
-export function CreateTabRightPanel() {
+export function CreateTabRightPanel({ width }: { width?: number }) {
   const { state: { step, profile } } = useCreateFlow()
 
   if (step === 'select' && profile) {
-    return <BookPreview />
+    return (
+      <div style={{ width: width ?? 600 }} className="shrink-0 flex flex-col h-full">
+        <BookPreview width={width} />
+      </div>
+    )
   }
 
   return null

@@ -1,4 +1,4 @@
-import { generatePageHtml } from './generator'
+import { ThreadsPost, ThreadsProfile } from '@/types/threads'
 
 function getWorkerConfig() {
   const url = process.env.LOOM_WORKER_URL
@@ -16,27 +16,27 @@ function getWorkerConfig() {
   return { url: url.replace(/\/+$/, ''), headers }
 }
 
-export async function renderPagesToPdf(pages: string[]): Promise<Buffer> {
+export async function createLoomPdf(
+  posts: ThreadsPost[],
+  profile: ThreadsProfile,
+  userId: string
+): Promise<{ pdfPath: string; loomId: string }> {
   const { url: workerUrl, headers } = getWorkerConfig()
 
-  // Wrap each page content in full HTML document
-  const fullPages = pages.map((pageContent) => generatePageHtml(pageContent))
+  console.log(`[PDF] Sending ${posts.length} posts to worker for loom creation...`)
 
-  console.log(`[PDF] Sending ${fullPages.length} pages to worker for rendering...`)
-
-  const response = await fetch(`${workerUrl}/generate-pdf`, {
+  const response = await fetch(`${workerUrl}/create-loom`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ pages: fullPages }),
+    body: JSON.stringify({ posts, profile, userId }),
   })
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
     throw new Error(
-      `Worker PDF generation failed (${response.status}): ${errorData.error || errorData.message || 'Unknown error'}`
+      `Worker create-loom failed (${response.status}): ${errorData.error || errorData.message || 'Unknown error'}`
     )
   }
 
-  const arrayBuffer = await response.arrayBuffer()
-  return Buffer.from(arrayBuffer)
+  return response.json()
 }
