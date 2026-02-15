@@ -17,6 +17,16 @@ const IMAGE_HEIGHT = 130        // max-height (120px) + margin (10px)
 // Minimum height for continuation
 const MIN_CONTINUATION_HEIGHT = POST_HEADER_HEIGHT + LINE_HEIGHT * 2
 
+
+// Merged post type for combining thread posts in essay mode
+export interface MergedPost {
+  content: string
+  date: Date
+  likeCount: number
+  imageUrls: string[]
+  postIds?: string[]
+}
+
 export interface PostChunk {
   post: ThreadsPost
   contentStart: number  // Start index in content
@@ -303,12 +313,13 @@ function estimatePostHeight(post: ThreadsPost): number {
 function estimateTextHeight(content: string): number {
   const lines = content.split('\n')
   let totalLines = 0
-  
+
   for (const line of lines) {
     // Each line takes at least 1 rendered line, plus extra for long lines
     const renderedLines = Math.max(Math.ceil(line.length / CHARS_PER_LINE), 1)
     totalLines += renderedLines
   }
-  
+
   return totalLines * LINE_HEIGHT
 }
+

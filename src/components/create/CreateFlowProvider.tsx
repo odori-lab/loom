@@ -1,22 +1,25 @@
 'use client'
 
-import { useState, useMemo, ReactNode } from 'react'
+import { useState, useMemo, useCallback, ReactNode } from 'react'
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
+import { BookStructure } from '@/types/book'
 import { generatePageContents } from '@/lib/pdf/generator'
 import { calculateSpreads } from '@/lib/pdf/spreads'
+import { scrapeThreadsDirect, createLoomDirect } from '@/lib/worker-client'
+import { createClient } from '@/lib/supabase/client'
 import {
   CreateFlowContext,
   CreateFlowContextValue,
   Step,
   SortOrder,
 } from './CreateFlowContext'
-import { MOCK_PROFILE, MOCK_POSTS } from '@/lib/mockdata'
+import { MOCK_PROFILE, MOCK_POSTS, MOCK_BOOK_STRUCTURE } from '@/lib/mockdata'
 import { Database } from '@/types/database'
 
 type Loom = Database['public']['Tables']['looms']['Row']
 
-const USE_MOCK_DATA = false
-const STEPS = ['username', 'select', 'complete'] as const
+const USE_MOCK_DATA = true
+const STEPS = ['username', 'organize', 'complete'] as const
 
 interface CreateFlowProviderProps {
   children: ReactNode
@@ -24,8 +27,8 @@ interface CreateFlowProviderProps {
 }
 
 export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderProps) {
-  // Core state (consolidated from page.tsx + SelectPostsStep.tsx)
-  const [step, setStep] = useState<Step>(USE_MOCK_DATA ? 'select' : 'username')
+  // Core state
+  const [step, setStep] = useState<Step>(USE_MOCK_DATA ? 'organize' : 'username')
   const [posts, setPosts] = useState<ThreadsPost[]>(USE_MOCK_DATA ? MOCK_POSTS : [])
   const [profile, setProfile] = useState<ThreadsProfile | null>(USE_MOCK_DATA ? MOCK_PROFILE : null)
   const [downloadUrl, setDownloadUrl] = useState('')
@@ -33,13 +36,17 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    () => new Set(USE_MOCK_DATA ? MOCK_POSTS.slice(0, 10).map(p => p.id) : [])
+    () => new Set(USE_MOCK_DATA ? MOCK_POSTS.map(p => p.id) : [])
   )
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
   const [searchQuery, setSearchQuery] = useState('')
   const [currentSpread, setCurrentSpread] = useState(0)
   const [currentUsername, setCurrentUsername] = useState('')
-  const [displayLimit, setDisplayLimit] = useState(10) // Start with 10 posts
+  const [displayLimit, setDisplayLimit] = useState(10)
+  const [bookStructure, setBookStructure] = useState<BookStructure | null>(
+    USE_MOCK_DATA ? MOCK_BOOK_STRUCTURE : null
+  )
+  const [organizing, setOrganizing] = useState(false)
 
   // Derived values
   const currentStepIndex = STEPS.indexOf(step)
@@ -58,7 +65,6 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
       return sortOrder === 'newest' ? diff : -diff
     })
 
-    // Only show up to displayLimit posts for infinite scroll
     return sorted.slice(0, displayLimit)
   }, [posts, searchQuery, sortOrder, displayLimit])
 
@@ -71,32 +77,100 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
       })
   }, [posts, selectedIds, sortOrder])
 
+  // Posts ordered by book structure chapters
+  const orderedPosts = useMemo(() => {
+    if (!bookStructure) return selectedPosts
+    const postMap = new Map(posts.map(p => [p.id, p]))
+    const ordered: ThreadsPost[] = []
+    for (const chapter of bookStructure.chapters) {
+      for (const subChapter of chapter.subChapters) {
+        for (const postId of subChapter.postIds) {
+          const post = postMap.get(postId)
+          if (post && selectedIds.has(postId)) {
+            ordered.push(post)
+          }
+        }
+      }
+    }
+    return ordered
+  }, [bookStructure, posts, selectedIds, selectedPosts])
+
   const pages = useMemo(() => {
-    if (selectedPosts.length === 0 || !profile) return []
-    return generatePageContents(selectedPosts, profile)
-  }, [selectedPosts, profile])
+    if (orderedPosts.length === 0 || !profile) return []
+    return generatePageContents(orderedPosts, profile, bookStructure ?? undefined)
+  }, [orderedPosts, profile, bookStructure])
 
   const spreads = useMemo(() => calculateSpreads(pages), [pages])
+
+  // Organize book with Gemini AI
+  const organizeBook = useCallback(async () => {
+    if (!profile || posts.length === 0) return
+
+    setOrganizing(true)
+    setError('')
+    try {
+      const res = await fetch('/api/organize-book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ posts, profile })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+
+      setBookStructure(data as BookStructure)
+      // Select all posts by default
+      setSelectedIds(new Set(posts.map(p => p.id)))
+    } catch (err: any) {
+      setError(err.message)
+      // Fallback to mock structure if available
+      if (USE_MOCK_DATA) {
+        setBookStructure(MOCK_BOOK_STRUCTURE)
+      }
+    } finally {
+      setOrganizing(false)
+    }
+  }, [posts, profile])
+
+  const regenerateStructure = useCallback(() => {
+    setBookStructure(null)
+    setCurrentSpread(0)
+    organizeBook()
+  }, [organizeBook])
 
   // Actions
   const submitUsername = async (username: string) => {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/scrape', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, limit: 100 }) // Fetch 100 posts upfront
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      // Call worker directly to bypass Vercel 10s timeout
+      const cleanUsername = username.replace(/^@/, '').trim()
+      const { posts: scrapedPosts, profile: scrapedProfile } = await scrapeThreadsDirect(cleanUsername, 100)
 
-      setPosts(data.posts)
-      setProfile(data.profile)
-      setCurrentUsername(username)
-      setDisplayLimit(10) // Reset to show first 10
-      setSelectedIds(new Set(data.posts.slice(0, 10).map((p: ThreadsPost) => p.id)))
-      setStep('select')
+      setPosts(scrapedPosts)
+      setProfile(scrapedProfile)
+      setCurrentUsername(cleanUsername)
+      setDisplayLimit(10)
+      // Select ALL posts by default
+      setSelectedIds(new Set(scrapedPosts.map(p => p.id)))
+      setStep('organize')
+
+      // Auto-organize with Gemini
+      setOrganizing(true)
+      try {
+        const organizeRes = await fetch('/api/organize-book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ posts: scrapedPosts, profile: scrapedProfile })
+        })
+        const organizeData = await organizeRes.json()
+        if (!organizeRes.ok) throw new Error(organizeData.error)
+        setBookStructure(organizeData as BookStructure)
+      } catch (orgErr: any) {
+        console.error('Failed to organize book:', orgErr.message)
+        // Continue without book structure - will use default ordering
+      } finally {
+        setOrganizing(false)
+      }
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -105,14 +179,11 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
   }
 
   const loadMorePosts = () => {
-    // Client-side pagination: just increase display limit
     if (displayLimit >= posts.length) return
 
     setLoadingMore(true)
 
-    // Simulate loading delay for smooth UX
     setTimeout(() => {
-      // Auto-add newly revealed posts to selectedIds
       const newPosts = posts.slice(displayLimit, displayLimit + 10)
       setSelectedIds(prev => {
         const next = new Set(prev)
@@ -130,10 +201,21 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
     setLoading(true)
     setError('')
     try {
+      // 1. Call worker directly for PDF generation (bypasses Vercel timeout)
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Not authenticated')
+      const userId = user.id
+
+      const { pdfPath, loomId } = await createLoomDirect(
+        orderedPosts, profile, userId, bookStructure ?? undefined
+      )
+
+      // 2. Register loom in DB via Vercel API (fast, no timeout risk)
       const res = await fetch('/api/looms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ posts: selectedPosts, profile })
+        body: JSON.stringify({ pdfPath, loomId, posts: orderedPosts, profile })
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
@@ -156,6 +238,7 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
     setProfile(null)
     setDownloadUrl('')
     setSelectedIds(new Set())
+    setBookStructure(null)
     setStep('username')
   }
 
@@ -177,12 +260,10 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
       const visibleIds = filteredAndSortedPosts.map(p => p.id)
       const allVisibleSelected = visibleIds.every(id => prev.has(id))
       if (allVisibleSelected) {
-        // Deselect all visible posts
         const next = new Set(prev)
         visibleIds.forEach(id => next.delete(id))
         return next
       }
-      // Select all visible posts (keep existing selections from other pages)
       const next = new Set(prev)
       visibleIds.forEach(id => next.add(id))
       return next
@@ -200,15 +281,27 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
 
   const goBack = () => {
     setStep('username')
+    setBookStructure(null)
   }
 
-  // Compute hasMore based on client-side pagination
   const computedHasMore = displayLimit < posts.length
 
   const value: CreateFlowContextValue = {
-    state: { step, posts, profile, downloadUrl, loading, loadingMore, hasMore: computedHasMore, error, selectedIds, sortOrder, searchQuery, currentSpread },
-    actions: { submitUsername, generateLoom, createAnother, togglePost, toggleAll, setSortOrder, setSearchQuery, prevSpread, nextSpread, goBack, loadMorePosts },
-    meta: { steps: STEPS, currentStepIndex, filteredAndSortedPosts, selectedPosts, pages, spreads, currentSpreadData: spreads[currentSpread], selectedCount: selectedIds.size, totalSpreads: spreads.length },
+    state: {
+      step, posts, profile, downloadUrl, loading, loadingMore,
+      hasMore: computedHasMore, error, selectedIds, sortOrder,
+      searchQuery, currentSpread, bookStructure, organizing,
+    },
+    actions: {
+      submitUsername, generateLoom, createAnother, togglePost, toggleAll,
+      setSortOrder, setSearchQuery, prevSpread, nextSpread, goBack,
+      loadMorePosts, organizeBook, regenerateStructure,
+    },
+    meta: {
+      steps: STEPS, currentStepIndex, filteredAndSortedPosts, selectedPosts,
+      orderedPosts, pages, spreads, currentSpreadData: spreads[currentSpread],
+      selectedCount: selectedIds.size, totalSpreads: spreads.length,
+    },
   }
 
   return (

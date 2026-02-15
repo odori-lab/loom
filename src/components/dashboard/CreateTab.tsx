@@ -5,7 +5,7 @@ import { useDashboard } from './DashboardContext'
 import { ProgressIndicator } from '@/components/create/ProgressIndicator'
 import { ErrorBanner } from '@/components/create/ErrorBanner'
 import { UsernameStep } from '@/components/create/UsernameStep'
-import { PostListSidebar } from '@/components/create/PostListSidebar'
+import { TOCSidebar } from '@/components/create/TOCSidebar'
 import { CompleteStep } from '@/components/create/CompleteStep'
 import { BookPreview } from '@/components/create/BookPreview'
 
@@ -13,9 +13,9 @@ export function CreateTabContent() {
   const { state: { step, profile } } = useCreateFlow()
   const { setActiveTab } = useDashboard()
 
-  if (step === 'select' && profile) {
+  if (step === 'organize' && profile) {
     return (
-      <PostListSidebar className="flex-1 flex flex-col bg-white overflow-hidden" />
+      <TOCSidebar className="flex-1 flex flex-col bg-white overflow-hidden" />
     )
   }
 
@@ -38,7 +38,7 @@ export function CreateTabContent() {
 export function CreateTabRightPanel({ width }: { width?: number }) {
   const { state: { step, profile } } = useCreateFlow()
 
-  if (step === 'select' && profile) {
+  if (step === 'organize' && profile) {
     return (
       <div style={{ width: width ?? 600 }} className="shrink-0 flex flex-col h-full">
         <BookPreview width={width} />

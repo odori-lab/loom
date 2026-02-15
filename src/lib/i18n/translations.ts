@@ -73,7 +73,7 @@ export const translations = {
     // Create Page
     'create.title': 'Loom 만들기',
     'create.step1': '사용자명',
-    'create.step2': '선택',
+    'create.step2': '구성',
     'create.step3': '완료',
     'create.username.title': 'Threads 사용자명을 입력하세요',
     'create.username.description': 'Threads 사용자명을 입력해서 시작하세요',
@@ -112,6 +112,15 @@ export const translations = {
     'create.posts.posts': '개 포스트',
     'create.posts.loadMore': '더 불러오기',
     'create.posts.allLoaded': '모든 포스트를 불러왔습니다',
+
+    // Create - Organize (TOCSidebar)
+    'create.organize.back': '뒤로',
+    'create.organize.regenerate': '다시 구성',
+    'create.organize.organizing': '구성 중...',
+    'create.organize.generate': 'PDF 생성',
+    'create.organize.chapters': '개 챕터',
+    'create.organize.subChapters': '개 소챕터',
+    'create.organize.noStructure': 'AI가 책 구조를 구성하지 못했습니다',
 
     // Settings
     'setting.title': '설정',
@@ -198,7 +207,7 @@ export const translations = {
     // Create Page
     'create.title': 'Create a Loom',
     'create.step1': 'Username',
-    'create.step2': 'Select',
+    'create.step2': 'Organize',
     'create.step3': 'Complete',
     'create.username.title': 'Enter a Threads username',
     'create.username.description': 'Enter a Threads username to get started',
@@ -237,6 +246,15 @@ export const translations = {
     'create.posts.posts': 'posts',
     'create.posts.loadMore': 'Load more posts',
     'create.posts.allLoaded': 'All posts loaded',
+
+    // Create - Organize (TOCSidebar)
+    'create.organize.back': 'Back',
+    'create.organize.regenerate': 'Regenerate',
+    'create.organize.organizing': 'Organizing...',
+    'create.organize.generate': 'Generate PDF',
+    'create.organize.chapters': 'chapters',
+    'create.organize.subChapters': 'sub-chapters',
+    'create.organize.noStructure': 'AI could not organize the book structure',
 
     // Settings
     'setting.title': 'Settings',

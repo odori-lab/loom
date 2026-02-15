@@ -1,5 +1,6 @@
 // Auto-generated from zuck profile scrape
 import { ThreadsPost, ThreadsProfile } from "@/types/threads"
+import { BookStructure } from "@/types/book"
 
 export const MOCK_PROFILE: ThreadsProfile = {
   username: "zuck",
@@ -1055,3 +1056,211 @@ export const MOCK_POSTS: ThreadsPost[] = [
     postedAt: new Date("2024-05-16T15:58:44.000Z"),
   },
 ];
+
+export const MOCK_BOOK_STRUCTURE: BookStructure = {
+  title: "Building the Future: Thoughts from Mark Zuckerberg",
+  preface: "이 책은 Meta의 CEO 마크 저커버그가 Threads에 공유한 생각들을 모은 것입니다. AI 인프라에 대한 거대한 비전부터 일상적인 순간들까지, 그의 글은 기술의 미래를 설계하는 사람의 시선을 담고 있습니다.\n\n각 챕터는 그의 사고의 흐름을 따라 주제별로 구성되었습니다. 인프라와 기술 전략, 제품 업데이트, 그리고 개인적인 이야기들이 하나의 내러티브로 엮여 있습니다.",
+  chapters: [
+    {
+      id: "infrastructure-vision",
+      title: "인프라의 미래",
+      description: "AI와 데이터센터 인프라에 대한 비전과 전략",
+      subChapters: [
+        {
+          id: "datacenter-strategy",
+          title: "데이터센터 전략",
+          postIds: [
+            "zuck-1771063751140-0", "zuck-1771063751140-1", "zuck-1771063751140-2",
+            "zuck-1771063751140-3", "zuck-1771063751140-4"
+          ]
+        },
+        {
+          id: "infrastructure-investment",
+          title: "인프라 투자와 파트너십",
+          postIds: [
+            "zuck-1771063751140-5", "zuck-1771063751140-6", "zuck-1771063751140-7",
+            "zuck-1771063752646-8", "zuck-1771063752646-9"
+          ]
+        },
+        {
+          id: "global-expansion",
+          title: "글로벌 확장",
+          postIds: [
+            "zuck-1771063752646-11", "zuck-1771063752646-10", "zuck-1771063754153-10",
+            "zuck-1771063754153-11", "zuck-1771063755660-6"
+          ]
+        },
+        {
+          id: "technical-architecture",
+          title: "기술 아키텍처",
+          postIds: [
+            "zuck-1771063755660-8", "zuck-1771063755660-7", "zuck-1771063757166-7",
+            "zuck-1771063757166-9", "zuck-1771063757166-8"
+          ]
+        }
+      ]
+    },
+    {
+      id: "product-updates",
+      title: "제품과 혁신",
+      description: "Meta 제품들의 최신 업데이트와 새로운 기능들",
+      subChapters: [
+        {
+          id: "platform-features",
+          title: "플랫폼 새 기능",
+          postIds: [
+            "zuck-1771063758671-7", "zuck-1771063758671-8", "zuck-1771063758671-9",
+            "zuck-1771063758671-10", "zuck-1771063758672-12"
+          ]
+        },
+        {
+          id: "user-experience",
+          title: "사용자 경험 개선",
+          postIds: [
+            "zuck-1771063758671-11", "zuck-1771063760177-11", "zuck-1771063760178-13",
+            "zuck-1771063760177-12", "zuck-1771063760178-14"
+          ]
+        },
+        {
+          id: "product-launches",
+          title: "신규 제품 출시",
+          postIds: [
+            "zuck-1771063761683-10", "zuck-1771063761684-11", "zuck-1771063761684-12",
+            "zuck-1771063761684-13", "zuck-1771063763190-10"
+          ]
+        },
+        {
+          id: "product-roadmap",
+          title: "제품 로드맵",
+          postIds: [
+            "zuck-1771063763190-12", "zuck-1771063763190-11", "zuck-1771063763190-13",
+            "zuck-1771063763190-14", "zuck-1771063764696-9"
+          ]
+        }
+      ]
+    },
+    {
+      id: "ai-and-technology",
+      title: "AI와 기술의 방향",
+      description: "인공지능 발전과 기술 트렌드에 대한 생각들",
+      subChapters: [
+        {
+          id: "ai-research",
+          title: "AI 연구와 발전",
+          postIds: [
+            "zuck-1771063764697-10", "zuck-1771063764697-11", "zuck-1771063764697-12",
+            "zuck-1771063766202-10", "zuck-1771063766202-12"
+          ]
+        },
+        {
+          id: "open-source-ai",
+          title: "오픈소스 AI 전략",
+          postIds: [
+            "zuck-1771063766202-11", "zuck-1771063766202-14", "zuck-1771063766202-13",
+            "zuck-1771063767708-9", "zuck-1771063767708-10"
+          ]
+        },
+        {
+          id: "ai-applications",
+          title: "AI 활용 사례",
+          postIds: [
+            "zuck-1771063769213-8", "zuck-1771063769213-7", "zuck-1771063769213-9",
+            "zuck-1771063770719-7", "zuck-1771063770719-8"
+          ]
+        },
+        {
+          id: "future-of-ai",
+          title: "AI의 미래 전망",
+          postIds: [
+            "zuck-1771063770720-9", "zuck-1771063772226-7", "zuck-1771063773732-8",
+            "zuck-1771063773732-7", "zuck-1771063773733-10"
+          ]
+        }
+      ]
+    },
+    {
+      id: "community-and-people",
+      title: "커뮤니티와 사람들",
+      description: "팀, 커뮤니티, 그리고 사람들에 대한 이야기",
+      subChapters: [
+        {
+          id: "team-leadership",
+          title: "팀과 리더십",
+          postIds: [
+            "zuck-1771063773732-9", "zuck-1771063773733-12", "zuck-1771063773733-11",
+            "zuck-1771063775239-10", "zuck-1771063775239-11"
+          ]
+        },
+        {
+          id: "creator-ecosystem",
+          title: "크리에이터 생태계",
+          postIds: [
+            "zuck-1771063775239-12", "zuck-1771063775239-13", "zuck-1771063775239-14",
+            "zuck-1771063775240-15", "zuck-1771063776745-12"
+          ]
+        },
+        {
+          id: "community-stories",
+          title: "커뮤니티 이야기",
+          postIds: [
+            "zuck-1771063778252-13", "zuck-1771063778252-14", "zuck-1771063778252-15",
+            "zuck-1771063778252-16", "zuck-1771063778253-18"
+          ]
+        },
+        {
+          id: "social-impact",
+          title: "사회적 영향",
+          postIds: [
+            "zuck-1771063778253-17", "zuck-1771063779760-11", "zuck-1771063779760-13",
+            "zuck-1771063779760-12", "zuck-1771063781266-9"
+          ]
+        }
+      ]
+    },
+    {
+      id: "personal-reflections",
+      title: "개인적 단상",
+      description: "일상, 취미, 그리고 개인적인 생각들",
+      subChapters: [
+        {
+          id: "daily-life",
+          title: "일상의 기록",
+          postIds: [
+            "zuck-1771063781267-11", "zuck-1771063781267-10", "zuck-1771063781267-12",
+            "zuck-1771063782772-9", "zuck-1771063782773-10"
+          ]
+        },
+        {
+          id: "hobbies-interests",
+          title: "취미와 관심사",
+          postIds: [
+            "zuck-1771063782773-11", "zuck-1771063784279-7", "zuck-1771063784279-8",
+            "zuck-1771063784280-10", "zuck-1771063784279-9"
+          ]
+        },
+        {
+          id: "personal-growth",
+          title: "개인적 성장",
+          postIds: [
+            "zuck-1771063785787-7", "zuck-1771063785787-8", "zuck-1771063785787-9",
+            "zuck-1771063787293-7", "zuck-1771063787294-8"
+          ]
+        },
+        {
+          id: "looking-ahead",
+          title: "앞으로의 전망",
+          postIds: [
+            "zuck-1771063788800-7", "zuck-1771063788800-8", "zuck-1771063788800-9",
+            "zuck-1771063788800-10", "zuck-1771063790307-9"
+          ]
+        }
+      ]
+    }
+  ],
+  imageCaptions: [
+    { postId: "zuck-1771063751140-4", caption: "SAM Audio 모델의 오디오 분리 기능 시연" },
+    { postId: "zuck-1771063757166-7", caption: "인스타그램 30억 월간 활성 사용자 달성을 축하하며" },
+    { postId: "zuck-1771063766202-10", caption: "Llama 4의 성능 대비 비용 효율성 차트" },
+    { postId: "zuck-1771063781267-12", caption: "유럽의 오픈소스 AI 도입을 촉구하는 이코노미스트 기고문" },
+  ]
+};

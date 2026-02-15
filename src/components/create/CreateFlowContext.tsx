@@ -2,9 +2,10 @@
 
 import { createContext, use } from 'react'
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
+import { BookStructure } from '@/types/book'
 import { SpreadData } from '@/lib/pdf/spreads'
 
-export type Step = 'username' | 'select' | 'complete'
+export type Step = 'username' | 'organize' | 'complete'
 export type SortOrder = 'newest' | 'oldest'
 
 export interface CreateFlowState {
@@ -20,6 +21,8 @@ export interface CreateFlowState {
   searchQuery: string
   currentSpread: number
   hasMore: boolean
+  bookStructure: BookStructure | null
+  organizing: boolean
 }
 
 export interface CreateFlowActions {
@@ -34,6 +37,8 @@ export interface CreateFlowActions {
   nextSpread: () => void
   goBack: () => void
   loadMorePosts: () => void
+  organizeBook: () => void
+  regenerateStructure: () => void
 }
 
 export interface CreateFlowMeta {
@@ -41,6 +46,7 @@ export interface CreateFlowMeta {
   currentStepIndex: number
   filteredAndSortedPosts: ThreadsPost[]
   selectedPosts: ThreadsPost[]
+  orderedPosts: ThreadsPost[]
   pages: string[]
   spreads: SpreadData[]
   currentSpreadData: SpreadData | undefined
