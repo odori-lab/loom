@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import type { Locale } from "@/lib/i18n/translations";
 
 export const metadata: Metadata = {
   title: 'Loom - Turn Threads into PDF',
@@ -17,17 +19,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const localeCookie = cookieStore.get('locale')?.value;
+  const locale: Locale = localeCookie === 'en' ? 'en' : 'ko';
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className="antialiased font-sans"
       >
-        <Providers>
+        <Providers initialLocale={locale}>
           {children}
         </Providers>
       </body>
