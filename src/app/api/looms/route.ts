@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { generatePageContents } from '@/lib/pdf/generator'
-import { renderPagesToPdf } from '@/lib/pdf/render'
+import { createLoomPdf } from '@/lib/pdf/render'
 import { requireAuth, AuthError } from '@/lib/api/auth'
 import { parseLoomInput, ValidationError } from '@/lib/api/validation'
 import { getSignedDownloadUrl } from '@/lib/api/storage'
@@ -38,27 +37,8 @@ export async function POST(request: Request) {
     const [{ user, supabase }, body] = await Promise.all([requireAuth(), request.json()])
     const { posts, profile } = parseLoomInput(body)
 
-    // Generate page contents (same as preview uses)
-    const pages = generatePageContents(posts, profile)
-
-    // Generate PDF using Puppeteer
-    const pdfBuffer = await renderPagesToPdf(pages)
-
-    // Upload to Supabase Storage
-    const loomId = crypto.randomUUID()
-    const pdfPath = `${user.id}/${loomId}.pdf`
-
-    const { error: uploadError } = await supabase.storage
-      .from('looms-pdf')
-      .upload(pdfPath, pdfBuffer, {
-        contentType: 'application/pdf',
-        upsert: false
-      })
-
-    if (uploadError) {
-      console.error('[STORAGE_UPLOAD_ERROR]', JSON.stringify(uploadError, null, 2))
-      return NextResponse.json({ error: `Failed to upload PDF: ${uploadError.message}` }, { status: 500 })
-    }
+    // Generate PDF and upload via worker
+    const { pdfPath, loomId } = await createLoomPdf(posts, profile, user.id)
 
     // Create loom record
     const coverData: CoverData = {

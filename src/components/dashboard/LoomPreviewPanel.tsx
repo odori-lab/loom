@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useDashboard } from './DashboardContext'
 import { useI18n } from '@/lib/i18n/context'
 import dynamic from 'next/dynamic'
@@ -9,9 +10,14 @@ const PdfPageViewer = dynamic(
   { ssr: false }
 )
 
+const BASE_PDF_WIDTH = 568
+
 export function LoomPreviewPanel({ width }: { width?: number }) {
   const { selectedLoom, previewUrl, loadingPreview, openPreviewModal } = useDashboard()
   const { t } = useI18n()
+  const panelWidth = width ?? 600
+  const availableWidth = panelWidth - 32 // px-4 padding on each side
+  const scale = useMemo(() => Math.min(1, availableWidth / BASE_PDF_WIDTH), [availableWidth])
 
   if (!selectedLoom) {
     return (
@@ -41,7 +47,15 @@ export function LoomPreviewPanel({ width }: { width?: number }) {
             </div>
           </div>
         ) : previewUrl ? (
-          <PdfPageViewer url={previewUrl} width={568} onPageClick={() => openPreviewModal()} />
+          <div style={{ width: BASE_PDF_WIDTH * scale, margin: '0 auto' }}>
+            <div style={{
+              width: BASE_PDF_WIDTH,
+              transform: `scale(${scale})`,
+              transformOrigin: 'top left',
+            }}>
+              <PdfPageViewer url={previewUrl} width={BASE_PDF_WIDTH} onPageClick={() => openPreviewModal()} />
+            </div>
+          </div>
         ) : (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">

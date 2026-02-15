@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { generatePageHtml } from '@/lib/pdf/generator'
 import { useCreateFlow } from './CreateFlowContext'
 import { useI18n } from '@/lib/i18n/context'
@@ -9,6 +9,7 @@ import { FlipContainer, SpreadViewerContainer, ZoomTransform, SpreadSlider, Zoom
 
 const PAGE_WIDTH = 280
 const PAGE_HEIGHT = Math.round(PAGE_WIDTH * (210 / 148))
+const SPREAD_NATURAL_WIDTH = PAGE_WIDTH * 2 + 40 // 2 pages + gap/padding
 
 function EmptyPreview({ label }: { label: string }) {
   return (
@@ -63,7 +64,7 @@ function renderPage(html: string | null, side: 'left' | 'right', noShadow?: bool
   return <PageFrame html={html} side={side} noShadow={noShadow} />
 }
 
-export function BookPreview() {
+export function BookPreview({ width }: { width?: number }) {
   const {
     state: { loading },
     actions: { goBack, generateLoom },
@@ -71,6 +72,10 @@ export function BookPreview() {
   } = useCreateFlow()
   const { t } = useI18n()
   const containerRef = useRef<HTMLDivElement>(null)
+  const panelScale = useMemo(
+    () => (width ? Math.min(1, (width - 40) / SPREAD_NATURAL_WIDTH) : 1),
+    [width]
+  )
 
   const totalSpreads = spreads.length
 
@@ -108,7 +113,7 @@ export function BookPreview() {
         nextSpread={nextSpread}
       >
         {pages.length === 0 ? <EmptyPreview label={t('create.preview.selectPosts')} /> : (
-          <ZoomTransform scale={scale} offset={offset} isDragging={isDragging}>
+          <ZoomTransform scale={scale * panelScale} offset={offset} isDragging={isDragging}>
             <FlipContainer<string | null>
               flipState={flipState}
               handleFlipEnd={handleFlipEnd}
@@ -122,14 +127,7 @@ export function BookPreview() {
       </SpreadViewerContainer>
 
       {/* Bottom bar: back, slider, zoom, generate */}
-      <div className="h-16 px-4 flex items-center gap-3 bg-white border-t border-gray-200 shrink-0">
-        <button
-          onClick={goBack}
-          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors shrink-0"
-        >
-          {t('create.preview.back')}
-        </button>
-
+      <div className="h-10 px-4 flex items-center gap-3 bg-white border-t border-gray-200 shrink-0">
         {totalSpreads > 0 && (
           <>
             <SpreadSlider

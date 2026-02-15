@@ -15,7 +15,7 @@ import { Database } from '@/types/database'
 
 type Loom = Database['public']['Tables']['looms']['Row']
 
-const USE_MOCK_DATA = true
+const USE_MOCK_DATA = false
 const STEPS = ['username', 'select', 'complete'] as const
 
 interface CreateFlowProviderProps {
@@ -33,7 +33,7 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    () => new Set(USE_MOCK_DATA ? MOCK_POSTS.map(p => p.id) : [])
+    () => new Set(USE_MOCK_DATA ? MOCK_POSTS.slice(0, 10).map(p => p.id) : [])
   )
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
   const [searchQuery, setSearchQuery] = useState('')
@@ -95,7 +95,7 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
       setProfile(data.profile)
       setCurrentUsername(username)
       setDisplayLimit(10) // Reset to show first 10
-      setSelectedIds(new Set(data.posts.map((p: ThreadsPost) => p.id)))
+      setSelectedIds(new Set(data.posts.slice(0, 10).map((p: ThreadsPost) => p.id)))
       setStep('select')
     } catch (err: any) {
       setError(err.message)
@@ -112,6 +112,13 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
 
     // Simulate loading delay for smooth UX
     setTimeout(() => {
+      // Auto-add newly revealed posts to selectedIds
+      const newPosts = posts.slice(displayLimit, displayLimit + 10)
+      setSelectedIds(prev => {
+        const next = new Set(prev)
+        newPosts.forEach(p => next.add(p.id))
+        return next
+      })
       setDisplayLimit(prev => Math.min(prev + 10, posts.length))
       setLoadingMore(false)
     }, 300)
@@ -167,10 +174,18 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
 
   const toggleAll = () => {
     setSelectedIds(prev => {
-      if (prev.size === filteredAndSortedPosts.length) {
-        return new Set()
+      const visibleIds = filteredAndSortedPosts.map(p => p.id)
+      const allVisibleSelected = visibleIds.every(id => prev.has(id))
+      if (allVisibleSelected) {
+        // Deselect all visible posts
+        const next = new Set(prev)
+        visibleIds.forEach(id => next.delete(id))
+        return next
       }
-      return new Set(filteredAndSortedPosts.map(p => p.id))
+      // Select all visible posts (keep existing selections from other pages)
+      const next = new Set(prev)
+      visibleIds.forEach(id => next.add(id))
+      return next
     })
     setCurrentSpread(0)
   }

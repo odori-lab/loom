@@ -48,7 +48,7 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
   return (
     <div className={className ?? "w-80 border-l border-gray-200 flex flex-col bg-white"} style={{ animation: 'slideInLeft 0.35s ease-out both' }}>
       {/* Profile + Search + Sort — single horizontal bar */}
-      <div className="h-16 px-4 flex items-center gap-3 border-b border-gray-100">
+      <div className="h-12 px-4 flex justify-between items-center gap-3 border-b border-gray-100">
         {/* Profile avatar + name */}
         <div className="flex items-center gap-2 shrink-0">
           {profile.profileImageUrl ? (
@@ -72,27 +72,29 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
           </span>
         </div>
 
-        {/* Search input — matches LoomsTab styling */}
-        <div className="relative flex-1 min-w-0">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder={t('create.posts.search')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-3 py-2 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 w-full h-8"
-          />
-        </div>
+        <div className='flex gap-3'>
+          {/* Sort selector — matches LoomsTab styling */}
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+            className="px-2 py-1 bg-gray-100 border-0 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-gray-300 h-7 shrink-0"
+          >
+            <option value="newest">{t('create.posts.new')}</option>
+            <option value="oldest">{t('create.posts.old')}</option>
+          </select>
 
-        {/* Sort selector — matches LoomsTab styling */}
-        <select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-          className="px-3 py-1 bg-gray-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 h-8 shrink-0"
-        >
-          <option value="newest">{t('create.posts.new')}</option>
-          <option value="oldest">{t('create.posts.old')}</option>
-        </select>
+          {/* Search input — matches LoomsTab styling */}
+          <div className="relative">
+            <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <input
+              type="text"
+              placeholder={t('create.posts.search')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8 pr-3 py-1 bg-gray-100 border-0 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-gray-300 w-40 h-7"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Select all / count bar */}
@@ -101,7 +103,7 @@ export function PostListSidebar({ className }: PostListSidebarProps) {
           onClick={toggleAll}
           className="text-xs text-gray-500 hover:text-gray-900 active:scale-[0.96]"
         >
-          {selectedIds.size === filteredAndSortedPosts.length ? t('create.posts.deselectAll') : t('create.posts.selectAll')}
+          {filteredAndSortedPosts.every(p => selectedIds.has(p.id)) ? t('create.posts.deselectAll') : t('create.posts.selectAll')}
         </button>
         <span className="text-xs text-gray-400">
           {filteredAndSortedPosts.length} {t('create.posts.posts')}

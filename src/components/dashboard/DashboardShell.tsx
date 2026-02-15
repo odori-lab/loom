@@ -42,9 +42,19 @@ function DashboardContent({ user }: { user: User }) {
   const [isResizing, setIsResizing] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // Create tab resizable panel (independent from looms tab)
+  const [createPreviewWidth, setCreatePreviewWidth] = useState(600)
+  const [isCreateResizing, setIsCreateResizing] = useState(false)
+  const createContainerRef = useRef<HTMLDivElement>(null)
+
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     setIsResizing(true)
+  }, [])
+
+  const handleCreateResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsCreateResizing(true)
   }, [])
 
   useEffect(() => {
@@ -68,6 +78,27 @@ function DashboardContent({ user }: { user: User }) {
     }
   }, [isResizing])
 
+  useEffect(() => {
+    if (!isCreateResizing) return
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!createContainerRef.current) return
+      const rect = createContainerRef.current.getBoundingClientRect()
+      const newWidth = rect.right - e.clientX
+      setCreatePreviewWidth(Math.max(680, Math.min(900, newWidth)))
+    }
+    const handleMouseUp = () => setIsCreateResizing(false)
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [isCreateResizing])
+
   return (
     <>
       {/* Looms tab */}
@@ -82,9 +113,13 @@ function DashboardContent({ user }: { user: User }) {
 
       {/* Create tab - always mounted, hidden via CSS to preserve state */}
       <CreateFlowProvider onComplete={addLoom}>
-        <div className={`flex-1 flex overflow-hidden ${activeTab !== 'create' ? 'hidden' : '[animation:dashboard-panel-fade_0.2s_ease-out]'}`}>
+        <div ref={createContainerRef} className={`flex-1 flex overflow-hidden ${activeTab !== 'create' ? 'hidden' : '[animation:dashboard-panel-fade_0.2s_ease-out]'}`}>
           <CreateTabContent />
-          <CreateTabRightPanel />
+          <div
+            onMouseDown={handleCreateResizeStart}
+            className={`w-1 shrink-0 cursor-col-resize transition-colors duration-150 ${isCreateResizing ? 'bg-gray-400' : 'hover:bg-gray-300'}`}
+          />
+          <CreateTabRightPanel width={createPreviewWidth} />
         </div>
       </CreateFlowProvider>
 

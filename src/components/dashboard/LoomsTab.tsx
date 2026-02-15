@@ -108,7 +108,8 @@ export function LoomsTab() {
           {filteredLooms.map((loom, index) => (
             <div
               key={loom.id}
-              onClick={() => { selectLoom(loom); openPreviewModal() }}
+              onClick={() => selectLoom(loom)}
+              onDoubleClick={() => openPreviewModal()}
               style={{ animationDelay: `${index * 40}ms` }}
               className={`w-[170px] cursor-pointer rounded-xl border-2 transition-all overflow-hidden [animation:dashboard-card-enter_0.3s_ease-out_both] active:scale-[0.97] ${
                 selectedLoom?.id === loom.id
