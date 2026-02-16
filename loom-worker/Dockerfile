@@ -1,21 +1,30 @@
 FROM node:20-slim
 
+# Install pnpm
+RUN npm install -g pnpm@10
+
 WORKDIR /app
 
-COPY package*.json ./
+# Copy workspace config + lockfile
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 
-# Install all dependencies (including devDependencies for build)
-RUN npm ci
+# Copy shared package
+COPY packages/ ./packages/
+
+# Copy worker package
+COPY loom-worker/ ./loom-worker/
+
+# Install dependencies (workspace-aware)
+RUN pnpm install --frozen-lockfile
 
 # Install Playwright Chromium with system dependencies
-RUN npx playwright install --with-deps chromium
+RUN cd loom-worker && npx playwright install --with-deps chromium
 
-COPY . .
-RUN npm run build
+# Build worker
+RUN pnpm --filter @loom/worker build
 
-# Remove devDependencies after build
-RUN npm prune --production
+WORKDIR /app/loom-worker
 
 EXPOSE 3001
 
-CMD ["npm", "start"]
+CMD ["node", "dist/index.js"]
