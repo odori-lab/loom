@@ -66,9 +66,11 @@ export async function POST(request: Request) {
       user_id: user.id,
       thread_username: profile.username,
       thread_display_name: profile.displayName,
+      title: body.title || null,
       post_count: posts.length,
       pdf_path: pdfPath,
-      cover_data: coverData as any
+      cover_data: coverData as any,
+      book_structure: body.bookStructure || null,
     }
 
     const { data: loom, error: insertError } = await supabase

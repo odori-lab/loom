@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS public.looms (
   post_count INTEGER NOT NULL DEFAULT 0,
   pdf_path TEXT NOT NULL,
   cover_data JSONB,
+  title TEXT,
+  book_structure JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

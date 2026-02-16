@@ -41,9 +41,11 @@ export interface Database {
           user_id: string
           thread_username: string
           thread_display_name: string | null
+          title: string | null
           post_count: number
           pdf_path: string
           cover_data: Json | null
+          book_structure: Json | null
           created_at: string
         }
         Insert: {
@@ -51,9 +53,11 @@ export interface Database {
           user_id: string
           thread_username: string
           thread_display_name?: string | null
+          title?: string | null
           post_count: number
           pdf_path: string
           cover_data?: Json | null
+          book_structure?: Json | null
           created_at?: string
         }
         Update: {
@@ -61,9 +65,11 @@ export interface Database {
           user_id?: string
           thread_username?: string
           thread_display_name?: string | null
+          title?: string | null
           post_count?: number
           pdf_path?: string
           cover_data?: Json | null
+          book_structure?: Json | null
           created_at?: string
         }
       }
