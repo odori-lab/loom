@@ -1,0 +1,4 @@
+packages:
+  - 'loom'
+  - 'loom-worker'
+  - 'packages'
