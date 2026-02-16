@@ -2,12 +2,13 @@
 
 import { useCreateFlow } from '@/components/create/CreateFlowContext'
 import { useDashboard } from './DashboardContext'
+import { LoomPreviewPanel } from './LoomPreviewPanel'
+import { BookPreview } from '@/components/create/BookPreview'
 import { ProgressIndicator } from '@/components/create/ProgressIndicator'
 import { ErrorBanner } from '@/components/create/ErrorBanner'
 import { UsernameStep } from '@/components/create/UsernameStep'
 import { TOCSidebar } from '@/components/create/TOCSidebar'
 import { CompleteStep } from '@/components/create/CompleteStep'
-import { BookPreview } from '@/components/create/BookPreview'
 
 export function CreateTabContent() {
   const { state: { step, profile } } = useCreateFlow()
@@ -36,15 +37,29 @@ export function CreateTabContent() {
 }
 
 export function CreateTabRightPanel({ width }: { width?: number }) {
-  const { state: { step, profile } } = useCreateFlow()
+  const { state: { step, profile, downloadUrl } } = useCreateFlow()
+  const { openPreviewModalWithUrl } = useDashboard()
 
-  if (step === 'organize' && profile) {
+  const showPanel = (step === 'organize' || step === 'complete') && profile
+
+  if (!showPanel) return null
+
+  // After PDF generation: show actual PDF in LoomPreviewPanel
+  if (downloadUrl) {
     return (
-      <div style={{ width: width ?? 600 }} className="shrink-0 flex flex-col h-full">
-        <BookPreview width={width} />
-      </div>
+      <LoomPreviewPanel
+        width={width}
+        active={true}
+        previewUrl={downloadUrl}
+        onPageClick={() => openPreviewModalWithUrl(downloadUrl)}
+      />
     )
   }
 
-  return null
+  // During organize: show BookPreview (HTML pages) inside LoomPreviewPanel shell
+  return (
+    <LoomPreviewPanel width={width} active={true}>
+      <BookPreview width={width} />
+    </LoomPreviewPanel>
+  )
 }

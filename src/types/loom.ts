@@ -3,6 +3,7 @@ export interface Loom {
   userId: string
   threadUsername: string
   threadDisplayName: string | null
+  title: string | null
   postCount: number
   pdfPath: string
   coverData: CoverData | null

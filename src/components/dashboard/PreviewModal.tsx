@@ -160,24 +160,30 @@ export function PreviewModal() {
     return () => document.removeEventListener('keydown', handleEsc)
   }, [previewModalOpen, closePreviewModal])
 
-  if (!previewModalOpen || !selectedLoom) return null
+  if (!previewModalOpen || (!selectedLoom && !previewUrl)) return null
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col animate-fade-in" style={{ animationDuration: '0.15s' }}>
       {/* Header */}
       <div className="h-14 px-6 flex items-center justify-between bg-white border-b border-gray-200 shrink-0 animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-            <span className="text-xs font-bold text-white">
-              {(selectedLoom.thread_display_name || selectedLoom.thread_username)?.[0]?.toUpperCase() || '?'}
-            </span>
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold text-gray-900">
-              {selectedLoom.thread_display_name || `@${selectedLoom.thread_username}`}
-            </h2>
-            <p className="text-xs text-gray-500">{selectedLoom.post_count} {t('create.preview.posts')}</p>
-          </div>
+          {selectedLoom ? (
+            <>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <span className="text-xs font-bold text-white">
+                  {(selectedLoom.thread_display_name || selectedLoom.thread_username)?.[0]?.toUpperCase() || '?'}
+                </span>
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900">
+                  {selectedLoom.thread_display_name || `@${selectedLoom.thread_username}`}
+                </h2>
+                <p className="text-xs text-gray-500">{selectedLoom.post_count} {t('create.preview.posts')}</p>
+              </div>
+            </>
+          ) : (
+            <h2 className="text-sm font-semibold text-gray-900">{t('dashboard.preview.title')}</h2>
+          )}
         </div>
         <button
           onClick={closePreviewModal}
