@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useI18n } from '@/lib/i18n/context'
 
 interface UserMenuProps {
   user: User
@@ -13,6 +14,7 @@ export function UserMenu({ user }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const { t } = useI18n()
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -58,7 +60,7 @@ export function UserMenu({ user }: UserMenuProps) {
               onClick={handleSignOut}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
-              Sign out
+              {t('auth.signOut')}
             </button>
           </div>
         </>

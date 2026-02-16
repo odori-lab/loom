@@ -7,6 +7,7 @@ import { SpreadData } from '@/lib/pdf/spreads'
 
 export type Step = 'username' | 'organize' | 'complete'
 export type SortOrder = 'newest' | 'oldest'
+export type LoadingPhase = 'idle' | 'scraping' | 'organizing'
 
 export interface CreateFlowState {
   step: Step
@@ -15,6 +16,7 @@ export interface CreateFlowState {
   downloadUrl: string
   loading: boolean
   loadingMore: boolean
+  loadingPhase: LoadingPhase
   error: string
   selectedIds: Set<string>
   sortOrder: SortOrder
@@ -23,6 +25,8 @@ export interface CreateFlowState {
   hasMore: boolean
   bookStructure: BookStructure | null
   organizing: boolean
+  measuring: boolean
+  spreadTarget: number | null
 }
 
 export interface CreateFlowActions {
@@ -39,6 +43,7 @@ export interface CreateFlowActions {
   loadMorePosts: () => void
   organizeBook: () => void
   regenerateStructure: () => void
+  goToSpread: (spreadIdx: number | null) => void
 }
 
 export interface CreateFlowMeta {
@@ -52,6 +57,7 @@ export interface CreateFlowMeta {
   currentSpreadData: SpreadData | undefined
   selectedCount: number
   totalSpreads: number
+  blockToSpread: Map<string, number>
 }
 
 export interface CreateFlowContextValue {

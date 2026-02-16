@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { generatePageHtml } from '@/lib/pdf/generator'
 import { useCreateFlow } from './CreateFlowContext'
 import { useI18n } from '@/lib/i18n/context'
@@ -28,6 +28,29 @@ function proxyImageUrls(html: string): string {
   return html.replace(
     /(<img\s[^>]*src=")([^"]+cdninstagram\.com[^"]+)(")/g,
     (_match, before, url, after) => `${before}/api/proxy-image?url=${encodeURIComponent(url)}${after}`
+  )
+}
+
+function GenerateButtonContent({ loading, label }: { loading: boolean; label: string }) {
+  if (loading) {
+    return (
+      <>
+        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        {label}
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
+          style={{ animation: 'shimmer 1.5s infinite linear', backgroundSize: '200% 100%' }}
+        />
+      </>
+    )
+  }
+  return (
+    <>
+      {label}
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+      </svg>
+    </>
   )
 }
 
@@ -66,8 +89,8 @@ function renderPage(html: string | null, side: 'left' | 'right', noShadow?: bool
 
 export function BookPreview({ width }: { width?: number }) {
   const {
-    state: { loading },
-    actions: { goBack, generateLoom },
+    state: { loading, spreadTarget },
+    actions: { goBack, generateLoom, goToSpread },
     meta: { pages, spreads, selectedCount },
   } = useCreateFlow()
   const { t } = useI18n()
@@ -92,11 +115,19 @@ export function BookPreview({ width }: { width?: number }) {
     resetKey: pages.length,
   })
 
+  // Navigate to spread when spreadTarget is set (from TOCSidebar clicks)
+  useEffect(() => {
+    if (spreadTarget !== null) {
+      handleSliderChange(spreadTarget)
+      goToSpread(null) // Clear target
+    }
+  }, [spreadTarget, handleSliderChange, goToSpread])
+
   const currentData = spreads[currentSpread] ?? null
   const targetData = flipState ? spreads[flipState.targetSpread] ?? null : null
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-100" style={{ animation: 'slideInRight 0.35s ease-out both' }}>
+    <div className="flex-1 flex flex-col" style={{ animation: 'slideInRight 0.35s ease-out both' }}>
       {/* Spread area */}
       <SpreadViewerContainer
         containerRef={containerRef}
@@ -151,23 +182,10 @@ export function BookPreview({ width }: { width?: number }) {
             disabled={selectedCount === 0 || loading}
             className="px-5 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 relative overflow-hidden"
           >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                {t('create.preview.generating')}
-                <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
-                  style={{ animation: 'shimmer 1.5s infinite linear', backgroundSize: '200% 100%' }}
-                />
-              </>
-            ) : (
-              <>
-                {t('create.preview.generatePdf')}
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </>
-            )}
+            <GenerateButtonContent
+              loading={loading}
+              label={loading ? t('create.preview.generating') : t('create.preview.generatePdf')}
+            />
           </button>
         </div>
       </div>

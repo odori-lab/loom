@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, use, useState, useCallback, ReactNode } from 'react'
+import { createContext, use, useState, useCallback, useMemo, ReactNode } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Database } from '@/types/database'
 
@@ -19,6 +19,7 @@ interface DashboardContextValue {
   selectLoom: (loom: Loom) => void
   deleteLoom: (id: string) => void
   openPreviewModal: () => void
+  openPreviewModalWithUrl: (url: string) => void
   closePreviewModal: () => void
   addLoom: (loom: Loom) => void
 }
@@ -100,28 +101,35 @@ export function DashboardProvider({ initialLooms, children }: DashboardProviderP
   }, [])
 
   const openPreviewModal = useCallback(() => setPreviewModalOpen(true), [])
+  const openPreviewModalWithUrl = useCallback((url: string) => {
+    setPreviewUrl(url)
+    setPreviewModalOpen(true)
+  }, [])
   const closePreviewModal = useCallback(() => setPreviewModalOpen(false), [])
 
   const addLoom = useCallback((loom: Loom) => {
     setLooms(prev => [loom, ...prev])
   }, [])
 
+  const value = useMemo(() => ({
+    activeTab,
+    looms,
+    selectedLoom,
+    previewUrl,
+    loadingPreview,
+    previewModalOpen,
+    deletingId,
+    setActiveTab,
+    selectLoom,
+    deleteLoom,
+    openPreviewModal,
+    openPreviewModalWithUrl,
+    closePreviewModal,
+    addLoom,
+  }), [activeTab, looms, selectedLoom, previewUrl, loadingPreview, previewModalOpen, deletingId, setActiveTab, selectLoom, deleteLoom, openPreviewModal, openPreviewModalWithUrl, closePreviewModal, addLoom])
+
   return (
-    <DashboardContext value={{
-      activeTab,
-      looms,
-      selectedLoom,
-      previewUrl,
-      loadingPreview,
-      previewModalOpen,
-      deletingId,
-      setActiveTab,
-      selectLoom,
-      deleteLoom,
-      openPreviewModal,
-      closePreviewModal,
-      addLoom,
-    }}>
+    <DashboardContext value={value}>
       {children}
     </DashboardContext>
   )

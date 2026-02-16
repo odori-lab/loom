@@ -1,53 +1,9 @@
 import { ThreadsPost } from '@/types/threads'
+import { MergedPost, PostChunk, PageLayout } from './types'
+import { MAX_PAGE_HEIGHT, LEGACY } from './constants'
 
-// Content area calculation (in pixels)
-// Page: 793.7px (210mm), Padding: 83.15px * 2 (22mm * 2)
-// Content area height: 793.7 - 166.3 = 627.4px
-// Using exact value for precise splitting
-const MAX_PAGE_HEIGHT = 627
-
-// Height estimates (in pixels) - based on actual rendered values
-const POST_HEADER_HEIGHT = 48   // Avatar (28px) + margins + username line
-const POST_STATS_HEIGHT = 30    // Stats row height
-const POST_MARGIN = 36          // margin-bottom (20px) + padding-bottom (16px)
-const LINE_HEIGHT = 21          // Actual line-height: ~20px + small buffer
-const CHARS_PER_LINE = 28       // 408px width / ~14.5px per Korean char
-const IMAGE_HEIGHT = 130        // max-height (120px) + margin (10px)
-
-// Minimum height for continuation
-const MIN_CONTINUATION_HEIGHT = POST_HEADER_HEIGHT + LINE_HEIGHT * 2
-
-
-// Merged post type for combining thread posts in essay mode
-export interface MergedPost {
-  content: string
-  date: Date
-  likeCount: number
-  imageUrls: string[]
-  postIds?: string[]
-}
-
-export interface PostChunk {
-  post: ThreadsPost
-  contentStart: number  // Start index in content
-  contentEnd: number    // End index in content
-  showHeader: boolean   // Show header only on first chunk
-  showStats: boolean    // Show stats only on last chunk
-  showImages: boolean   // Show images only on first chunk (or when fits)
-  isFirstChunk: boolean
-  isLastChunk: boolean
-  // Continue indicators - set by generator based on spread position
-  showContinued?: boolean   // Show "(...continued)" at top
-  showContinues?: boolean   // Show "(continues...)" at bottom
-  // Thread information for self-reply chains
-  threadPosition?: number   // Position in thread (1, 2, 3...)
-  threadTotal?: number      // Total posts in thread
-}
-
-interface PageLayout {
-  posts: ThreadsPost[]
-  chunks?: PostChunk[]  // New: for split posts
-}
+// Re-export types for backward compatibility
+export type { MergedPost, PostChunk, PageLayout } from './types'
 
 // Build thread information map: threadId -> { positions, total }
 function buildThreadInfo(posts: ThreadsPost[]): Map<string, { posts: ThreadsPost[], positions: Map<string, number> }> {
@@ -194,7 +150,7 @@ function splitPostAcrossPages(post: ThreadsPost, currentPageUsed: number, thread
   let availableHeight = MAX_PAGE_HEIGHT - currentPageUsed
 
   // If not enough space for meaningful content, start fresh on new page
-  if (availableHeight < MIN_CONTINUATION_HEIGHT) {
+  if (availableHeight < LEGACY.MIN_CONTINUATION_HEIGHT) {
     availableHeight = MAX_PAGE_HEIGHT
   }
 
@@ -203,13 +159,13 @@ function splitPostAcrossPages(post: ThreadsPost, currentPageUsed: number, thread
 
   while (contentIndex < content.length) {
     // Calculate how much content fits
-    const headerHeight = isFirst ? POST_HEADER_HEIGHT : 0
-    const imageHeight = isFirst && post.imageUrls.length > 0 ? IMAGE_HEIGHT : 0
+    const headerHeight = isFirst ? LEGACY.POST_HEADER_HEIGHT : 0
+    const imageHeight = isFirst && post.imageUrls.length > 0 ? LEGACY.IMAGE_HEIGHT : 0
     const statsHeight = 0 // Stats only shown on last chunk, calculated after
-    const availableForText = availableHeight - headerHeight - imageHeight - POST_MARGIN - statsHeight
+    const availableForText = availableHeight - headerHeight - imageHeight - LEGACY.POST_MARGIN - statsHeight
 
     // Calculate how many lines fit
-    const linesAvailable = Math.max(Math.floor(availableForText / LINE_HEIGHT), 1)
+    const linesAvailable = Math.max(Math.floor(availableForText / LEGACY.LINE_HEIGHT), 1)
 
     // Find end index based on available lines
     const endIndex = findEndIndexForLines(content, contentIndex, linesAvailable)
@@ -241,19 +197,19 @@ function splitPostAcrossPages(post: ThreadsPost, currentPageUsed: number, thread
 function findEndIndexForLines(content: string, startIndex: number, maxLines: number): number {
   const remaining = content.slice(startIndex)
   const lines = remaining.split('\n')
-  
+
   let lineCount = 0
   let charCount = 0
-  
+
   for (const line of lines) {
     // Calculate how many rendered lines this text line takes
-    const renderedLines = Math.max(Math.ceil(line.length / CHARS_PER_LINE), 1)
-    
+    const renderedLines = Math.max(Math.ceil(line.length / LEGACY.CHARS_PER_LINE), 1)
+
     if (lineCount + renderedLines > maxLines) {
       // This line would exceed the limit
       if (lineCount === 0) {
         // First line - need to split it
-        const charsForRemainingLines = maxLines * CHARS_PER_LINE
+        const charsForRemainingLines = maxLines * LEGACY.CHARS_PER_LINE
         // Find a good break point
         let breakPoint = Math.min(charsForRemainingLines, line.length)
         const lastSpace = line.lastIndexOf(' ', breakPoint)
@@ -265,27 +221,27 @@ function findEndIndexForLines(content: string, startIndex: number, maxLines: num
       // Return up to before this line
       return startIndex + charCount
     }
-    
+
     lineCount += renderedLines
     charCount += line.length + 1 // +1 for newline
   }
-  
+
   return content.length
 }
 
 function estimateChunkHeight(chunk: PostChunk): number {
-  let height = POST_MARGIN
+  let height = LEGACY.POST_MARGIN
 
   if (chunk.showHeader) {
-    height += POST_HEADER_HEIGHT
+    height += LEGACY.POST_HEADER_HEIGHT
   }
 
   if (chunk.showStats) {
-    height += POST_STATS_HEIGHT
+    height += LEGACY.POST_STATS_HEIGHT
   }
 
   if (chunk.showImages && chunk.post.imageUrls.length > 0) {
-    height += IMAGE_HEIGHT
+    height += LEGACY.IMAGE_HEIGHT
   }
 
   // Text height for this chunk
@@ -296,14 +252,14 @@ function estimateChunkHeight(chunk: PostChunk): number {
 }
 
 function estimatePostHeight(post: ThreadsPost): number {
-  let height = POST_HEADER_HEIGHT + POST_STATS_HEIGHT + POST_MARGIN
+  let height = LEGACY.POST_HEADER_HEIGHT + LEGACY.POST_STATS_HEIGHT + LEGACY.POST_MARGIN
 
   // Text height
   height += estimateTextHeight(post.content)
 
   // Image height
   if (post.imageUrls.length > 0) {
-    height += IMAGE_HEIGHT
+    height += LEGACY.IMAGE_HEIGHT
   }
 
   return height
@@ -316,10 +272,9 @@ function estimateTextHeight(content: string): number {
 
   for (const line of lines) {
     // Each line takes at least 1 rendered line, plus extra for long lines
-    const renderedLines = Math.max(Math.ceil(line.length / CHARS_PER_LINE), 1)
+    const renderedLines = Math.max(Math.ceil(line.length / LEGACY.CHARS_PER_LINE), 1)
     totalLines += renderedLines
   }
 
-  return totalLines * LINE_HEIGHT
+  return totalLines * LEGACY.LINE_HEIGHT
 }
-

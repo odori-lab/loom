@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useCreateFlow } from './CreateFlowContext'
 import { useI18n } from '@/lib/i18n/context'
 import { BookChapter, BookSubChapter } from '@/types/book'
@@ -17,8 +17,8 @@ function proxyImageUrl(url: string): string {
 export function TOCSidebar({ className }: TOCSidebarProps) {
   const {
     state: { bookStructure, organizing, profile, posts },
-    actions: { regenerateStructure, generateLoom, goBack },
-    meta: { orderedPosts },
+    actions: { regenerateStructure, generateLoom, goBack, goToSpread },
+    meta: { orderedPosts, blockToSpread },
   } = useCreateFlow()
   const { t } = useI18n()
 
@@ -27,6 +27,15 @@ export function TOCSidebar({ className }: TOCSidebarProps) {
   const totalSubChapters = bookStructure
     ? bookStructure.chapters.reduce((sum, ch) => sum + ch.subChapters.length, 0)
     : 0
+
+  const postMap = useMemo(() => new Map(posts.map(p => [p.id, p])), [posts])
+
+  const handleNavigate = (blockId: string) => {
+    const spreadIdx = blockToSpread.get(blockId)
+    if (spreadIdx !== undefined) {
+      goToSpread(spreadIdx)
+    }
+  }
 
   return (
     <div
@@ -109,7 +118,8 @@ export function TOCSidebar({ className }: TOCSidebarProps) {
         ) : bookStructure ? (
           <ChapterList
             chapters={bookStructure.chapters}
-            posts={posts}
+            postMap={postMap}
+            onNavigate={handleNavigate}
           />
         ) : (
           <div className="p-8 text-center text-sm text-gray-400">
@@ -139,9 +149,7 @@ function ShimmerLoading() {
   )
 }
 
-function ChapterList({ chapters, posts }: { chapters: BookChapter[]; posts: ThreadsPost[] }) {
-  const postMap = new Map(posts.map(p => [p.id, p]))
-
+function ChapterList({ chapters, postMap, onNavigate }: { chapters: BookChapter[]; postMap: Map<string, ThreadsPost>; onNavigate: (blockId: string) => void }) {
   return (
     <div>
       {chapters.map((chapter, index) => (
@@ -150,6 +158,7 @@ function ChapterList({ chapters, posts }: { chapters: BookChapter[]; posts: Thre
           chapter={chapter}
           index={index}
           postMap={postMap}
+          onNavigate={onNavigate}
         />
       ))}
     </div>
@@ -160,10 +169,12 @@ function ChapterItem({
   chapter,
   index,
   postMap,
+  onNavigate,
 }: {
   chapter: BookChapter
   index: number
   postMap: Map<string, ThreadsPost>
+  onNavigate: (blockId: string) => void
 }) {
   const [expanded, setExpanded] = useState(index === 0)
 
@@ -175,30 +186,37 @@ function ChapterItem({
       style={{ animation: `fadeInUp 0.3s ease-out ${Math.min(index * 50, 250)}ms both` }}
     >
       {/* Chapter header */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-3 flex items-start gap-3 hover:bg-gray-50/50 transition-colors text-left active:scale-[0.99]"
-      >
-        <span className="text-xs font-mono text-gray-400 mt-0.5 shrink-0 w-5 text-center">
-          {index + 1}
-        </span>
-        <div className="flex-1 min-w-0">
-          <p className="text-[13px] font-medium text-gray-900 leading-tight">
-            {chapter.title}
-          </p>
-          <p className="text-[11px] text-gray-400 mt-0.5">
-            {chapter.description} · {chapter.subChapters.length} sub · {totalPosts} posts
-          </p>
-        </div>
-        <svg
-          className={`w-4 h-4 text-gray-400 shrink-0 mt-0.5 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <div className="flex items-start">
+        <button
+          onClick={() => onNavigate(`chapter-${index}`)}
+          className="flex-1 px-4 py-3 flex items-start gap-3 hover:bg-gray-50/50 transition-colors text-left active:scale-[0.99] cursor-pointer"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
+          <span className="text-xs font-mono text-gray-400 mt-0.5 shrink-0 w-5 text-center">
+            {index + 1}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-medium text-gray-900 leading-tight hover:underline">
+              {chapter.title}
+            </p>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              {chapter.description} · {chapter.subChapters.length} sub · {totalPosts} posts
+            </p>
+          </div>
+        </button>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="px-3 py-3 hover:bg-gray-50/50 transition-colors"
+        >
+          <svg
+            className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
 
       {/* Sub-chapters */}
       {expanded && (
@@ -210,6 +228,7 @@ function ChapterItem({
               chapterIndex={index}
               subIndex={scIdx}
               postMap={postMap}
+              onNavigate={onNavigate}
             />
           ))}
         </div>
@@ -223,11 +242,13 @@ function SubChapterItem({
   chapterIndex,
   subIndex,
   postMap,
+  onNavigate,
 }: {
   subChapter: BookSubChapter
   chapterIndex: number
   subIndex: number
   postMap: Map<string, ThreadsPost>
+  onNavigate: (blockId: string) => void
 }) {
   const [expanded, setExpanded] = useState(false)
 
@@ -238,44 +259,52 @@ function SubChapterItem({
   return (
     <div style={{ animation: `fadeIn 0.2s ease-out ${subIndex * 30}ms both` }}>
       {/* Sub-chapter header */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full pl-12 pr-4 py-2 flex items-start gap-2 hover:bg-gray-50/30 transition-colors text-left active:scale-[0.99]"
-      >
-        <span className="text-[10px] font-mono text-gray-300 mt-0.5 shrink-0 w-6 text-center">
-          {chapterIndex + 1}.{subIndex + 1}
-        </span>
-        <div className="flex-1 min-w-0">
-          <p className="text-[12px] font-medium text-gray-700 leading-tight">
-            {subChapter.title}
-          </p>
-          <p className="text-[10px] text-gray-400 mt-0.5">
-            {subPosts.length} posts
-          </p>
-        </div>
-        <svg
-          className={`w-3 h-3 text-gray-300 shrink-0 mt-0.5 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <div className="flex items-start">
+        <button
+          onClick={() => onNavigate(`sub-chapter-${chapterIndex}-${subIndex}`)}
+          className="flex-1 pl-12 pr-2 py-2 flex items-start gap-2 hover:bg-gray-50/30 transition-colors text-left active:scale-[0.99] cursor-pointer"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
+          <span className="text-[10px] font-mono text-gray-300 mt-0.5 shrink-0 w-6 text-center">
+            {chapterIndex + 1}.{subIndex + 1}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] font-medium text-gray-700 leading-tight hover:underline">
+              {subChapter.title}
+            </p>
+            <p className="text-[10px] text-gray-400 mt-0.5">
+              {subPosts.length} posts
+            </p>
+          </div>
+        </button>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="px-3 py-2 hover:bg-gray-50/30 transition-colors"
+        >
+          <svg
+            className={`w-3 h-3 text-gray-300 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
 
       {/* Post previews */}
       {expanded && (
         <div className="pb-1" style={{ animation: 'fadeIn 0.15s ease-out both' }}>
           {subPosts.map((post, postIdx) => (
-            <div
+            <button
               key={post.id}
-              className="pl-20 pr-4 py-1"
+              onClick={() => onNavigate(`post-${chapterIndex}-${subIndex}-${postIdx}`)}
+              className="w-full pl-20 pr-4 py-1 text-left hover:bg-gray-50/30 transition-colors cursor-pointer"
               style={{ animation: `fadeIn 0.15s ease-out ${postIdx * 20}ms both` }}
             >
-              <p className="text-[11px] text-gray-500 leading-[1.4] line-clamp-2 whitespace-pre-line">
+              <p className="text-[11px] text-gray-500 leading-[1.4] line-clamp-2 whitespace-pre-line hover:text-gray-700">
                 {post.content}
               </p>
-            </div>
+            </button>
           ))}
         </div>
       )}

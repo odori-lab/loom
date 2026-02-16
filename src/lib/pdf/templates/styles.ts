@@ -22,10 +22,11 @@ export const PDF_STYLES = `
 
   .page {
     width: 148mm;
-    min-height: 210mm;
+    height: 210mm;
     padding: 22mm 20mm;
     position: relative;
     background: #ffffff;
+    overflow: hidden;
   }
 
   /* Cover Page */
@@ -194,7 +195,7 @@ export const PDF_STYLES = `
   .post-image {
     max-width: 100%;
     max-height: 140px;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 12px;
   }
 
@@ -367,6 +368,9 @@ export const PDF_STYLES = `
     color: #000;
     line-height: 1.4;
     margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
   }
 
   .toc-chapter-desc {
@@ -387,6 +391,35 @@ export const PDF_STYLES = `
     color: #999;
     padding-left: 8px;
     line-height: 1.4;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .toc-page-number {
+    font-size: 9pt;
+    color: #999;
+    font-weight: 400;
+    margin-left: 8px;
+    white-space: nowrap;
+  }
+
+  .toc-sub-chapter .toc-page-number {
+    font-size: 8pt;
+  }
+
+  /* TOC items when placed directly in page (split TOC) */
+  .toc-page > .toc-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 4px;
+  }
+
+  .toc-page > .toc-item:last-child {
+    border-bottom: none;
   }
 
   /* Preface Page */
@@ -490,6 +523,7 @@ export const PDF_STYLES = `
   .essay-inline-image {
     max-width: 100%;
     max-height: 200px;
+    min-height: 100px;
     object-fit: contain;
     border-radius: 8px;
     margin: 12px 0;
@@ -504,14 +538,17 @@ export const PDF_STYLES = `
     display: flex;
     gap: 6px;
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   .essay-image-row .essay-inline-image {
     margin: 0;
-    flex: 1;
+    flex: 0 1 auto;
     min-width: 0;
+    max-width: 100%;
     max-height: 200px;
-    object-fit: cover;
+    min-height: 100px;
+    object-fit: contain;
   }
 
   .essay-image-caption {
@@ -520,5 +557,15 @@ export const PDF_STYLES = `
     font-style: italic;
     margin-top: 4px;
     line-height: 1.4;
+  }
+
+  /* Page Numbers */
+  .page-number {
+    position: absolute;
+    bottom: 12mm;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8pt;
+    color: #999;
   }
 `
