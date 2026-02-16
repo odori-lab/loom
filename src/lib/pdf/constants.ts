@@ -17,20 +17,8 @@ export const IMAGE_LOAD_TIMEOUT = 2000
 // These match the CSS max-height values in styles.ts
 export const IMAGE_FALLBACK_HEIGHTS: Record<string, number> = {
   'essay-inline-image': 200,
-  'post-image': 140,
 }
 export const DEFAULT_IMAGE_FALLBACK = 200
-
-// ─── Legacy layout constants (Threads-style) ───
-export const LEGACY = {
-  POST_HEADER_HEIGHT: 48,    // Avatar (28px) + margins + username line
-  POST_STATS_HEIGHT: 30,     // Stats row height
-  POST_MARGIN: 36,           // margin-bottom (20px) + padding-bottom (16px)
-  LINE_HEIGHT: 21,           // Actual line-height: ~20px + small buffer
-  CHARS_PER_LINE: 28,        // 408px width / ~14.5px per Korean char
-  IMAGE_HEIGHT: 130,         // max-height (120px) + margin (10px)
-  MIN_CONTINUATION_HEIGHT: 48 + 21 * 2,  // POST_HEADER_HEIGHT + LINE_HEIGHT * 2
-} as const
 
 // ─── Essay layout constants ───
 export const ESSAY = {

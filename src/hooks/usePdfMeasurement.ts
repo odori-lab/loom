@@ -22,7 +22,7 @@ export function usePdfMeasurement(
   const [pageMappingRef, setPageMappingRef] = useState<PageMapping | null>(null)
 
   useEffect(() => {
-    if (orderedPosts.length === 0 || !profile) {
+    if (orderedPosts.length === 0 || !profile || !bookStructure) {
       setPages([])
       setPageAssignmentsRef(null)
       setPageMappingRef(null)
@@ -35,7 +35,7 @@ export function usePdfMeasurement(
       setMeasuring(true)
       let iframe: HTMLIFrameElement | null = null
       try {
-        const blocks = generateContentBlocks(orderedPosts, profile!, bookStructure ?? undefined)
+        const blocks = generateContentBlocks(orderedPosts, profile!, bookStructure!)
         const { measured, iframe: measureIframe } = await measureBlockHeights(blocks)
         iframe = measureIframe
         if (cancelled) return
@@ -99,7 +99,7 @@ export function usePdfMeasurement(
       } catch {
         // Fallback to sync generation if measurement fails (SSR, etc.)
         if (!cancelled) {
-          setPages(generatePageContents(orderedPosts, profile!, bookStructure ?? undefined))
+          setPages(bookStructure ? generatePageContents(orderedPosts, profile!, bookStructure) : [])
           setPageAssignmentsRef(null)
           setPageMappingRef(null)
         }
@@ -150,5 +150,5 @@ export function usePdfMeasurement(
     setSpreadTarget(spreadIdx)
   }, [])
 
-  return { pages, measuring, spreads, spreadTarget, blockToSpread, goToSpread }
+  return { pages, measuring, spreads, spreadTarget, blockToSpread, goToSpread, pageMapping: pageMappingRef }
 }

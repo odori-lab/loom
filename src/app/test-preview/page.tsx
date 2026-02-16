@@ -2,9 +2,14 @@
 
 import { Suspense } from 'react'
 import { CreateFlowProvider } from '@/components/create/CreateFlowProvider'
-import { BookPreview } from '@/components/create/BookPreview'
 import { useCreateFlow } from '@/components/create/CreateFlowContext'
 import { I18nProvider } from '@/lib/i18n/context'
+import dynamic from 'next/dynamic'
+
+const PageListViewer = dynamic(
+  () => import('@/components/ui/PageListViewer').then((mod) => mod.PageListViewer),
+  { ssr: false }
+)
 
 function PreviewPanel() {
   const {
@@ -29,9 +34,9 @@ function PreviewPanel() {
         <span>Measuring: <strong id="measuring-status">{measuring ? 'yes' : 'no'}</strong></span>
       </div>
 
-      {/* BookPreview */}
-      <div className="flex-1 flex">
-        <BookPreview width={700} />
+      {/* PageListViewer */}
+      <div className="flex-1 overflow-hidden">
+        <PageListViewer htmlPages={pages} width={700} />
       </div>
     </div>
   )

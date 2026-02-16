@@ -2,6 +2,7 @@ export interface BookSubChapter {
   id: string
   title: string
   postIds: string[]
+  startPage?: number
 }
 
 export interface BookChapter {
@@ -9,6 +10,7 @@ export interface BookChapter {
   title: string
   description: string
   subChapters: BookSubChapter[]
+  startPage?: number
 }
 
 export interface ImageCaption {

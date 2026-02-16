@@ -1,16 +1,14 @@
 'use client'
 
-import { useMemo, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { useDashboard } from './DashboardContext'
 import { useI18n } from '@/lib/i18n/context'
 import dynamic from 'next/dynamic'
 
-const PdfPageViewer = dynamic(
-  () => import('@/components/ui/PdfPageViewer').then((mod) => mod.PdfPageViewer),
+const PageListViewer = dynamic(
+  () => import('@/components/ui/PageListViewer').then((mod) => mod.PageListViewer),
   { ssr: false }
 )
-
-const BASE_PDF_WIDTH = 568
 
 export interface LoomPreviewPanelProps {
   width?: number
@@ -24,8 +22,6 @@ export interface LoomPreviewPanelProps {
   emptyState?: ReactNode
   /** Whether there is active content to display. Defaults to checking selectedLoom from context. */
   active?: boolean
-  /** Optional bottom bar content */
-  bottomBar?: ReactNode
   /** Custom content to render instead of the PDF viewer */
   children?: ReactNode
 }
@@ -37,7 +33,6 @@ export function LoomPreviewPanel({
   onPageClick: propOnPageClick,
   emptyState,
   active: propActive,
-  bottomBar,
   children,
 }: LoomPreviewPanelProps) {
   const dashboard = useDashboard()
@@ -49,8 +44,6 @@ export function LoomPreviewPanel({
   const handlePageClick = propOnPageClick ?? (() => dashboard.openPreviewModal())
 
   const panelWidth = width ?? 600
-  const availableWidth = panelWidth - 96 // more padding for breathing room
-  const scale = useMemo(() => Math.min(0.85, availableWidth / BASE_PDF_WIDTH), [availableWidth])
 
   // Shell-only mode: when children are provided, render the panel shell with custom content
   if (children) {
@@ -82,7 +75,7 @@ export function LoomPreviewPanel({
 
   return (
     <div className="bg-gray-50 border-l border-gray-100 flex flex-col shrink-0" style={{ width: panelWidth }}>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-hidden">
         {loadingPreview ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
@@ -91,21 +84,13 @@ export function LoomPreviewPanel({
             </div>
           </div>
         ) : previewUrl ? (
-          <div className="min-h-full flex flex-col items-center justify-center p-10">
-            <div style={{ width: BASE_PDF_WIDTH * scale }}>
-              <div style={{
-                width: BASE_PDF_WIDTH,
-                transform: `scale(${scale})`,
-                transformOrigin: 'top left',
-              }}>
-                <PdfPageViewer url={previewUrl} width={BASE_PDF_WIDTH} onPageClick={() => handlePageClick()} />
-              </div>
-            </div>
-          </div>
+          <PageListViewer
+            pdfUrl={previewUrl}
+            width={panelWidth}
+            onPageClick={() => handlePageClick()}
+          />
         ) : emptyState ? (
-          <div className="h-full flex items-center justify-center">
-            {emptyState}
-          </div>
+          <div className="h-full flex items-center justify-center">{emptyState}</div>
         ) : (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
@@ -119,7 +104,6 @@ export function LoomPreviewPanel({
           </div>
         )}
       </div>
-      {bottomBar}
     </div>
   )
 }

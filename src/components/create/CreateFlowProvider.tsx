@@ -146,11 +146,24 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
         selection.orderedPosts, profile, userId, book.bookStructure ?? undefined
       )
 
-      // 2. Register loom in DB via Vercel API (fast, no timeout risk)
+      // 2. Enrich bookStructure with page numbers from measurement
+      const enrichedStructure = book.bookStructure ? {
+        ...book.bookStructure,
+        chapters: book.bookStructure.chapters.map((ch, chIdx) => ({
+          ...ch,
+          startPage: pdf.pageMapping?.get(`chapter-${chIdx}`) ?? undefined,
+          subChapters: ch.subChapters.map((sc, scIdx) => ({
+            ...sc,
+            startPage: pdf.pageMapping?.get(`sub-chapter-${chIdx}-${scIdx}`) ?? undefined,
+          })),
+        })),
+      } : null
+
+      // 3. Register loom in DB via Vercel API (fast, no timeout risk)
       const res = await fetch('/api/looms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pdfPath, loomId, posts: selection.orderedPosts, profile, title: book.bookStructure?.title || null, bookStructure: book.bookStructure || null })
+        body: JSON.stringify({ pdfPath, loomId, posts: selection.orderedPosts, profile, title: enrichedStructure?.title || null, bookStructure: enrichedStructure })
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
@@ -217,6 +230,7 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
       selectedCount: selection.selectedIds.size,
       totalSpreads: pdf.spreads.length,
       blockToSpread: pdf.blockToSpread,
+      pageMapping: pdf.pageMapping,
     },
   }), [
     step, posts, profile, downloadUrl, loading, loadingPhase, error, currentSpread,
@@ -227,7 +241,7 @@ export function CreateFlowProvider({ children, onComplete }: CreateFlowProviderP
     selection.loadMorePosts,
     book.bookStructure, book.organizing,
     pdf.measuring, pdf.spreadTarget, pdf.pages, pdf.spreads, pdf.blockToSpread,
-    pdf.goToSpread,
+    pdf.goToSpread, pdf.pageMapping,
     togglePost, toggleAll, organizeBook, regenerateStructure,
   ])
 
