@@ -1,5 +1,5 @@
 import { ThreadsProfile } from '@/types/threads'
-import { PostChunk, MergedPost } from '../layout'
+import { PostChunk, MergedPost, CaptionMap } from '../types'
 import { formatNumber, escapeHtml, formatDate } from '@/lib/utils/format'
 import { generateSubChapterTitle } from './chapter'
 
@@ -14,8 +14,8 @@ export function generateContentPageFromChunks(chunks: PostChunk[], profile: Thre
   `
 }
 
-// Caption map type: postId -> caption (one caption per post)
-export type CaptionMap = Map<string, string>
+// Re-export CaptionMap for backward compatibility
+export type { CaptionMap } from '../types'
 
 // Generate essay-style sub-chapter page with merged posts and inline images
 export function generateEssaySubChapterPage(

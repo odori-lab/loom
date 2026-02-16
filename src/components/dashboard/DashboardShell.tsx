@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useResizable } from '@/hooks/useResizable'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
 import { DashboardProvider, useDashboard } from './DashboardContext'
@@ -38,66 +38,20 @@ export function DashboardShell({ user, initialLooms }: DashboardShellProps) {
 
 function DashboardContent({ user }: { user: User }) {
   const { activeTab, addLoom } = useDashboard()
-  const [previewWidth, setPreviewWidth] = useState(600)
-  const [isResizing, setIsResizing] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
 
-  // Create tab resizable panel (independent from looms tab)
-  const [createPreviewWidth, setCreatePreviewWidth] = useState(600)
-  const [isCreateResizing, setIsCreateResizing] = useState(false)
-  const createContainerRef = useRef<HTMLDivElement>(null)
+  const {
+    width: previewWidth,
+    isResizing,
+    handleMouseDown: handleResizeStart,
+    containerRef,
+  } = useResizable(600, 300, 900)
 
-  const handleResizeStart = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsResizing(true)
-  }, [])
-
-  const handleCreateResizeStart = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsCreateResizing(true)
-  }, [])
-
-  useEffect(() => {
-    if (!isResizing) return
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current) return
-      const rect = containerRef.current.getBoundingClientRect()
-      const newWidth = rect.right - e.clientX
-      setPreviewWidth(Math.max(300, Math.min(900, newWidth)))
-    }
-    const handleMouseUp = () => setIsResizing(false)
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-    document.body.style.cursor = 'col-resize'
-    document.body.style.userSelect = 'none'
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-      document.body.style.cursor = ''
-      document.body.style.userSelect = ''
-    }
-  }, [isResizing])
-
-  useEffect(() => {
-    if (!isCreateResizing) return
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!createContainerRef.current) return
-      const rect = createContainerRef.current.getBoundingClientRect()
-      const newWidth = rect.right - e.clientX
-      setCreatePreviewWidth(Math.max(680, Math.min(900, newWidth)))
-    }
-    const handleMouseUp = () => setIsCreateResizing(false)
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-    document.body.style.cursor = 'col-resize'
-    document.body.style.userSelect = 'none'
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-      document.body.style.cursor = ''
-      document.body.style.userSelect = ''
-    }
-  }, [isCreateResizing])
+  const {
+    width: createPreviewWidth,
+    isResizing: isCreateResizing,
+    handleMouseDown: handleCreateResizeStart,
+    containerRef: createContainerRef,
+  } = useResizable(600, 680, 900)
 
   return (
     <>

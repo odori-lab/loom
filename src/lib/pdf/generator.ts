@@ -1,14 +1,17 @@
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
-import { BookStructure, ImageCaption } from '@/types/book'
+import { BookStructure } from '@/types/book'
+import { MergedPost, CaptionMap } from './types'
+import { buildCaptionMap } from './utils'
+import { ESSAY } from './constants'
 import { PDF_STYLES } from './templates/styles'
 import { generateCoverPage } from './templates/cover'
-import { generateContentPageFromChunks, generateEssaySubChapterPage, generateEssayContinuationPage, CaptionMap } from './templates/content'
+import { generateContentPageFromChunks, generateEssaySubChapterPage, generateEssayContinuationPage } from './templates/content'
 import { generateTocPage } from './templates/toc'
 import { generatePrefacePage } from './templates/preface'
 import { generateChapterTitlePage } from './templates/chapter'
 import { generateLastPage } from './templates/last'
-import { calculateLayout, PostChunk, MergedPost } from './layout'
-export type { MergedPost } from './layout'
+import { calculateLayout, PostChunk } from './layout'
+export type { MergedPost } from './types'
 
 // Generate HTML for a single page (used by both PDF and Preview)
 export function generatePageHtml(pageContent: string): string {
@@ -178,30 +181,20 @@ export function mergeThreadPosts(posts: ThreadsPost[]): MergedPost[] {
   return result
 }
 
-// Height estimation constants for essay mode (in pixels)
-// Page content area: 210mm = 793.7px - 22mm*2 padding = 627px
-const ESSAY_CONTENT_HEIGHT = 627
-const ESSAY_SUB_CHAPTER_TITLE_HEIGHT = 40  // sub-chapter title + margin
-const ESSAY_POST_HEADER_HEIGHT = 24        // date + likes line
-const ESSAY_POST_MARGIN = 20               // margin-bottom between posts
-const ESSAY_LINE_HEIGHT = 24               // 10pt * 1.7 line-height ≈ 23px, rounded up
-const ESSAY_CHARS_PER_LINE = 30            // content area ~108mm at 10pt
-const ESSAY_IMAGE_HEIGHT = 224             // max-height 200px + margin 24px
-
 // Estimate the height of a single merged post
 function estimateMergedPostHeight(post: MergedPost): number {
-  let height = ESSAY_POST_HEADER_HEIGHT + ESSAY_POST_MARGIN
+  let height = ESSAY.POST_HEADER_HEIGHT + ESSAY.POST_MARGIN
 
   // Text height
   const lines = post.content.split('\n')
   let totalLines = 0
   for (const line of lines) {
-    totalLines += Math.max(Math.ceil(line.length / ESSAY_CHARS_PER_LINE), 1)
+    totalLines += Math.max(Math.ceil(line.length / ESSAY.CHARS_PER_LINE), 1)
   }
-  height += totalLines * ESSAY_LINE_HEIGHT
+  height += totalLines * ESSAY.LINE_HEIGHT
 
   // Image height
-  height += post.imageUrls.length * ESSAY_IMAGE_HEIGHT
+  height += post.imageUrls.length * ESSAY.IMAGE_HEIGHT
 
   return height
 }
@@ -218,7 +211,7 @@ function splitSubChapterIntoPages(
   const pageGroups: MergedPost[][] = []
   let currentGroup: MergedPost[] = []
   // First page has less space due to sub-chapter title
-  let remainingHeight = ESSAY_CONTENT_HEIGHT - ESSAY_SUB_CHAPTER_TITLE_HEIGHT
+  let remainingHeight = ESSAY.CONTENT_HEIGHT - ESSAY.SUB_CHAPTER_TITLE_HEIGHT
   let isFirstPage = true
 
   for (const post of mergedPosts) {
@@ -229,7 +222,7 @@ function splitSubChapterIntoPages(
       pageGroups.push(currentGroup)
       currentGroup = [post]
       // Subsequent pages have full content area
-      remainingHeight = ESSAY_CONTENT_HEIGHT - postHeight
+      remainingHeight = ESSAY.CONTENT_HEIGHT - postHeight
       isFirstPage = false
     } else {
       currentGroup.push(post)
@@ -330,20 +323,6 @@ function generateEssayPageContents(
   pages.push(generateLastPage())
 
   return pages
-}
-
-// Build caption lookup map from ImageCaption array: postId -> caption (first caption wins)
-function buildCaptionMap(imageCaptions?: ImageCaption[]): CaptionMap {
-  const map: CaptionMap = new Map()
-  if (!imageCaptions) return map
-
-  for (const cap of imageCaptions) {
-    if (!map.has(cap.postId)) {
-      map.set(cap.postId, cap.caption)
-    }
-  }
-
-  return map
 }
 
 // Generate blank page for print-friendly spreads

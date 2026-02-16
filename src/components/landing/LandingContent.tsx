@@ -46,6 +46,34 @@ function useParallax() {
   }, [handleScroll])
 }
 
+const STEPS = [
+  { step: 1, titleKey: 'howItWorks.step1.title', descKey: 'howItWorks.step1.description', color: 'purple' },
+  { step: 2, titleKey: 'howItWorks.step2.title', descKey: 'howItWorks.step2.description', color: 'blue' },
+  { step: 3, titleKey: 'howItWorks.step3.title', descKey: 'howItWorks.step3.description', color: 'green' },
+] as const
+
+const FEATURE_ICONS = [
+  <svg key="book" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  </svg>,
+  <svg key="image" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>,
+  <svg key="filter" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+  </svg>,
+  <svg key="heart" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+  </svg>,
+]
+
+const FEATURES = [
+  { titleKey: 'features.bookFormat.title', descKey: 'features.bookFormat.description', gradient: 'from-purple-500 to-pink-500', bg: 'bg-purple-50' },
+  { titleKey: 'features.images.title', descKey: 'features.images.description', gradient: 'from-blue-500 to-cyan-500', bg: 'bg-blue-50' },
+  { titleKey: 'features.filter.title', descKey: 'features.filter.description', gradient: 'from-green-500 to-emerald-500', bg: 'bg-green-50' },
+  { titleKey: 'features.engagement.title', descKey: 'features.engagement.description', gradient: 'from-orange-500 to-red-500', bg: 'bg-orange-50' },
+] as const
+
 interface LandingContentProps {
   user: User | null
 }
@@ -130,11 +158,7 @@ export function LandingContent({ user }: LandingContentProps) {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { step: 1, title: t('howItWorks.step1.title'), desc: t('howItWorks.step1.description'), color: 'purple' },
-              { step: 2, title: t('howItWorks.step2.title'), desc: t('howItWorks.step2.description'), color: 'blue' },
-              { step: 3, title: t('howItWorks.step3.title'), desc: t('howItWorks.step3.description'), color: 'green' },
-            ].map((item, index) => (
+            {STEPS.map((item, index) => (
               <div key={item.step} className={`relative group landing-scroll-animate landing-stagger-${index + 1}${index < 2 ? ' landing-step-connector' : ''}`}>
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50 rounded-3xl -z-10 group-hover:scale-105 transition-transform" />
                 <div className="p-8">
@@ -145,8 +169,8 @@ export function LandingContent({ user }: LandingContentProps) {
                   } text-white flex items-center justify-center text-xl font-bold shadow-lg`}>
                     {item.step}
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900">{item.title}</h3>
-                  <p className="text-gray-500 leading-relaxed">{item.desc}</p>
+                  <h3 className="text-xl font-semibold mb-3 text-gray-900">{t(item.titleKey)}</h3>
+                  <p className="text-gray-500 leading-relaxed">{t(item.descKey)}</p>
                 </div>
               </div>
             ))}
@@ -167,60 +191,15 @@ export function LandingContent({ user }: LandingContentProps) {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {[
-              {
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                ),
-                title: t('features.bookFormat.title'),
-                desc: t('features.bookFormat.description'),
-                gradient: 'from-purple-500 to-pink-500',
-                bg: 'bg-purple-50'
-              },
-              {
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                ),
-                title: t('features.images.title'),
-                desc: t('features.images.description'),
-                gradient: 'from-blue-500 to-cyan-500',
-                bg: 'bg-blue-50'
-              },
-              {
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                  </svg>
-                ),
-                title: t('features.filter.title'),
-                desc: t('features.filter.description'),
-                gradient: 'from-green-500 to-emerald-500',
-                bg: 'bg-green-50'
-              },
-              {
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                ),
-                title: t('features.engagement.title'),
-                desc: t('features.engagement.description'),
-                gradient: 'from-orange-500 to-red-500',
-                bg: 'bg-orange-50'
-              }
-            ].map((feature, i) => (
+            {FEATURES.map((feature, i) => (
               <div key={i} className={`group p-6 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all landing-feature-card landing-scroll-animate landing-stagger-${i + 1}`}>
                 <div className={`w-12 h-12 mb-5 rounded-xl ${feature.bg} flex items-center justify-center landing-feature-icon`}>
                   <div className={`bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`}>
-                    {feature.icon}
+                    {FEATURE_ICONS[i]}
                   </div>
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-900">{feature.title}</h3>
-                <p className="text-gray-500 leading-relaxed">{feature.desc}</p>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">{t(feature.titleKey)}</h3>
+                <p className="text-gray-500 leading-relaxed">{t(feature.descKey)}</p>
               </div>
             ))}
           </div>

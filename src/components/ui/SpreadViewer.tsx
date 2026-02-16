@@ -14,6 +14,55 @@ interface FlipContainerProps<T> {
   renderPage: (data: T, side: 'left' | 'right', noShadow?: boolean) => ReactNode
 }
 
+interface FlipPageProps<T> {
+  flipState: FlipState
+  handleFlipEnd: () => void
+  pageWidth: number
+  direction: 'forward' | 'backward'
+  flipTransform: string
+  frontPage: T
+  backPage: T
+  behindPage: T
+  renderPage: (data: T, side: 'left' | 'right', noShadow?: boolean) => ReactNode
+}
+
+function FlipPage<T>({
+  flipState, handleFlipEnd, pageWidth, direction, flipTransform,
+  frontPage, backPage, behindPage, renderPage,
+}: FlipPageProps<T>) {
+  const isForward = direction === 'forward'
+  const side = isForward ? 'right' : 'left'
+  const backSide = isForward ? 'left' : 'right'
+  const origin = isForward ? 'left center' : 'right center'
+  const backRotation = isForward ? 'rotateY(180deg)' : 'rotateY(-180deg)'
+
+  return (
+    <div style={{ width: pageWidth, position: 'relative' }}>
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        {renderPage(behindPage, side)}
+      </div>
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          transformStyle: 'preserve-3d',
+          transformOrigin: origin,
+          transform: flipTransform,
+          transition: flipState.phase === 'animating' ? 'transform 0.6s ease-in-out' : 'none',
+        }}
+        onTransitionEnd={handleFlipEnd}
+      >
+        <div style={{ backfaceVisibility: 'hidden' }}>
+          {renderPage(frontPage, side, true)}
+        </div>
+        <div style={{ backfaceVisibility: 'hidden', transform: backRotation, position: 'absolute', inset: 0 }}>
+          {renderPage(backPage, backSide, true)}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function FlipContainer<T>({
   flipState, handleFlipEnd, pageWidth, current, target, renderPage,
 }: FlipContainerProps<T>) {
@@ -32,68 +81,33 @@ export function FlipContainer<T>({
     ? `rotateY(${isForward ? -180 : 180}deg)`
     : 'rotateY(0deg)'
 
+  const staticPage = isForward ? current.left : current.right
+  const staticSide = isForward ? 'left' : 'right'
+
   return (
     <div style={{ perspective: '2000px' }} className="flex gap-0.5">
       {isForward ? (
         <>
-          {/* Left side stays */}
           <div style={{ width: pageWidth, position: 'relative', zIndex: 0 }}>
-            {renderPage(current.left, 'left')}
+            {renderPage(staticPage, staticSide)}
           </div>
-          {/* Right side flips */}
-          <div style={{ width: pageWidth, position: 'relative' }}>
-            <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-              {renderPage(target.right, 'right')}
-            </div>
-            <div
-              style={{
-                position: 'relative',
-                zIndex: 1,
-                transformStyle: 'preserve-3d',
-                transformOrigin: 'left center',
-                transform: flipTransform,
-                transition: flipState.phase === 'animating' ? 'transform 0.6s ease-in-out' : 'none',
-              }}
-              onTransitionEnd={handleFlipEnd}
-            >
-              <div style={{ backfaceVisibility: 'hidden' }}>
-                {renderPage(current.right, 'right', true)}
-              </div>
-              <div style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', position: 'absolute', inset: 0 }}>
-                {renderPage(target.left, 'left', true)}
-              </div>
-            </div>
-          </div>
+          <FlipPage
+            flipState={flipState} handleFlipEnd={handleFlipEnd}
+            pageWidth={pageWidth} direction="forward" flipTransform={flipTransform}
+            frontPage={current.right} backPage={target.left} behindPage={target.right}
+            renderPage={renderPage}
+          />
         </>
       ) : (
         <>
-          {/* Left side flips */}
-          <div style={{ width: pageWidth, position: 'relative' }}>
-            <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-              {renderPage(target.left, 'left')}
-            </div>
-            <div
-              style={{
-                position: 'relative',
-                zIndex: 1,
-                transformStyle: 'preserve-3d',
-                transformOrigin: 'right center',
-                transform: flipTransform,
-                transition: flipState.phase === 'animating' ? 'transform 0.6s ease-in-out' : 'none',
-              }}
-              onTransitionEnd={handleFlipEnd}
-            >
-              <div style={{ backfaceVisibility: 'hidden' }}>
-                {renderPage(current.left, 'left', true)}
-              </div>
-              <div style={{ backfaceVisibility: 'hidden', transform: 'rotateY(-180deg)', position: 'absolute', inset: 0 }}>
-                {renderPage(target.right, 'right', true)}
-              </div>
-            </div>
-          </div>
-          {/* Right side stays */}
+          <FlipPage
+            flipState={flipState} handleFlipEnd={handleFlipEnd}
+            pageWidth={pageWidth} direction="backward" flipTransform={flipTransform}
+            frontPage={current.left} backPage={target.right} behindPage={target.left}
+            renderPage={renderPage}
+          />
           <div style={{ width: pageWidth, position: 'relative', zIndex: 0 }}>
-            {renderPage(current.right, 'right')}
+            {renderPage(staticPage, staticSide)}
           </div>
         </>
       )}

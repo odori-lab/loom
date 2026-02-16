@@ -56,6 +56,7 @@ export const translations = {
     'dashboard.empty.title': '아직 Loom이 없습니다',
     'dashboard.empty.description': 'Threads 포스트를 아름다운 PDF로 변환하세요',
     'dashboard.empty.cta': '첫 Loom 만들기',
+    'dashboard.preview.title': '미리보기',
     'dashboard.preview.select': 'Loom을 선택해서 미리보기',
     'dashboard.preview.hint': '그리드에서 항목을 클릭하세요',
     'dashboard.preview.loading': '미리보기 로딩 중...',
@@ -81,6 +82,8 @@ export const translations = {
     'create.username.button': '포스트 가져오기',
     'create.username.continue': '계속',
     'create.username.loading': '포스트 가져오는 중...',
+    'create.username.scraping': '포스트 가져오는 중...',
+    'create.username.organizing': '책 구성 중...',
     'create.username.helper': '이 Threads 프로필의 최근 포스트를 가져옵니다',
     'create.select.title': '포함할 포스트를 선택하세요',
     'create.select.selectAll': '전체 선택',
@@ -121,6 +124,9 @@ export const translations = {
     'create.organize.chapters': '개 챕터',
     'create.organize.subChapters': '개 소챕터',
     'create.organize.noStructure': 'AI가 책 구조를 구성하지 못했습니다',
+
+    // Auth
+    'auth.signOut': '로그아웃',
 
     // Settings
     'setting.title': '설정',
@@ -190,6 +196,7 @@ export const translations = {
     'dashboard.empty.title': 'No Looms yet',
     'dashboard.empty.description': 'Transform your Threads posts into beautiful PDFs',
     'dashboard.empty.cta': 'Create Your First Loom',
+    'dashboard.preview.title': 'Preview',
     'dashboard.preview.select': 'Select a Loom to preview',
     'dashboard.preview.hint': 'Click on any item from the grid',
     'dashboard.preview.loading': 'Loading preview...',
@@ -215,6 +222,8 @@ export const translations = {
     'create.username.button': 'Fetch Posts',
     'create.username.continue': 'Continue',
     'create.username.loading': 'Fetching posts...',
+    'create.username.scraping': 'Fetching posts...',
+    'create.username.organizing': 'Organizing book...',
     'create.username.helper': "We'll fetch the latest posts from this Threads profile",
     'create.select.title': 'Select posts to include',
     'create.select.selectAll': 'Select All',
@@ -255,6 +264,9 @@ export const translations = {
     'create.organize.chapters': 'chapters',
     'create.organize.subChapters': 'sub-chapters',
     'create.organize.noStructure': 'AI could not organize the book structure',
+
+    // Auth
+    'auth.signOut': 'Sign out',
 
     // Settings
     'setting.title': 'Settings',

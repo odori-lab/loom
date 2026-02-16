@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type RefObject } from 'react'
+import { useState, useEffect, useCallback, useRef, type RefObject } from 'react'
 
 export interface FlipState {
   direction: 'forward' | 'backward'
@@ -39,22 +39,22 @@ export function useSpreadViewer({
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
 
-  // Reset when content changes (state-during-render pattern)
-  const [prevResetKey, setPrevResetKey] = useState(resetKey)
-  if (prevResetKey !== resetKey) {
-    setPrevResetKey(resetKey)
+  // Reset when content changes
+  useEffect(() => {
     setNav({ currentSpread: 0, flipState: null })
     setScale(1)
     setOffset({ x: 0, y: 0 })
-  }
+  }, [resetKey])
 
-  // Reset zoom/pan on spread change (state-during-render pattern)
-  const [prevSpreadIndex, setPrevSpreadIndex] = useState(nav.currentSpread)
-  if (prevSpreadIndex !== nav.currentSpread) {
-    setPrevSpreadIndex(nav.currentSpread)
-    setScale(1)
-    setOffset({ x: 0, y: 0 })
-  }
+  // Reset zoom/pan on spread change
+  const currentSpreadRef = useRef(nav.currentSpread)
+  useEffect(() => {
+    if (currentSpreadRef.current !== nav.currentSpread) {
+      currentSpreadRef.current = nav.currentSpread
+      setScale(1)
+      setOffset({ x: 0, y: 0 })
+    }
+  }, [nav.currentSpread])
 
   // ── Spread navigation ──
   // Using functional setState on combined `nav` keeps these callbacks stable.

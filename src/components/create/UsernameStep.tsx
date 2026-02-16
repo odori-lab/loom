@@ -6,8 +6,26 @@ import { ArrowRightIcon } from '@/components/ui/Icons'
 import { useCreateFlow } from './CreateFlowContext'
 import { useI18n } from '@/lib/i18n/context'
 
+function SubmitButtonContent({ loading, loadingPhase }: { loading: boolean; loadingPhase?: string }) {
+  const { t } = useI18n()
+  if (loading) {
+    return (
+      <>
+        <Spinner size="md" className="text-white" />
+        {loadingPhase === 'organizing' ? t('create.username.organizing') : t('create.username.scraping')}
+      </>
+    )
+  }
+  return (
+    <>
+      {t('create.username.continue')}
+      <ArrowRightIcon />
+    </>
+  )
+}
+
 export function UsernameStep() {
-  const { state: { loading, error }, actions: { submitUsername } } = useCreateFlow()
+  const { state: { loading, loadingPhase, error }, actions: { submitUsername } } = useCreateFlow()
   const { t } = useI18n()
   const [username, setUsername] = useState('')
 
@@ -54,17 +72,7 @@ export function UsernameStep() {
               style={{ animation: 'shimmer 1.5s infinite linear', backgroundSize: '200% 100%' }}
             />
           )}
-          {loading ? (
-            <>
-              <Spinner size="md" className="text-white" />
-              {t('create.username.loading')}
-            </>
-          ) : (
-            <>
-              {t('create.username.continue')}
-              <ArrowRightIcon />
-            </>
-          )}
+          <SubmitButtonContent loading={loading} loadingPhase={loadingPhase} />
         </button>
       </form>
 
