@@ -15,10 +15,11 @@ interface DashboardContextValue {
   loadingPreview: boolean
   previewModalOpen: boolean
   deletingId: string | null
+  initialPage: number | null
   setActiveTab: (tab: DashboardTab) => void
   selectLoom: (loom: Loom) => void
   deleteLoom: (id: string) => void
-  openPreviewModal: () => void
+  openPreviewModal: (page?: number) => void
   openPreviewModalWithUrl: (url: string) => void
   closePreviewModal: () => void
   addLoom: (loom: Loom) => void
@@ -52,6 +53,7 @@ export function DashboardProvider({ initialLooms, children }: DashboardProviderP
   const [loadingPreview, setLoadingPreview] = useState(false)
   const [previewModalOpen, setPreviewModalOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [initialPage, setInitialPage] = useState<number | null>(null)
 
   const setActiveTab = useCallback((tab: DashboardTab) => {
     setActiveTabState(tab)
@@ -100,12 +102,19 @@ export function DashboardProvider({ initialLooms, children }: DashboardProviderP
     }
   }, [])
 
-  const openPreviewModal = useCallback(() => setPreviewModalOpen(true), [])
-  const openPreviewModalWithUrl = useCallback((url: string) => {
-    setPreviewUrl(url)
+  const openPreviewModal = useCallback((page?: number) => {
+    setInitialPage(page ?? null)
     setPreviewModalOpen(true)
   }, [])
-  const closePreviewModal = useCallback(() => setPreviewModalOpen(false), [])
+  const openPreviewModalWithUrl = useCallback((url: string) => {
+    setPreviewUrl(url)
+    setInitialPage(null)
+    setPreviewModalOpen(true)
+  }, [])
+  const closePreviewModal = useCallback(() => {
+    setPreviewModalOpen(false)
+    setInitialPage(null)
+  }, [])
 
   const addLoom = useCallback((loom: Loom) => {
     setLooms(prev => [loom, ...prev])
@@ -119,6 +128,7 @@ export function DashboardProvider({ initialLooms, children }: DashboardProviderP
     loadingPreview,
     previewModalOpen,
     deletingId,
+    initialPage,
     setActiveTab,
     selectLoom,
     deleteLoom,
@@ -126,7 +136,7 @@ export function DashboardProvider({ initialLooms, children }: DashboardProviderP
     openPreviewModalWithUrl,
     closePreviewModal,
     addLoom,
-  }), [activeTab, looms, selectedLoom, previewUrl, loadingPreview, previewModalOpen, deletingId, setActiveTab, selectLoom, deleteLoom, openPreviewModal, openPreviewModalWithUrl, closePreviewModal, addLoom])
+  }), [activeTab, looms, selectedLoom, previewUrl, loadingPreview, previewModalOpen, deletingId, initialPage, setActiveTab, selectLoom, deleteLoom, openPreviewModal, openPreviewModalWithUrl, closePreviewModal, addLoom])
 
   return (
     <DashboardContext value={value}>

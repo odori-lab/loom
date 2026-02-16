@@ -62,10 +62,6 @@ test.describe('BookPreview - Page Navigation & Content Overflow', () => {
 
       // Take screenshot of each spread
       await page.screenshot({ path: `test-results/02-spread-${i}.png`, fullPage: true })
-
-      // Check the spread indicator text
-      const spreadText = await page.locator('span.text-sm.text-gray-400').textContent()
-      console.log(`  Spread indicator: ${spreadText}`)
     }
   })
 

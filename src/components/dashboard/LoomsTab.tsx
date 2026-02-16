@@ -3,9 +3,10 @@
 import { useState, useMemo } from 'react'
 import { useDashboard } from './DashboardContext'
 import { SpinnerSvg } from '@/components/ui/Spinner'
-import { TrashIcon, PlusIcon, BookOpenIcon, SearchIcon, DownloadIcon } from '@/components/ui/Icons'
+import { TrashIcon, PlusIcon, BookOpenIcon, SearchIcon, DownloadIcon, ChevronRightIcon } from '@/components/ui/Icons'
 import { useI18n } from '@/lib/i18n/context'
 import { Json } from '@/types/database'
+import { BookStructure, BookChapter } from '@/types/book'
 
 type SortOrder = 'newest' | 'oldest'
 
@@ -30,6 +31,13 @@ function parseCoverData(raw: Json | null): CoverDataShape | null {
   return raw as unknown as CoverDataShape
 }
 
+function parseBookStructure(raw: Json | null): BookStructure | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
+  const obj = raw as Record<string, unknown>
+  if (!obj.chapters || !Array.isArray(obj.chapters)) return null
+  return raw as unknown as BookStructure
+}
+
 function proxyImageUrl(url: string): string {
   return `/api/proxy-image?url=${encodeURIComponent(url)}`
 }
@@ -47,6 +55,7 @@ export function LoomsTab() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
+  const [expandedLoomId, setExpandedLoomId] = useState<string | null>(null)
 
   const filteredLooms = useMemo(() => {
     let result = [...looms]
@@ -77,6 +86,16 @@ export function LoomsTab() {
     } finally {
       setDownloadingId(null)
     }
+  }
+
+  const handleRowClick = (loom: typeof looms[0]) => {
+    selectLoom(loom)
+    setExpandedLoomId(prev => prev === loom.id ? null : loom.id)
+  }
+
+  const handleChapterClick = (e: React.MouseEvent, startPage?: number) => {
+    e.stopPropagation()
+    openPreviewModal(startPage)
   }
 
   if (looms.length === 0) {
@@ -127,41 +146,94 @@ export function LoomsTab() {
         </div>
       </div>
 
-      {/* Grid */}
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="grid grid-cols-[repeat(auto-fill,180px)] gap-4 justify-center">
+      {/* List */}
+      <div className="flex-1 overflow-y-auto px-6 pb-6">
+        <div className="flex flex-col gap-1">
           {filteredLooms.map((loom, index) => {
             const coverData = parseCoverData(loom.cover_data)
             const profileImg = coverData?.profileImageUrl
             const title = getBookTitle(loom.title, coverData, loom.thread_display_name, loom.thread_username)
             const displayName = loom.thread_display_name || coverData?.name || `@${loom.thread_username}`
+            const isExpanded = expandedLoomId === loom.id
+            const isSelected = selectedLoom?.id === loom.id
+            const bookStructure = parseBookStructure(loom.book_structure)
+            const chapters = bookStructure?.chapters || []
 
             return (
               <div
                 key={loom.id}
-                onClick={() => selectLoom(loom)}
-                onDoubleClick={() => openPreviewModal()}
                 style={{ animationDelay: `${index * 40}ms`, contentVisibility: 'auto' }}
-                className={`w-[180px] group cursor-pointer rounded-xl border transition-all overflow-hidden [animation:dashboard-card-enter_0.3s_ease-out_both] active:scale-[0.97] ${
-                  selectedLoom?.id === loom.id
-                    ? 'border-gray-900 shadow-md'
-                    : 'border-[#e0e0e0] hover:border-gray-400 hover:shadow-sm'
-                }`}
+                className="[animation:dashboard-card-enter_0.3s_ease-out_both]"
               >
-                {/* Book cover area */}
-                <div className="relative bg-[#fafafa] px-4 pt-5 pb-3 flex flex-col items-center">
-                  {/* Action buttons - visible on hover */}
-                  <div className="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                {/* Loom row */}
+                <div
+                  onClick={() => handleRowClick(loom)}
+                  className={`group flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all active:scale-[0.99] ${
+                    isSelected
+                      ? 'bg-gray-900 text-white'
+                      : 'hover:bg-[#fafafa]'
+                  }`}
+                >
+                  {/* Expand chevron */}
+                  <div className={`flex-shrink-0 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
+                    <ChevronRightIcon className={`w-4 h-4 ${isSelected ? 'text-gray-400' : 'text-gray-300'}`} />
+                  </div>
+
+                  {/* Profile image */}
+                  {profileImg ? (
+                    <img
+                      src={proxyImageUrl(profileImg)}
+                      alt={displayName}
+                      className="w-9 h-9 rounded-full border border-[#e0e0e0] object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full border border-[#e0e0e0] bg-[#f5f5f5] flex items-center justify-center flex-shrink-0">
+                      <span className={`text-xs font-medium ${isSelected ? 'text-gray-400' : 'text-[#999999]'}`}>
+                        {(displayName[0] || '?').toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Title and username */}
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-sm font-semibold truncate leading-tight ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                      {title}
+                    </p>
+                    <p className={`text-xs truncate leading-tight mt-0.5 ${isSelected ? 'text-gray-400' : 'text-[#999999]'}`}>
+                      @{loom.thread_username}
+                    </p>
+                  </div>
+
+                  {/* Post count badge */}
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium flex-shrink-0 ${
+                    isSelected
+                      ? 'bg-white/15 text-gray-300'
+                      : 'bg-gray-100 text-[#737373]'
+                  }`}>
+                    {loom.post_count} {loom.post_count === 1 ? 'post' : 'posts'}
+                  </span>
+
+                  {/* Date */}
+                  <span className={`text-xs flex-shrink-0 hidden sm:block ${isSelected ? 'text-gray-400' : 'text-[#999999]'}`}>
+                    {formatDate(loom.created_at)}
+                  </span>
+
+                  {/* Action buttons */}
+                  <div className={`flex gap-1 flex-shrink-0 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-150`}>
                     <button
                       onClick={(e) => handleDownload(e, loom.id)}
                       disabled={downloadingId === loom.id}
-                      className="p-1.5 bg-white/90 backdrop-blur-sm rounded-lg text-gray-400 hover:text-gray-900 hover:bg-white transition-all disabled:opacity-50 active:scale-[0.96] shadow-sm"
+                      className={`p-1.5 rounded-lg transition-all disabled:opacity-50 active:scale-[0.96] ${
+                        isSelected
+                          ? 'text-gray-400 hover:text-white hover:bg-white/10'
+                          : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
+                      }`}
                       title="Download"
                     >
                       {downloadingId === loom.id ? (
                         <SpinnerSvg />
                       ) : (
-                        <DownloadIcon className="w-3.5 h-3.5" />
+                        <DownloadIcon className="w-4 h-4" />
                       )}
                     </button>
                     <button
@@ -170,73 +242,77 @@ export function LoomsTab() {
                         deleteLoom(loom.id)
                       }}
                       disabled={deletingId === loom.id}
-                      className="p-1.5 bg-white/90 backdrop-blur-sm rounded-lg text-gray-400 hover:text-red-500 hover:bg-white transition-all disabled:opacity-50 active:scale-[0.96] shadow-sm"
+                      className={`p-1.5 rounded-lg transition-all disabled:opacity-50 active:scale-[0.96] ${
+                        isSelected
+                          ? 'text-gray-400 hover:text-red-400 hover:bg-white/10'
+                          : 'text-gray-400 hover:text-red-500 hover:bg-gray-100'
+                      }`}
                       title="Delete"
                     >
                       {deletingId === loom.id ? (
                         <SpinnerSvg />
                       ) : (
-                        <TrashIcon className="w-3.5 h-3.5" />
+                        <TrashIcon className="w-4 h-4" />
                       )}
                     </button>
                   </div>
-
-                  {/* Mini book cover */}
-                  <div className="w-[100px] h-[130px] rounded-sm bg-white border border-[#e0e0e0] shadow-[2px_2px_8px_rgba(0,0,0,0.08)] flex flex-col items-center justify-center px-3 relative overflow-hidden">
-                    {/* Spine accent */}
-                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gray-900" />
-                    {/* Title */}
-                    <p className="text-[11px] font-semibold text-gray-900 text-center leading-tight line-clamp-3 mt-1">
-                      {title}
-                    </p>
-                    {/* Divider */}
-                    <div className="w-6 h-px bg-[#e0e0e0] my-2" />
-                    {/* Username on cover */}
-                    <p className="text-[9px] text-[#999999] text-center">
-                      @{loom.thread_username}
-                    </p>
-                  </div>
-
-                  {/* Post count badge */}
-                  <div className="mt-2">
-                    <span className="inline-flex items-center px-1.5 py-0.5 bg-white border border-[#e0e0e0] rounded-full text-[10px] text-[#737373] font-medium">
-                      {loom.post_count} {loom.post_count === 1 ? 'post' : 'posts'}
-                    </span>
-                  </div>
                 </div>
 
-                {/* Profile & metadata */}
-                <div className="px-3 py-2.5 bg-white border-t border-[#f0f0f0]">
-                  <div className="flex items-center gap-2">
-                    {/* Avatar */}
-                    {profileImg ? (
-                      <img
-                        src={proxyImageUrl(profileImg)}
-                        alt={displayName}
-                        className="w-7 h-7 rounded-full border border-[#e0e0e0] object-cover flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-7 h-7 rounded-full border border-[#e0e0e0] bg-[#f5f5f5] flex items-center justify-center flex-shrink-0">
-                        <span className="text-[10px] font-medium text-[#999999]">
-                          {(displayName[0] || '?').toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                    {/* Name & username */}
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-semibold text-gray-900 truncate leading-tight">
-                        {displayName}
-                      </p>
-                      <p className="text-[11px] text-[#999999] truncate leading-tight">
-                        @{loom.thread_username}
-                      </p>
+                {/* Expanded chapters */}
+                {isExpanded && chapters.length > 0 && (
+                  <div className="ml-[52px] mr-4 mb-2 mt-1">
+                    <div className="border border-[#f0f0f0] rounded-lg overflow-hidden">
+                      {chapters.map((chapter: BookChapter, chapterIndex: number) => (
+                        <div
+                          key={chapter.id}
+                          onClick={(e) => handleChapterClick(e, chapter.startPage)}
+                          style={{ animationDelay: `${chapterIndex * 30}ms` }}
+                          className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[#fafafa] transition-colors border-b border-[#f0f0f0] last:border-b-0 active:scale-[0.99] [animation:dashboard-card-enter_0.2s_ease-out_both]"
+                        >
+                          {/* Chapter number */}
+                          <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center text-[11px] font-semibold text-[#737373] mt-0.5">
+                            {chapterIndex + 1}
+                          </span>
+
+                          {/* Chapter info */}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[13px] font-semibold text-gray-900 truncate leading-tight">
+                              {chapter.title}
+                            </p>
+                            {chapter.description && (
+                              <p className="text-[12px] text-[#999999] truncate leading-tight mt-0.5">
+                                {chapter.description}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Page number */}
+                          {chapter.startPage && (
+                            <span className="flex-shrink-0 text-[11px] text-[#999999] mt-0.5">
+                              p.{chapter.startPage}
+                            </span>
+                          )}
+
+                          {/* Sub-chapter count */}
+                          {chapter.subChapters && chapter.subChapters.length > 0 && (
+                            <span className="flex-shrink-0 text-[11px] text-[#999999] mt-0.5">
+                              {chapter.subChapters.length} {chapter.subChapters.length === 1 ? 'section' : 'sections'}
+                            </span>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  {/* Date */}
-                  <p className="text-[10px] text-[#999999] mt-1.5">
-                    {formatDate(loom.created_at)}
-                  </p>
-                </div>
+                )}
+
+                {/* Expanded but no chapters */}
+                {isExpanded && chapters.length === 0 && (
+                  <div className="ml-[52px] mr-4 mb-2 mt-1">
+                    <div className="border border-[#f0f0f0] rounded-lg px-3 py-3 text-center">
+                      <p className="text-xs text-[#999999]">No chapters available</p>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}

@@ -16,8 +16,8 @@ function proxyImageUrl(url: string): string {
 
 export function TOCSidebar({ className }: TOCSidebarProps) {
   const {
-    state: { bookStructure, organizing, profile, posts },
-    actions: { regenerateStructure, generateLoom, goBack, goToSpread },
+    state: { bookStructure, organizing, profile, posts, loading },
+    actions: { generateLoom, goToSpread },
     meta: { orderedPosts, blockToSpread },
   } = useCreateFlow()
   const { t } = useI18n()
@@ -73,30 +73,6 @@ export function TOCSidebar({ className }: TOCSidebarProps) {
           </h2>
         )}
 
-        {/* Actions row */}
-        <div className="flex items-center gap-2 mt-2">
-          <button
-            onClick={goBack}
-            className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors active:scale-[0.96]"
-          >
-            {t('create.organize.back')}
-          </button>
-          <button
-            onClick={regenerateStructure}
-            disabled={organizing}
-            className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors active:scale-[0.96] disabled:opacity-50"
-          >
-            {organizing ? t('create.organize.organizing') : t('create.organize.regenerate')}
-          </button>
-          <div className="flex-1" />
-          <button
-            onClick={generateLoom}
-            disabled={organizing || orderedPosts.length === 0}
-            className="px-4 py-1.5 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors active:scale-[0.96] disabled:opacity-50"
-          >
-            {t('create.organize.generate')}
-          </button>
-        </div>
       </div>
 
       {/* Post count bar */}
@@ -126,6 +102,33 @@ export function TOCSidebar({ className }: TOCSidebarProps) {
             {t('create.organize.noStructure')}
           </div>
         )}
+      </div>
+
+      {/* Generate PDF button — fixed bottom bar */}
+      <div className="px-4 py-3 border-t border-gray-200 shrink-0">
+        <button
+          onClick={generateLoom}
+          disabled={organizing || orderedPosts.length === 0 || loading}
+          className="w-full py-2.5 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-xl transition-all active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 relative overflow-hidden"
+        >
+          {loading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              {t('create.preview.generating')}
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
+                style={{ animation: 'shimmer 1.5s infinite linear', backgroundSize: '200% 100%' }}
+              />
+            </>
+          ) : (
+            <>
+              {t('create.organize.generate')}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </>
+          )}
+        </button>
       </div>
     </div>
   )

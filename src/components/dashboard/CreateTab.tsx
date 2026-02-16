@@ -3,12 +3,17 @@
 import { useCreateFlow } from '@/components/create/CreateFlowContext'
 import { useDashboard } from './DashboardContext'
 import { LoomPreviewPanel } from './LoomPreviewPanel'
-import { BookPreview } from '@/components/create/BookPreview'
 import { ProgressIndicator } from '@/components/create/ProgressIndicator'
 import { ErrorBanner } from '@/components/create/ErrorBanner'
 import { UsernameStep } from '@/components/create/UsernameStep'
 import { TOCSidebar } from '@/components/create/TOCSidebar'
 import { CompleteStep } from '@/components/create/CompleteStep'
+import dynamic from 'next/dynamic'
+
+const PageListViewer = dynamic(
+  () => import('@/components/ui/PageListViewer').then((mod) => mod.PageListViewer),
+  { ssr: false }
+)
 
 export function CreateTabContent() {
   const { state: { step, profile } } = useCreateFlow()
@@ -37,7 +42,7 @@ export function CreateTabContent() {
 }
 
 export function CreateTabRightPanel({ width }: { width?: number }) {
-  const { state: { step, profile, downloadUrl } } = useCreateFlow()
+  const { state: { step, profile, downloadUrl }, meta: { pages } } = useCreateFlow()
   const { openPreviewModalWithUrl } = useDashboard()
 
   const showPanel = (step === 'organize' || step === 'complete') && profile
@@ -56,10 +61,13 @@ export function CreateTabRightPanel({ width }: { width?: number }) {
     )
   }
 
-  // During organize: show BookPreview (HTML pages) inside LoomPreviewPanel shell
+  // During organize: show HTML pages in PageListViewer inside LoomPreviewPanel shell
   return (
     <LoomPreviewPanel width={width} active={true}>
-      <BookPreview width={width} />
+      <PageListViewer
+        htmlPages={pages}
+        width={width}
+      />
     </LoomPreviewPanel>
   )
 }

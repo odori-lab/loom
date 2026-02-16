@@ -4,6 +4,7 @@ import { createContext, use } from 'react'
 import { ThreadsPost, ThreadsProfile } from '@/types/threads'
 import { BookStructure } from '@/types/book'
 import { SpreadData } from '@/lib/pdf/spreads'
+import { PageMapping } from '@/lib/pdf/types'
 
 export type Step = 'username' | 'organize' | 'complete'
 export type SortOrder = 'newest' | 'oldest'
@@ -58,6 +59,7 @@ export interface CreateFlowMeta {
   selectedCount: number
   totalSpreads: number
   blockToSpread: Map<string, number>
+  pageMapping: PageMapping | null
 }
 
 export interface CreateFlowContextValue {
