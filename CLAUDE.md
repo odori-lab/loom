@@ -14,56 +14,74 @@ Loom은 Threads 프로필의 포스트를 A5 PDF 책으로 변환하는 웹 서�
 - **i18n**: 자체 구현 (ko/en, React Context)
 - **Design**: Pencil `.pen` 파일 (`pencil/loom.pen`)
 
-## Project Structure
+## Project Structure (Monorepo)
+
+pnpm workspace 기반 모노레포. `pnpm-workspace.yaml`로 워크스페이스 관리.
 
 ```
-src/
-├── app/                    # Next.js App Router
-│   ├── page.tsx            # 랜딩 페이지 (서버 컴포넌트)
-│   ├── layout.tsx          # 루트 레이아웃 (Geist 폰트, Providers)
-│   ├── login/              # 로그인 페이지
-│   ├── auth/callback/      # OAuth 콜백 처리
-│   ├── create/             # Loom 생성 플로우
-│   ├── my/                 # 내 Loom 목록 + 관리
-│   └── api/
-│       ├── scrape/         # Threads 스크래핑 API
-│       ├── looms/          # Loom CRUD API
-│       ├── generate-pdf/   # PDF 생성 API
-│       └── proxy-image/    # 이미지 프록시 API
-├── components/
-│   ├── auth/               # LoginButton, UserMenu
-│   ├── create/             # 생성 플로우 (UsernameStep, BookPreview, PostListSidebar 등)
-│   ├── landing/            # LandingContent
-│   ├── ui/                 # 공통 UI (Icons, Spinner)
-│   ├── Providers.tsx       # 클라이언트 프로바이더 래퍼
-│   └── LanguageToggle.tsx  # 언어 전환
-├── lib/
-│   ├── api/                # API 유틸 (auth, storage, validation)
-│   ├── i18n/               # 번역 (translations.ts, context.tsx)
-│   ├── pdf/                # PDF 생성 (generator, layout, render, spreads, templates/)
-│   ├── supabase/           # Supabase 클라이언트 (client, server, middleware)
-│   ├── scraper.ts          # Apify 스크래퍼
-│   ├── mockdata.ts         # 목 데이터
-│   └── utils/format.ts     # 날짜 포맷
-├── types/
-│   ├── database.ts         # Supabase DB 타입
-│   ├── loom.ts             # Loom, CoverData 인터페이스
-│   └── threads.ts          # ThreadsPost, ThreadsProfile 인터페이스
-└── proxy.ts                 # Supabase 세션 갱신 (Next.js proxy)
+loom/                              # repo root
+├── package.json                   # 루트 (scripts 없음)
+├── pnpm-workspace.yaml            # pnpm workspace 설정
+├── tsconfig.base.json             # 공통 TS 설정
+├── .gitignore
+├── .github/
+├── CLAUDE.md
+├── supabase/
+│
+├── loom/                          # Next.js 앱 (@loom/web)
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── next.config.ts
+│   ├── postcss.config.mjs
+│   ├── tailwind.config.ts
+│   ├── eslint.config.mjs
+│   ├── vercel.json
+│   ├── playwright.config.ts
+│   ├── public/
+│   ├── src/
+│   │   ├── app/                   # Next.js App Router
+│   │   ├── components/            # React 컴포넌트
+│   │   ├── hooks/                 # Custom hooks
+│   │   └── lib/                   # 유틸, PDF, Supabase 등
+│   └── tests/
+│
+├── loom-worker/                   # Railway 워커 (@loom/worker)
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── src/
+│       └── index.ts
+│
+└── packages/                      # 공유 패키지 (@loom/shared)
+    ├── package.json
+    ├── tsconfig.json
+    └── src/
+        ├── index.ts               # barrel export
+        └── types/
+            ├── threads.ts         # ThreadsPost, ThreadsProfile
+            ├── loom.ts            # Loom, CoverData
+            ├── book.ts            # BookStructure, BookChapter 등
+            └── database.ts        # Database, Json (Supabase)
 ```
 
 ## Commands
 
 ```bash
-npm run dev       # 개발 서버 (localhost:3000)
-npm run build     # 프로덕션 빌드
-npm run start     # 프로덕션 서버
-npm run lint      # ESLint 실행
+# 루트에서 실행
+pnpm install                       # 전체 워크스페이스 의존성 설치
+pnpm --filter @loom/web dev        # Next.js 개발 서버
+pnpm --filter @loom/web build      # Next.js 프로덕션 빌드
+pnpm --filter @loom/web lint       # ESLint 실행
+pnpm --filter @loom/worker dev     # Worker 개발 모드
+pnpm --filter @loom/worker build   # Worker 빌드
+
+# 또는 각 워크스페이스 디렉토리에서 직접 실행
+cd loom && pnpm dev
+cd loom-worker && pnpm dev
 ```
 
 ## Environment Variables
 
-`.env.local` 파일에 아래 값 필요:
+`loom/.env.local` 파일에 아래 값 필요:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=
@@ -84,10 +102,11 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 - **언어**: 코드와 커밋 메시지는 영어, 사용자 대면 텍스트는 한/영 i18n
 - **컴포넌트**: 서버 컴포넌트 기본, 클라이언트는 `'use client'` 명시
-- **임포트**: `@/` 경로 별칭 사용 (`src/` 기준)
+- **임포트**: `@/` 경로 별칭 (`loom/src/` 기준), 공유 타입은 `@loom/shared`
 - **스타일**: Tailwind CSS 유틸리티 클래스 직접 사용, 별도 CSS 모듈 없음
 - **상태**: React 19 `use()`, Context API 활용
-- **타입**: `src/types/`에 인터페이스 정의, Supabase DB 타입은 `database.ts`
+- **타입**: `packages/src/types/`에 인터페이스 정의 → `@loom/shared`로 import
+- **패키지 관리**: pnpm workspace (모노레포)
 
 ## Design File
 
@@ -155,23 +174,23 @@ Agent Teams (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`)를 활용한 병렬 작�
 ### Modified Files
 
 ```
-src/app/globals.css                          # 25+ @keyframes, @utility, 스크롤바, focus-visible
-src/app/login/page.tsx                       # 미니멀 화이트 로그인
-src/components/landing/LandingContent.tsx    # 스크롤 애니메이션, 680px 피드 폭
-src/components/dashboard/Sidebar.tsx         # 탭 전환 애니메이션
-src/components/dashboard/LoomsTab.tsx        # 카드 스태거 입장, 셀렉션
-src/components/dashboard/DashboardShell.tsx  # 패널 전환 효과
-src/components/dashboard/PreviewModal.tsx    # 모달 입장 애니메이션
-src/components/create/UsernameStep.tsx       # 인풋 포커스, 에러 셰이크
-src/components/create/PostListSidebar.tsx    # 포스트 셀렉션, 스크롤 페이드
-src/components/create/BookPreview.tsx        # 페이지 플립, 스파인 섀도
-src/components/create/CompleteStep.tsx       # 컨페티 버스트, 축하 효과
-src/components/create/ProgressIndicator.tsx  # 스텝 인디케이터 애니메이션
-src/components/create/ErrorBanner.tsx        # 셰이크 + 페이드 입장
-src/components/dashboard/CreateTab.tsx       # 스텝 전환 애니메이션
-src/components/ui/Spinner.tsx                # 3-dot 펄스 스피너
-src/components/auth/UserMenu.tsx             # 드롭다운 애니메이션
-src/components/LanguageToggle.tsx            # 토글 호버/프레스
+loom/src/app/globals.css                          # 25+ @keyframes, @utility, 스크롤바, focus-visible
+loom/src/app/login/page.tsx                       # 미니멀 화이트 로그인
+loom/src/components/landing/LandingContent.tsx    # 스크롤 애니메이션, 680px 피드 폭
+loom/src/components/dashboard/Sidebar.tsx         # 탭 전환 애니메이션
+loom/src/components/dashboard/LoomsTab.tsx        # 카드 스태거 입장, 셀렉션
+loom/src/components/dashboard/DashboardShell.tsx  # 패널 전환 효과
+loom/src/components/dashboard/PreviewModal.tsx    # 모달 입장 애니메이션
+loom/src/components/create/UsernameStep.tsx       # 인풋 포커스, 에러 셰이크
+loom/src/components/create/PostListSidebar.tsx    # 포스트 셀렉션, 스크롤 페이드
+loom/src/components/create/BookPreview.tsx        # 페이지 플립, 스파인 섀도
+loom/src/components/create/CompleteStep.tsx       # 컨페티 버스트, 축하 효과
+loom/src/components/create/ProgressIndicator.tsx  # 스텝 인디케이터 애니메이션
+loom/src/components/create/ErrorBanner.tsx        # 셰이크 + 페이드 입장
+loom/src/components/dashboard/CreateTab.tsx       # 스텝 전환 애니메이션
+loom/src/components/ui/Spinner.tsx                # 3-dot 펄스 스피너
+loom/src/components/auth/UserMenu.tsx             # 드롭다운 애니메이션
+loom/src/components/LanguageToggle.tsx            # 토글 호버/프레스
 ```
 
 ### Workflow
