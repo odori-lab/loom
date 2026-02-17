@@ -2,6 +2,7 @@ export interface PageMeta {
   type:
     | "cover"
     | "blank"
+    | "author"
     | "preface"
     | "toc"
     | "chapter-title"
@@ -17,4 +18,6 @@ export interface PageMeta {
 export interface StoredPage {
   html: string;
   meta: PageMeta;
+  /** All block-level metas for this page (when multiple blocks share a page) */
+  blockMetas?: PageMeta[];
 }

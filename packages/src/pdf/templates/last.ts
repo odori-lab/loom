@@ -1,7 +1,7 @@
-import { LOOM_LOGO_SVG } from "./logo";
+import { LOOM_LOGO_SVG } from "../logo";
 
 export function generateLastPage(): string {
-  return `
+	return `
     <div class="page last-page">
       ${LOOM_LOGO_SVG}
     </div>

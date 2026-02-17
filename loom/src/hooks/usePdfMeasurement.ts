@@ -21,7 +21,7 @@ import {
   pagesToStoredPages,
 } from "@/lib/pdf/measure";
 import { calculateSpreads } from "@/lib/pdf/spreads";
-import { generateTocPage } from "@/lib/pdf/templates/toc";
+import { generateTocPage } from "@loom/shared";
 
 export function usePdfMeasurement(
   orderedPosts: ThreadsPost[],
@@ -79,12 +79,12 @@ export function usePdfMeasurement(
           }
 
           if (tocIndices.length > 0) {
-            // Create new TOC block with page numbers
+            // Create new TOC block with page numbers (non-fullPage, can be split)
             const newTocBlock: MeasuredBlock = {
               id: "toc",
               html: tocHtml,
               type: "toc",
-              fullPage: true,
+              fullPage: false,
               measuredHeight: split[tocIndices[0]].measuredHeight, // initial estimate
             };
 

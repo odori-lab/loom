@@ -70,6 +70,11 @@ export const translations = {
     "dashboard.preview.loading": "미리보기 로딩 중...",
     "dashboard.preview.error": "미리보기를 불러오지 못했습니다",
     "dashboard.preview.downloadPdf": "PDF 다운로드",
+    "dashboard.preview.toc": "목차",
+    "dashboard.preview.cover": "표지",
+    "dashboard.preview.preface": "서문",
+    "dashboard.preview.tableOfContents": "목차 페이지",
+    "dashboard.preview.last": "마지막",
 
     // My Page
     "my.title": "내 Looms",
@@ -125,13 +130,9 @@ export const translations = {
     "create.posts.loadMore": "더 불러오기",
     "create.posts.allLoaded": "모든 포스트를 불러왔습니다",
 
-    // Create - Organize (TOCSidebar)
-    "create.organize.back": "뒤로",
-    "create.organize.regenerate": "다시 구성",
+    // Create - Organize
     "create.organize.organizing": "구성 중...",
     "create.organize.generate": "PDF 생성",
-    "create.organize.chapters": "개 챕터",
-    "create.organize.subChapters": "개 소챕터",
     "create.organize.noStructure": "AI가 책 구조를 구성하지 못했습니다",
 
     // Auth
@@ -222,6 +223,11 @@ export const translations = {
     "dashboard.preview.loading": "Loading preview...",
     "dashboard.preview.error": "Failed to load preview",
     "dashboard.preview.downloadPdf": "Download PDF",
+    "dashboard.preview.toc": "Contents",
+    "dashboard.preview.cover": "Cover",
+    "dashboard.preview.preface": "Preface",
+    "dashboard.preview.tableOfContents": "Table of Contents",
+    "dashboard.preview.last": "End",
 
     // My Page
     "my.title": "My Looms",
@@ -279,13 +285,9 @@ export const translations = {
     "create.posts.loadMore": "Load more posts",
     "create.posts.allLoaded": "All posts loaded",
 
-    // Create - Organize (TOCSidebar)
-    "create.organize.back": "Back",
-    "create.organize.regenerate": "Regenerate",
+    // Create - Organize
     "create.organize.organizing": "Organizing...",
     "create.organize.generate": "Generate PDF",
-    "create.organize.chapters": "chapters",
-    "create.organize.subChapters": "sub-chapters",
     "create.organize.noStructure": "AI could not organize the book structure",
 
     // Auth

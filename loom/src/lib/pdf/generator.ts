@@ -1,18 +1,22 @@
-import { ThreadsPost, ThreadsProfile, BookStructure } from "@loom/shared";
-import { MergedPost, CaptionMap } from "./types";
-import { buildCaptionMap } from "./utils";
-import { ESSAY } from "./constants";
-import { PDF_STYLES } from "./templates/styles";
-import { generateCoverPage } from "./templates/cover";
 import {
+  ThreadsPost,
+  ThreadsProfile,
+  BookStructure,
+  PDF_STYLES,
   generateEssaySubChapterPage,
   generateEssayContinuationPage,
-} from "./templates/content";
-import { generateTocPage } from "./templates/toc";
-import { generatePrefacePage } from "./templates/preface";
-import { generateChapterTitlePage } from "./templates/chapter";
-import { generateLastPage } from "./templates/last";
-export type { MergedPost } from "./types";
+  generateTocPage,
+  generatePrefacePage,
+  generateChapterTitlePage,
+  generateLastPage,
+  mergeThreadPosts,
+  buildCaptionMap,
+} from "@loom/shared";
+import type { MergedPost, CaptionMap } from "@loom/shared";
+import { ESSAY } from "./constants";
+import { generateCoverPage } from "./templates/cover";
+export { mergeThreadPosts } from "@loom/shared";
+export type { MergedPost } from "@loom/shared";
 
 // Generate HTML for a single page (used by both PDF and Preview)
 export function generatePageHtml(pageContent: string): string {
@@ -40,60 +44,6 @@ export function generatePageContents(
   return generateEssayPageContents(posts, profile, bookStructure);
 }
 
-// Merge thread posts: group by threadId, combine content, sum likes
-export function mergeThreadPosts(posts: ThreadsPost[]): MergedPost[] {
-  const merged: MergedPost[] = [];
-  const threadGroups = new Map<string, ThreadsPost[]>();
-  const seenThreadIds: string[] = [];
-
-  for (const post of posts) {
-    if (post.threadId) {
-      if (!threadGroups.has(post.threadId)) {
-        threadGroups.set(post.threadId, []);
-        seenThreadIds.push(post.threadId);
-      }
-      threadGroups.get(post.threadId)!.push(post);
-    } else {
-      // Posts without threadId: each is its own group
-      // Use a unique key to maintain order
-      merged.push({
-        content: post.content,
-        date: new Date(post.postedAt),
-        likeCount: post.likeCount || 0,
-        imageUrls: [...post.imageUrls],
-        postIds: [post.id],
-      });
-    }
-  }
-
-  // Now insert thread groups in order of first occurrence
-  // We need to rebuild merged in the correct order
-  const result: MergedPost[] = [];
-  let nonThreadIdx = 0;
-  const threadInserted = new Set<string>();
-
-  for (const post of posts) {
-    if (post.threadId) {
-      if (!threadInserted.has(post.threadId)) {
-        threadInserted.add(post.threadId);
-        const group = threadGroups.get(post.threadId)!;
-        result.push({
-          content: group.map((p) => p.content).join("\n\n"),
-          date: new Date(group[0].postedAt),
-          likeCount: group.reduce((sum, p) => sum + (p.likeCount || 0), 0),
-          imageUrls: group.flatMap((p) => p.imageUrls),
-          postIds: group.map((p) => p.id),
-        });
-      }
-    } else {
-      result.push(merged[nonThreadIdx]);
-      nonThreadIdx++;
-    }
-  }
-
-  return result;
-}
-
 // Estimate the height of a single merged post
 function estimateMergedPostHeight(post: MergedPost): number {
   let height = ESSAY.POST_HEADER_HEIGHT + ESSAY.POST_MARGIN;
@@ -116,7 +66,6 @@ function estimateMergedPostHeight(post: MergedPost): number {
 function splitSubChapterIntoPages(
   subChapterTitle: string,
   mergedPosts: MergedPost[],
-  profile: ThreadsProfile,
   chapterIdx: number,
   subIdx: number,
   captionMap?: CaptionMap,
@@ -153,7 +102,6 @@ function splitSubChapterIntoPages(
       return generateEssaySubChapterPage(
         subChapterTitle,
         group,
-        profile,
         chapterIdx,
         subIdx,
         captionMap,
@@ -226,7 +174,6 @@ function generateEssayPageContents(
       const subChapterPages = splitSubChapterIntoPages(
         subChapter.title,
         mergedPosts,
-        profile,
         chapterIdx,
         subIdx,
         captionMap,

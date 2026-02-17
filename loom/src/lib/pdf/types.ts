@@ -7,6 +7,7 @@ export interface ContentBlock {
     | "cover"
     | "toc"
     | "preface"
+    | "author"
     | "chapter-title"
     | "sub-chapter"
     | "post"
@@ -28,18 +29,6 @@ export interface MeasuredBlock extends ContentBlock {
 // Maps block ID to its 1-based page number
 export type PageMapping = Map<string, number>;
 
-// ─── Layout types ───
+// ─── Layout types (re-exported from @loom/shared) ───
 
-// Merged post type for combining thread posts in essay mode
-export interface MergedPost {
-  content: string;
-  date: Date;
-  likeCount: number;
-  imageUrls: string[];
-  postIds?: string[];
-}
-
-// ─── Caption map type (from content.ts / content-blocks.ts) ───
-
-// Caption map type: postId -> caption (one caption per post)
-export type CaptionMap = Map<string, string>;
+export type { MergedPost, CaptionMap } from "@loom/shared";

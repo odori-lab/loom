@@ -1,14 +1,22 @@
-import { ThreadsPost, ThreadsProfile, BookStructure } from "@loom/shared";
-import { ContentBlock, CaptionMap, MergedPost } from "./types";
-import { buildCaptionMap } from "./utils";
+import {
+  ThreadsPost,
+  ThreadsProfile,
+  BookStructure,
+  formatNumber,
+  escapeHtml,
+  formatDate,
+  generateTocPage,
+  generatePrefacePage,
+  generateChapterTitlePage,
+  generateSubChapterTitle,
+  generateLastPage,
+  mergeThreadPosts,
+  buildCaptionMap,
+} from "@loom/shared";
+import type { CaptionMap, MergedPost } from "@loom/shared";
+import { ContentBlock } from "./types";
 import { generateCoverPage } from "./templates/cover";
-import { generateTocPage } from "./templates/toc";
-import { generatePrefacePage } from "./templates/preface";
-import { generateChapterTitlePage } from "./templates/chapter";
-import { generateSubChapterTitle } from "./templates/chapter";
-import { generateLastPage } from "./templates/last";
-import { mergeThreadPosts } from "./generator";
-import { formatNumber, escapeHtml, formatDate } from "@/lib/utils/format";
+import { generateAuthorPage } from "./templates/author";
 
 // Re-export ContentBlock type for backward compatibility
 export type { ContentBlock } from "./types";
@@ -50,27 +58,16 @@ function generateMergedPostInnerHtml(
   `;
 }
 
-// Render images with optional caption - stack vertically for 3+ images
+// Render images with optional caption - all images in a single horizontal row
 function renderImagesHtml(imageUrls: string[], caption?: string): string {
   const captionHtml = caption
     ? `<figcaption class="essay-image-caption">${escapeHtml(caption)}</figcaption>`
     : "";
 
-  if (imageUrls.length >= 3) {
-    // Stack vertically for 3+ images - each in its own row
-    const rowsHtml = imageUrls
-      .map(
-        (url) =>
-          `<div class="essay-image-row"><img src="${url}" alt="" class="essay-inline-image" /></div>`,
-      )
-      .join("");
-    return `<figure class="essay-figure">${rowsHtml}${captionHtml}</figure>`;
-  }
-
-  // 1-2 images in a single row
   const imgsHtml = imageUrls
     .map((url) => `<img src="${url}" alt="" class="essay-inline-image" />`)
     .join("");
+
   return `<figure class="essay-figure"><div class="essay-image-row">${imgsHtml}</div>${captionHtml}</figure>`;
 }
 
@@ -89,21 +86,10 @@ function generateInlineContent(
       .join("");
   }
 
-  if (paragraphs.length <= 1) {
-    return `<div class="essay-post-text">${escapeHtml(content)}</div>${renderImagesHtml(imageUrls, caption)}`;
-  }
-
-  const result: string[] = [];
-  for (let i = 0; i < paragraphs.length; i++) {
-    result.push(
-      `<div class="essay-post-text">${escapeHtml(paragraphs[i])}</div>`,
-    );
-    if (i === 0) {
-      result.push(renderImagesHtml(imageUrls, caption));
-    }
-  }
-
-  return result.join("");
+  const textHtml = paragraphs
+    .map((p) => `<div class="essay-post-text">${escapeHtml(p)}</div>`)
+    .join("");
+  return textHtml + renderImagesHtml(imageUrls, caption);
 }
 
 export function generateContentBlocks(
@@ -135,11 +121,11 @@ function generateEssayBlocks(
     fullPage: true,
   });
 
-  // Blank page after cover (back of cover page)
+  // Author page (full page) - after cover
   blocks.push({
-    id: "cover-blank",
-    html: '<div class="page"></div>',
-    type: "blank",
+    id: "author",
+    html: generateAuthorPage(profile),
+    type: "author",
     fullPage: true,
   });
 
@@ -153,12 +139,12 @@ function generateEssayBlocks(
     });
   }
 
-  // TOC (full page) - after preface
+  // TOC (non-fullPage, can be split across pages)
   blocks.push({
     id: "toc",
     html: generateTocPage(bookStructure),
     type: "toc",
-    fullPage: true,
+    fullPage: false,
   });
 
   // Chapters
@@ -210,18 +196,68 @@ function generateEssayBlocks(
 
       const mergedPosts = mergeThreadPosts(subChapterPosts);
 
-      // Each merged post is a separate block
-      for (let postIdx = 0; postIdx < mergedPosts.length; postIdx++) {
+      // Generate individual element-level blocks for natural page packing
+      for (
+        let postIdx = 0;
+        postIdx < mergedPosts.length;
+        postIdx++
+      ) {
         const mp = mergedPosts[postIdx];
+        const dateStr = formatDate(mp.date);
+        const likesStr =
+          mp.likeCount > 0
+            ? ` &middot; &#9829; ${formatNumber(mp.likeCount)}`
+            : "";
+
+        // Post header block
         blocks.push({
-          id: `post-${chapterIdx}-${subIdx}-${postIdx}`,
-          html: generateMergedPostInnerHtml(mp, captionMap),
+          id: `post-header-${chapterIdx}-${subIdx}-${postIdx}`,
+          html: `<div class="essay-post-header">${dateStr}${likesStr}</div>`,
           type: "post",
           chapterIndex: chapterIdx,
           chapterTitle: chapter.title,
           subChapterIndex: subIdx,
           subChapterTitle: subChapter.title,
         });
+
+        // Text paragraph blocks
+        const paragraphs = mp.content
+          .split("\n\n")
+          .filter((p) => p.trim());
+        for (let pIdx = 0; pIdx < paragraphs.length; pIdx++) {
+          blocks.push({
+            id: `post-text-${chapterIdx}-${subIdx}-${postIdx}-${pIdx}`,
+            html: `<div class="essay-post-text">${escapeHtml(paragraphs[pIdx])}</div>`,
+            type: "post",
+            chapterIndex: chapterIdx,
+            chapterTitle: chapter.title,
+            subChapterIndex: subIdx,
+            subChapterTitle: subChapter.title,
+          });
+        }
+
+        // Image block (if any)
+        if (mp.imageUrls.length > 0) {
+          let caption: string | undefined;
+          if (captionMap && mp.postIds) {
+            for (const postId of mp.postIds) {
+              const found = captionMap.get(postId);
+              if (found) {
+                caption = found;
+                break;
+              }
+            }
+          }
+          blocks.push({
+            id: `post-image-${chapterIdx}-${subIdx}-${postIdx}`,
+            html: renderImagesHtml(mp.imageUrls, caption),
+            type: "post",
+            chapterIndex: chapterIdx,
+            chapterTitle: chapter.title,
+            subChapterIndex: subIdx,
+            subChapterTitle: subChapter.title,
+          });
+        }
       }
     }
   }
