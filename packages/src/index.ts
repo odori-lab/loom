@@ -8,3 +8,4 @@ export type {
   BookStructure,
 } from "./types/book";
 export type { Json, Database } from "./types/database";
+export type { PageMeta, StoredPage } from "./types/page";

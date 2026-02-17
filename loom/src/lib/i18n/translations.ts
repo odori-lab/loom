@@ -69,6 +69,7 @@ export const translations = {
     "dashboard.preview.hint": "그리드에서 항목을 클릭하세요",
     "dashboard.preview.loading": "미리보기 로딩 중...",
     "dashboard.preview.error": "미리보기를 불러오지 못했습니다",
+    "dashboard.preview.downloadPdf": "PDF 다운로드",
 
     // My Page
     "my.title": "내 Looms",
@@ -220,6 +221,7 @@ export const translations = {
     "dashboard.preview.hint": "Click on any item from the grid",
     "dashboard.preview.loading": "Loading preview...",
     "dashboard.preview.error": "Failed to load preview",
+    "dashboard.preview.downloadPdf": "Download PDF",
 
     // My Page
     "my.title": "My Looms",

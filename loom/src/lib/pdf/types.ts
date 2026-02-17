@@ -13,6 +13,10 @@ export interface ContentBlock {
     | "last"
     | "blank";
   fullPage?: boolean;
+  chapterIndex?: number;
+  chapterTitle?: string;
+  subChapterIndex?: number;
+  subChapterTitle?: string;
 }
 
 // ─── Measurement types (from measure.ts) ───

@@ -168,31 +168,11 @@ export function CreateFlowProvider({
       if (!user) throw new Error("Not authenticated");
       const userId = user.id;
 
-      const { pdfPath, loomId } = await createLoomDirect(
-        selection.orderedPosts,
-        profile,
-        userId,
-        book.bookStructure ?? undefined,
-      );
+      // Extract HTML strings for worker
+      const htmlPages = pdf.pages.map((p) => p.html);
+      const { pdfPath, loomId } = await createLoomDirect(htmlPages, userId);
 
-      // 2. Enrich bookStructure with page numbers from measurement
-      const enrichedStructure = book.bookStructure
-        ? {
-            ...book.bookStructure,
-            chapters: book.bookStructure.chapters.map((ch, chIdx) => ({
-              ...ch,
-              startPage: pdf.pageMapping?.get(`chapter-${chIdx}`) ?? undefined,
-              subChapters: ch.subChapters.map((sc, scIdx) => ({
-                ...sc,
-                startPage:
-                  pdf.pageMapping?.get(`sub-chapter-${chIdx}-${scIdx}`) ??
-                  undefined,
-              })),
-            })),
-          }
-        : null;
-
-      // 3. Register loom in DB via Vercel API (fast, no timeout risk)
+      // 2. Register loom in DB via Vercel API (fast, no timeout risk)
       const res = await fetch("/api/looms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -201,8 +181,8 @@ export function CreateFlowProvider({
           loomId,
           posts: selection.orderedPosts,
           profile,
-          title: enrichedStructure?.title || null,
-          bookStructure: enrichedStructure,
+          title: book.bookStructure?.title || null,
+          pages: pdf.pages,
         }),
       });
       const data = await res.json();

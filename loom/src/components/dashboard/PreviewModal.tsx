@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
+import { StoredPage } from "@loom/shared";
 import { useDashboard } from "./DashboardContext";
 import { useI18n } from "@/lib/i18n/context";
 import { useSpreadViewer } from "@/hooks/useSpreadViewer";
+import { generatePageHtml } from "@/lib/pdf/generator";
 import {
   FlipContainer,
   SpreadViewerContainer,
@@ -13,9 +14,18 @@ import {
   ZoomControls,
 } from "@/components/ui/SpreadViewer";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Source page dimensions (A5 at 96dpi)
+const SOURCE_WIDTH = 559;
+const SOURCE_HEIGHT = 793;
+const MAX_PAGE_WIDTH = 400;
 
-const MAX_PAGE_WIDTH = 560;
+function proxyImageUrls(html: string): string {
+  return html.replace(
+    /(<img\s[^>]*src=")([^"]+cdninstagram\.com[^"]+)(")/g,
+    (_match, before, url, after) =>
+      `${before}/api/proxy-image?url=${encodeURIComponent(url)}${after}`,
+  );
+}
 
 interface SpreadData {
   leftPage: number | null;
@@ -36,30 +46,44 @@ function buildSpreads(numPages: number): SpreadData[] {
   return spreads;
 }
 
-function PdfPage({
+function HtmlPage({
   pageNum,
+  pages,
   side,
   noShadow = false,
   pageWidth,
 }: {
   pageNum: number | null;
+  pages: StoredPage[];
   side: "left" | "right";
   noShadow?: boolean;
   pageWidth: number;
 }) {
   const rounded = side === "left" ? "rounded-l-lg" : "rounded-r-lg";
   const shadow = noShadow ? "" : "shadow-xl";
-  if (pageNum) {
+  const scale = pageWidth / SOURCE_WIDTH;
+  const pageHeight = Math.round(SOURCE_HEIGHT * scale);
+
+  if (pageNum && pages[pageNum - 1]) {
+    const html = pages[pageNum - 1].html;
     return (
       <div
         className={`overflow-hidden ${rounded} ${shadow} bg-white`}
-        style={{ width: pageWidth }}
+        style={{ width: pageWidth, height: pageHeight }}
       >
-        <Page
-          pageNumber={pageNum}
-          width={pageWidth}
-          renderAnnotationLayer={false}
-          renderTextLayer={false}
+        <iframe
+          srcDoc={generatePageHtml(proxyImageUrls(html))}
+          className="bg-white pointer-events-none"
+          scrolling="no"
+          style={{
+            width: `${SOURCE_WIDTH}px`,
+            height: `${SOURCE_HEIGHT}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+            border: "none",
+            overflow: "hidden",
+          }}
+          title={`Page ${pageNum}`}
         />
       </div>
     );
@@ -72,39 +96,19 @@ function PdfPage({
   );
 }
 
-function makeRenderPage(pageWidth: number) {
-  return function renderPage(
-    pageNum: number | null,
-    side: "left" | "right",
-    noShadow?: boolean,
-  ) {
-    return (
-      <PdfPage
-        pageNum={pageNum}
-        side={side}
-        noShadow={noShadow}
-        pageWidth={pageWidth}
-      />
-    );
-  };
-}
-
 function pageToSpread(pageNum: number): number {
-  // Spread 0: cover (page 1 on right)
-  // Spread 1: pages 2-3
-  // Spread N: pages (2*N), (2*N+1)
   return Math.max(0, Math.ceil(pageNum / 2));
 }
 
-function PdfSpreadViewer({
-  url,
+function HtmlSpreadViewer({
+  pages,
   initialPage,
 }: {
-  url: string;
+  pages: StoredPage[];
   initialPage?: number | null;
 }) {
   const { t } = useI18n();
-  const [numPages, setNumPages] = useState<number>(0);
+  const numPages = pages.length;
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -117,10 +121,9 @@ function PdfSpreadViewer({
     return () => observer.disconnect();
   }, []);
 
-  // Each spread = 2 pages + gap + nav arrows padding (~128px)
   const pageWidth =
     containerWidth > 0
-      ? Math.min(MAX_PAGE_WIDTH, Math.floor((containerWidth - 128) / 2))
+      ? Math.min(MAX_PAGE_WIDTH, Math.floor((containerWidth - 192) / 2))
       : MAX_PAGE_WIDTH;
   const pageHeight = Math.round(pageWidth * (210 / 148));
 
@@ -150,7 +153,6 @@ function PdfSpreadViewer({
     containerRef,
   });
 
-  // Navigate to initial page spread once PDF is loaded
   const initialPageApplied = useRef(false);
   useEffect(() => {
     if (
@@ -171,11 +173,27 @@ function PdfSpreadViewer({
   const targetData = flipState
     ? (spreads[flipState.targetSpread] ?? null)
     : null;
-  const renderPage = useMemo(() => makeRenderPage(pageWidth), [pageWidth]);
+
+  const renderPage = useMemo(() => {
+    return function renderPage(
+      pageNum: number | null,
+      side: "left" | "right",
+      noShadow?: boolean,
+    ) {
+      return (
+        <HtmlPage
+          pageNum={pageNum}
+          pages={pages}
+          side={side}
+          noShadow={noShadow}
+          pageWidth={pageWidth}
+        />
+      );
+    };
+  }, [pageWidth, pages]);
 
   return (
     <>
-      {/* Spread area */}
       <SpreadViewerContainer
         containerRef={containerRef}
         scale={scale}
@@ -190,65 +208,36 @@ function PdfSpreadViewer({
         prevSpread={prevSpread}
         nextSpread={nextSpread}
       >
-        <Document
-          file={url}
-          onLoadSuccess={({ numPages: n }) => setNumPages(n)}
-          loading={<div />}
-          error={
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-50 flex items-center justify-center">
-                  <svg
-                    className="w-8 h-8 text-red-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
-                </div>
-                <p className="text-gray-500">{t("create.preview.failedPdf")}</p>
-              </div>
-            </div>
-          }
-        >
-          {numPages > 0 && currentData && (
-            <div className="h-full flex items-center justify-center">
-              <ZoomTransform
-                scale={scale}
-                offset={offset}
-                isDragging={isDragging}
-              >
-                <FlipContainer<number | null>
-                  flipState={flipState}
-                  handleFlipEnd={handleFlipEnd}
-                  pageWidth={pageWidth}
-                  current={{
-                    left: currentData.leftPage,
-                    right: currentData.rightPage,
-                  }}
-                  target={
-                    targetData
-                      ? {
-                          left: targetData.leftPage,
-                          right: targetData.rightPage,
-                        }
-                      : null
-                  }
-                  renderPage={renderPage}
-                />
-              </ZoomTransform>
-            </div>
-          )}
-        </Document>
+        {numPages > 0 && currentData && (
+          <div className="h-full flex items-center justify-center">
+            <ZoomTransform
+              scale={scale}
+              offset={offset}
+              isDragging={isDragging}
+            >
+              <FlipContainer<number | null>
+                flipState={flipState}
+                handleFlipEnd={handleFlipEnd}
+                pageWidth={pageWidth}
+                current={{
+                  left: currentData.leftPage,
+                  right: currentData.rightPage,
+                }}
+                target={
+                  targetData
+                    ? {
+                        left: targetData.leftPage,
+                        right: targetData.rightPage,
+                      }
+                    : null
+                }
+                renderPage={renderPage}
+              />
+            </ZoomTransform>
+          </div>
+        )}
       </SpreadViewerContainer>
 
-      {/* Bottom bar */}
       {totalSpreads > 0 && (
         <div className="h-16 px-8 flex items-center gap-4 bg-white border-t border-gray-200 shrink-0">
           <SpreadSlider
@@ -274,6 +263,7 @@ export function PreviewModal() {
   const { t } = useI18n();
   const {
     previewModalOpen,
+    previewPages,
     previewUrl,
     loadingPreview,
     selectedLoom,
@@ -292,7 +282,7 @@ export function PreviewModal() {
     return () => document.removeEventListener("keydown", handleEsc);
   }, [previewModalOpen, closePreviewModal]);
 
-  if (!previewModalOpen || (!selectedLoom && !previewUrl)) return null;
+  if (!previewModalOpen || (!selectedLoom && !previewPages)) return null;
 
   // Parse cover_data for profile image and name
   const coverData = selectedLoom?.cover_data as {
@@ -320,7 +310,7 @@ export function PreviewModal() {
 
       {/* Modal container */}
       <div
-        className="relative z-10 w-[95vw] max-w-6xl h-[85vh] bg-gray-100 rounded-2xl overflow-hidden flex flex-col shadow-2xl animate-fade-in-up"
+        className="relative z-10 w-[90vw] h-[90vh] bg-gray-100 rounded-2xl overflow-hidden flex flex-col shadow-2xl animate-fade-in-up"
         style={{ animationDuration: "0.2s" }}
       >
         {/* Header */}
@@ -388,31 +378,27 @@ export function PreviewModal() {
               </p>
             </div>
           </div>
-        ) : previewUrl ? (
-          <PdfSpreadViewer
-            key={previewUrl}
-            url={previewUrl}
+        ) : previewPages ? (
+          <HtmlSpreadViewer
+            key={previewPages.length}
+            pages={previewPages}
             initialPage={initialPage}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-50 flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-red-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <p className="text-gray-500">
+                {t("dashboard.preview.error")}
+              </p>
+              {previewUrl && (
+                <a
+                  href={previewUrl}
+                  download
+                  className="mt-3 inline-block text-sm font-medium text-black underline"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              <p className="text-gray-500">{t("dashboard.preview.error")}</p>
+                  {t("dashboard.preview.downloadPdf")}
+                </a>
+              )}
             </div>
           </div>
         )}

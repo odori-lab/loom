@@ -3,11 +3,7 @@ import express from "express";
 import cors from "cors";
 import { scraperWorker } from "./scraper-worker";
 import { renderPagesToPdf, renderHtmlToPdf } from "./pdf-renderer";
-import {
-  generatePageContents,
-  generatePageHtml,
-  generateAllPagesHtml,
-} from "./pdf/generator";
+import { generateAllPagesHtml } from "./pdf/generator";
 import { getSupabase } from "./supabase";
 import crypto from "crypto";
 
@@ -125,15 +121,12 @@ app.post("/generate-pdf", requireAuth, async (req, res) => {
 });
 
 // Create loom endpoint (public — called directly from client to bypass Vercel timeout)
+// Accepts { pages: string[], userId: string } — pre-rendered HTML pages from frontend
 app.post("/create-loom", async (req, res) => {
-  const { posts, profile, userId, bookStructure } = req.body;
+  const { pages, userId } = req.body;
 
-  if (!posts || !Array.isArray(posts) || posts.length === 0) {
-    res.status(400).json({ error: "posts array is required" });
-    return;
-  }
-  if (!profile) {
-    res.status(400).json({ error: "profile is required" });
+  if (!pages || !Array.isArray(pages) || pages.length === 0) {
+    res.status(400).json({ error: "pages array is required" });
     return;
   }
   if (!userId) {
@@ -143,20 +136,17 @@ app.post("/create-loom", async (req, res) => {
 
   try {
     console.log(
-      `[CreateLoom] Generating PDF for ${posts.length} posts by @${profile.username}...`,
+      `[CreateLoom] Generating PDF from ${pages.length} pre-rendered pages...`,
     );
     const startTime = Date.now();
 
-    // 1. Generate page contents (same logic as frontend preview)
-    const pageContents = generatePageContents(posts, profile, bookStructure);
+    // 1. Combine all pages into a single HTML document for fast single-pass rendering
+    const html = generateAllPagesHtml(pages);
 
-    // 2. Combine all pages into a single HTML document for fast single-pass rendering
-    const html = generateAllPagesHtml(pageContents);
-
-    // 3. Render to PDF (single tab, ~5x faster than per-page rendering)
+    // 2. Render to PDF (single tab, ~5x faster than per-page rendering)
     const pdfBuffer = await renderHtmlToPdf(html);
 
-    // 4. Upload to Supabase Storage
+    // 3. Upload to Supabase Storage
     const loomId = crypto.randomUUID();
     const pdfPath = `${userId}/${loomId}.pdf`;
 

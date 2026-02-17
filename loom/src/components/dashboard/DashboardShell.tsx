@@ -44,14 +44,14 @@ function DashboardContent({ user }: { user: User }) {
     isResizing,
     handleMouseDown: handleResizeStart,
     containerRef,
-  } = useResizable(600, 300, 900);
+  } = useResizable(450, 300, 900);
 
   const {
     width: createPreviewWidth,
     isResizing: isCreateResizing,
     handleMouseDown: handleCreateResizeStart,
     containerRef: createContainerRef,
-  } = useResizable(600, 680, 900);
+  } = useResizable(450, 300, 900);
 
   return (
     <>

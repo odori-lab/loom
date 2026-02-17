@@ -54,31 +54,25 @@ export function CreateTabContent() {
 
 export function CreateTabRightPanel({ width }: { width?: number }) {
   const {
-    state: { step, profile, downloadUrl },
+    state: { step, profile },
     meta: { pages },
   } = useCreateFlow();
-  const { openPreviewModalWithUrl } = useDashboard();
+  const { openPreviewModalWithPages } = useDashboard();
 
-  const showPanel = (step === "organize" || step === "complete") && profile;
+  const showPanel = step === "organize" && profile;
 
   if (!showPanel) return null;
 
-  // After PDF generation: show actual PDF in LoomPreviewPanel
-  if (downloadUrl) {
-    return (
-      <LoomPreviewPanel
-        width={width}
-        active={true}
-        previewUrl={downloadUrl}
-        onPageClick={() => openPreviewModalWithUrl(downloadUrl)}
-      />
-    );
-  }
+  const htmlPages = pages.map((p) => p.html);
 
   // During organize: show HTML pages in PageListViewer inside LoomPreviewPanel shell
   return (
-    <LoomPreviewPanel width={width} active={true}>
-      <PageListViewer htmlPages={pages} width={width} />
+    <LoomPreviewPanel
+      width={width}
+      active={true}
+      onPageClick={() => openPreviewModalWithPages(pages)}
+    >
+      <PageListViewer pages={htmlPages} width={width} />
     </LoomPreviewPanel>
   );
 }
