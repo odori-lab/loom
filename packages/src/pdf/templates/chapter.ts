@@ -1,13 +1,13 @@
-import { BookChapter } from "@loom/shared";
-import { escapeHtml } from "@/lib/utils/format";
+import { BookChapter } from "../../types/book";
+import { escapeHtml } from "../../format";
 
 export function generateChapterTitlePage(
-  chapter: BookChapter,
-  index: number,
+	chapter: BookChapter,
+	index: number,
 ): string {
-  const chapterNum = index + 1;
+	const chapterNum = index + 1;
 
-  return `
+	return `
     <div class="page chapter-title-page">
       <div class="chapter-title-content">
         <div class="chapter-number">Chapter ${chapterNum}</div>
@@ -19,15 +19,15 @@ export function generateChapterTitlePage(
 }
 
 export function generateSubChapterTitle(
-  title: string,
-  chapterIndex?: number,
-  subIndex?: number,
+	title: string,
+	chapterIndex?: number,
+	subIndex?: number,
 ): string {
-  const label =
-    chapterIndex !== undefined && subIndex !== undefined
-      ? `${chapterIndex + 1}.${subIndex + 1} `
-      : "";
-  return `
+	const label =
+		chapterIndex !== undefined && subIndex !== undefined
+			? `${chapterIndex + 1}.${subIndex + 1} `
+			: "";
+	return `
     <div class="sub-chapter-header">
       <div class="sub-chapter-title">${label}${escapeHtml(title)}</div>
     </div>

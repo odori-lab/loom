@@ -1,31 +1,31 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef } from "react";
-import { StoredPage } from "@loom/shared";
-import { useDashboard } from "./DashboardContext";
-import { useI18n } from "@/lib/i18n/context";
-import { useSpreadViewer } from "@/hooks/useSpreadViewer";
-import { generatePageHtml } from "@/lib/pdf/generator";
+import type { StoredPage } from "@loom/shared";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   FlipContainer,
-  SpreadViewerContainer,
-  ZoomTransform,
   SpreadSlider,
+  SpreadViewerContainer,
   ZoomControls,
+  ZoomTransform,
 } from "@/components/ui/SpreadViewer";
+import { useSpreadTocSync } from "@/hooks/useSpreadTocSync";
+import { useSpreadViewer } from "@/hooks/useSpreadViewer";
+import { useI18n } from "@/lib/i18n/context";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import { PAGE_HEIGHT, PAGE_WIDTH } from "@/lib/pdf/constants";
+import { generatePageHtml } from "@/lib/pdf/generator";
+import { proxyImageUrls } from "@/lib/proxy";
+import { useDashboard } from "./DashboardContext";
 
-// Source page dimensions (A5 at 96dpi)
-const SOURCE_WIDTH = 559;
-const SOURCE_HEIGHT = 793;
 const MAX_PAGE_WIDTH = 400;
-
-function proxyImageUrls(html: string): string {
-  return html.replace(
-    /(<img\s[^>]*src=")([^"]+cdninstagram\.com[^"]+)(")/g,
-    (_match, before, url, after) =>
-      `${before}/api/proxy-image?url=${encodeURIComponent(url)}${after}`,
-  );
-}
 
 interface SpreadData {
   leftPage: number | null;
@@ -61,8 +61,8 @@ function HtmlPage({
 }) {
   const rounded = side === "left" ? "rounded-l-lg" : "rounded-r-lg";
   const shadow = noShadow ? "" : "shadow-xl";
-  const scale = pageWidth / SOURCE_WIDTH;
-  const pageHeight = Math.round(SOURCE_HEIGHT * scale);
+  const scale = pageWidth / PAGE_WIDTH;
+  const pageHeight = Math.round(PAGE_HEIGHT * scale);
 
   if (pageNum && pages[pageNum - 1]) {
     const html = pages[pageNum - 1].html;
@@ -76,8 +76,8 @@ function HtmlPage({
           className="bg-white pointer-events-none"
           scrolling="no"
           style={{
-            width: `${SOURCE_WIDTH}px`,
-            height: `${SOURCE_HEIGHT}px`,
+            width: `${PAGE_WIDTH}px`,
+            height: `${PAGE_HEIGHT}px`,
             transform: `scale(${scale})`,
             transformOrigin: "top left",
             border: "none",
@@ -97,15 +97,365 @@ function HtmlPage({
 }
 
 function pageToSpread(pageNum: number): number {
-  return Math.max(0, Math.ceil(pageNum / 2));
+  return Math.floor(pageNum / 2);
 }
 
-function HtmlSpreadViewer({
+// ── TOC data extraction ──
+
+interface TocEntry {
+  type: "special" | "chapter" | "sub-chapter";
+  label: string;
+  labelKey?: TranslationKey;
+  pageNumber: number;
+  chapterIndex?: number; // for grouping collapse
+}
+
+function parseTocHtml(html: string): { chapters: { title: string; pageNum: number | null; subChapters: { title: string; pageNum: number | null }[] }[] } {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const items = doc.querySelectorAll(".toc-item");
+  const chapters: { title: string; pageNum: number | null; subChapters: { title: string; pageNum: number | null }[] }[] = [];
+
+  items.forEach((item) => {
+    const titleEl = item.querySelector(".toc-chapter-title");
+    const titleSpan = titleEl?.querySelector("span");
+    const titlePageEl = titleEl?.querySelector(".toc-page-number");
+    const chTitle = titleSpan?.textContent?.trim() || "";
+    const chPage = titlePageEl ? Number(titlePageEl.textContent) || null : null;
+
+    const subs: { title: string; pageNum: number | null }[] = [];
+    item.querySelectorAll(".toc-sub-chapter").forEach((subEl) => {
+      const subSpan = subEl.querySelector("span");
+      const subPageEl = subEl.querySelector(".toc-page-number");
+      subs.push({
+        title: subSpan?.textContent?.trim() || "",
+        pageNum: subPageEl ? Number(subPageEl.textContent) || null : null,
+      });
+    });
+
+    chapters.push({ title: chTitle, pageNum: chPage, subChapters: subs });
+  });
+
+  return { chapters };
+}
+
+function buildTocEntries(pages: StoredPage[]): TocEntry[] {
+  const entries: TocEntry[] = [];
+
+  // Add special pages (cover, preface, toc, last)
+  for (let i = 0; i < pages.length; i++) {
+    const { meta } = pages[i];
+    const pageNum = i + 1;
+    switch (meta.type) {
+      case "cover":
+        entries.push({ type: "special", label: "", labelKey: "dashboard.preview.cover", pageNumber: pageNum });
+        break;
+      case "preface":
+        entries.push({ type: "special", label: "", labelKey: "dashboard.preview.preface", pageNumber: pageNum });
+        break;
+      case "toc":
+        if (!entries.some((e) => e.labelKey === "dashboard.preview.tableOfContents")) {
+          entries.push({ type: "special", label: "", labelKey: "dashboard.preview.tableOfContents", pageNumber: pageNum });
+        }
+        break;
+      case "last":
+        entries.push({ type: "special", label: "", labelKey: "dashboard.preview.last", pageNumber: pageNum });
+        break;
+    }
+  }
+
+  // Parse chapters/sub-chapters from all TOC pages (may span multiple pages)
+  const tocHtml = pages
+    .filter((p) => p.meta.type === "toc")
+    .map((p) => p.html)
+    .join("");
+  if (tocHtml) {
+    const { chapters } = parseTocHtml(tocHtml);
+    chapters.forEach((ch, chIdx) => {
+      entries.push({
+        type: "chapter",
+        label: `${chIdx + 1}. ${ch.title}`,
+        pageNumber: ch.pageNum ?? 1,
+        chapterIndex: chIdx,
+      });
+      for (const sub of ch.subChapters) {
+        entries.push({
+          type: "sub-chapter",
+          label: sub.title,
+          pageNumber: sub.pageNum ?? 1,
+          chapterIndex: chIdx,
+        });
+      }
+    });
+  }
+
+  // Sort: specials first by page, then chapters/subs by page
+  entries.sort((a, b) => a.pageNumber - b.pageNumber);
+
+  return entries;
+}
+
+// ── TocPanel component ──
+
+function ChapterChildren({
+  entries,
+  activePages,
+  onNavigate,
+  activeRef,
+  t,
+}: {
+  entries: TocEntry[];
+  activePages: Set<number>;
+  onNavigate: (pageNum: number) => void;
+  activeRef: React.RefObject<HTMLButtonElement | null>;
+  t: (key: TranslationKey) => string;
+}) {
+  return (
+    <>
+      {entries.map((entry) => {
+        const isActive = activePages.has(entry.pageNumber);
+        const label = entry.labelKey ? t(entry.labelKey) : entry.label;
+        return (
+          <button
+            key={`sub-${entry.pageNumber}`}
+            ref={isActive ? activeRef : undefined}
+            onClick={() => onNavigate(entry.pageNumber)}
+            className={`w-full text-left pr-3 py-1.5 pl-8 text-xs truncate transition-colors duration-150 ${isActive
+              ? "bg-[#f5f5f5] text-gray-900 font-medium"
+              : "text-gray-500 hover:bg-[#fafafa]"
+              }`}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </>
+  );
+}
+
+export function TocPanel({
+  pages,
+  visiblePages,
+  onNavigate,
+  children,
+  className,
+}: {
+  pages: StoredPage[];
+  visiblePages: Set<number>;
+  onNavigate: (pageNum: number) => void;
+  children?: ReactNode;
+  className?: string;
+}) {
+  const { t } = useI18n();
+  const entries = useMemo(() => buildTocEntries(pages), [pages]);
+  const activeRef = useRef<HTMLButtonElement>(null);
+  const [collapsed, setCollapsed] = useState<Set<number>>(() => {
+    const all = new Set<number>();
+    for (const e of buildTocEntries(pages)) {
+      if (e.type === "chapter" && e.chapterIndex !== undefined) {
+        all.add(e.chapterIndex);
+      }
+    }
+    return all;
+  });
+
+  // Compute active entry pages.
+  // Nearest-previous fallback only applies when both visible pages resolve
+  // to the same entry, to avoid highlighting two entries simultaneously.
+  const activePages = useMemo(() => {
+    const result = new Set<number>();
+    if (visiblePages.size === 0) return result;
+
+    const findNearest = (page: number): TocEntry | null => {
+      // Direct match on special pages
+      const special = entries.find(
+        (e) => e.type === "special" && e.pageNumber === page,
+      );
+      if (special) return special;
+
+      // Nearest previous chapter/sub-chapter
+      let nearest: TocEntry | null = null;
+      for (const e of entries) {
+        if (e.type === "special") continue;
+        if (e.pageNumber <= page) {
+          nearest = e;
+        } else {
+          break;
+        }
+      }
+      return nearest;
+    };
+
+    const resolved = [...visiblePages].map(findNearest);
+    const allSame =
+      resolved.length > 0 &&
+      resolved.every((r) => r && resolved[0] && r.pageNumber === resolved[0].pageNumber);
+
+    if (allSame && resolved[0]) {
+      result.add(resolved[0].pageNumber);
+    } else {
+      // Different entries — only use direct matches
+      for (const vp of visiblePages) {
+        const direct = entries.find((e) => e.pageNumber === vp);
+        if (direct) result.add(direct.pageNumber);
+      }
+    }
+    return result;
+  }, [visiblePages, entries]);
+
+  const toggleChapter = (chapterIndex: number) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(chapterIndex)) {
+        next.delete(chapterIndex);
+      } else {
+        next.add(chapterIndex);
+      }
+      return next;
+    });
+  };
+
+  // Auto-expand chapters that contain active sub-chapters
+  useEffect(() => {
+    if (activePages.size === 0) return;
+    setCollapsed((prev) => {
+      let changed = false;
+      const next = new Set(prev);
+      for (const e of entries) {
+        if (
+          e.type === "sub-chapter" &&
+          e.chapterIndex !== undefined &&
+          activePages.has(e.pageNumber) &&
+          next.has(e.chapterIndex)
+        ) {
+          next.delete(e.chapterIndex);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [activePages, entries]);
+
+  // Scroll active entry into view
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [visiblePages]);
+
+  // Group sub-chapters by their parent chapter index
+  const chapterChildren = useMemo(() => {
+    const map = new Map<number, TocEntry[]>();
+    for (const e of entries) {
+      if (e.type === "sub-chapter" && e.chapterIndex !== undefined) {
+        if (!map.has(e.chapterIndex)) map.set(e.chapterIndex, []);
+        map.get(e.chapterIndex)!.push(e);
+      }
+    }
+    return map;
+  }, [entries]);
+
+  return (
+    <div className={className ?? "hidden lg:flex flex-col w-56 bg-white border-l border-gray-200 shrink-0"}>
+      {/* <div className="px-4 py-3 border-b border-gray-100">
+        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          {t("dashboard.preview.toc")}
+        </h3>
+      </div> */}
+      <div className="flex-1 overflow-y-auto py-1 scrollbar-stable">
+        {entries.map((entry) => {
+          // Sub-chapters are rendered inside their parent chapter's collapsible area
+          if (entry.type === "sub-chapter") return null;
+
+          const isActive = activePages.has(entry.pageNumber);
+          const label = entry.labelKey ? t(entry.labelKey) : entry.label;
+
+          if (entry.type === "special") {
+            return (
+              <button
+                key={`special-${entry.pageNumber}`}
+                ref={isActive ? activeRef : undefined}
+                onClick={() => onNavigate(entry.pageNumber)}
+                className={`w-full text-left pr-3 py-1.5 pl-4 text-xs font-semibold truncate transition-colors duration-150 ${isActive
+                  ? "bg-[#f5f5f5] text-gray-900"
+                  : "text-gray-900 hover:bg-[#fafafa]"
+                  }`}
+              >
+                {label}
+              </button>
+            );
+          }
+
+          // Chapter entry with collapsible children
+          const isCollapsed =
+            entry.chapterIndex !== undefined &&
+            collapsed.has(entry.chapterIndex);
+          const children = entry.chapterIndex !== undefined
+            ? chapterChildren.get(entry.chapterIndex) ?? []
+            : [];
+
+          return (
+            <div key={`ch-${entry.pageNumber}`}>
+              <button
+                ref={isActive ? activeRef : undefined}
+                onClick={() => {
+                  if (entry.chapterIndex !== undefined && children.length > 0) {
+                    toggleChapter(entry.chapterIndex);
+                  }
+                  onNavigate(entry.pageNumber);
+                }}
+                className={`w-full text-left pr-3 py-1.5 pl-4 text-xs font-semibold truncate flex items-center gap-1 mt-1 transition-colors duration-150 ${isActive
+                  ? "bg-[#f5f5f5] text-gray-900"
+                  : "text-gray-900 hover:bg-[#fafafa]"
+                  }`}
+              >
+                {children.length > 0 && (
+                  <svg
+                    className={`w-3 h-3 shrink-0 transition-transform duration-200 ${isCollapsed ? "" : "rotate-90"}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                  </svg>
+                )}
+                <span className="truncate">{label}</span>
+              </button>
+              {children.length > 0 && (
+                <div
+                  className="overflow-hidden transition-[grid-template-rows] duration-200 ease-in-out grid"
+                  style={{ gridTemplateRows: isCollapsed ? "0fr" : "1fr" }}
+                >
+                  <div className="min-h-0">
+                    <ChapterChildren
+                      entries={children}
+                      activePages={activePages}
+                      onNavigate={onNavigate}
+                      activeRef={activeRef}
+                      t={t}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// ── HtmlSpreadViewer ──
+
+export function HtmlSpreadViewer({
   pages,
   initialPage,
+  onNavigateReady,
+  onSpreadChange,
 }: {
   pages: StoredPage[];
   initialPage?: number | null;
+  onNavigateReady?: (fn: (pageNum: number) => void) => void;
+  onSpreadChange?: (left: number | null, right: number | null) => void;
 }) {
   const numPages = pages.length;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -152,6 +502,29 @@ function HtmlSpreadViewer({
     containerRef,
   });
 
+  // Expose navigate function to parent
+  const navigateTo = useCallback(
+    (pageNum: number) => {
+      const targetSpread = pageToSpread(pageNum);
+      if (targetSpread < totalSpreads) {
+        handleSliderChange(targetSpread);
+      }
+    },
+    [totalSpreads, handleSliderChange],
+  );
+
+  useEffect(() => {
+    onNavigateReady?.(navigateTo);
+  }, [navigateTo, onNavigateReady]);
+
+  // Report current visible pages to parent
+  const currentData = spreads[currentSpread] ?? null;
+  useEffect(() => {
+    if (currentData) {
+      onSpreadChange?.(currentData.leftPage, currentData.rightPage);
+    }
+  }, [currentSpread, currentData, onSpreadChange]);
+
   const initialPageApplied = useRef(false);
   useEffect(() => {
     if (
@@ -168,7 +541,6 @@ function HtmlSpreadViewer({
     }
   }, [initialPage, numPages, totalSpreads, handleSliderChange]);
 
-  const currentData = spreads[currentSpread] ?? null;
   const targetData = flipState
     ? (spreads[flipState.targetSpread] ?? null)
     : null;
@@ -225,9 +597,9 @@ function HtmlSpreadViewer({
                 target={
                   targetData
                     ? {
-                        left: targetData.leftPage,
-                        right: targetData.rightPage,
-                      }
+                      left: targetData.leftPage,
+                      right: targetData.rightPage,
+                    }
                     : null
                 }
                 renderPage={renderPage}
@@ -238,7 +610,7 @@ function HtmlSpreadViewer({
       </SpreadViewerContainer>
 
       {totalSpreads > 0 && (
-        <div className="h-16 px-8 flex items-center gap-4 bg-white border-t border-gray-200 shrink-0">
+        <div className="h-[69px] px-8 flex items-center gap-4 bg-white border-t border-gray-200 shrink-0">
           <SpreadSlider
             currentSpread={currentSpread}
             totalSpreads={totalSpreads}
@@ -269,6 +641,13 @@ export function PreviewModal() {
     closePreviewModal,
     initialPage,
   } = useDashboard();
+
+  const {
+    visiblePages,
+    handleNavigateReady,
+    handleSpreadChange,
+    handleTocNavigate,
+  } = useSpreadTocSync();
 
   // Escape key to close modal
   useEffect(() => {
@@ -379,11 +758,22 @@ export function PreviewModal() {
             </div>
           </div>
         ) : previewPages ? (
-          <HtmlSpreadViewer
-            key={previewPages.length}
-            pages={previewPages}
-            initialPage={initialPage}
-          />
+          <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-col flex-1 min-w-0">
+              <HtmlSpreadViewer
+                key={previewPages.length}
+                pages={previewPages}
+                initialPage={initialPage}
+                onNavigateReady={handleNavigateReady}
+                onSpreadChange={handleSpreadChange}
+              />
+            </div>
+            <TocPanel
+              pages={previewPages}
+              visiblePages={visiblePages}
+              onNavigate={handleTocNavigate}
+            />
+          </div>
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">

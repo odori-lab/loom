@@ -1,18 +1,24 @@
-import { ThreadsPost, ThreadsProfile } from "@loom/shared";
-import { BookStructure, ImageCaption } from "@loom/shared";
-import { PDF_STYLES } from "./templates/styles";
-import { generateCoverPage } from "./templates/cover";
 import {
-  generateContentPageFromChunks,
+  PDF_STYLES,
+  generatePrefacePage,
+  generateChapterTitlePage,
+  generateLastPage,
   generateEssaySubChapterPage,
   generateEssayContinuationPage,
+  mergeThreadPosts,
+  buildCaptionMap,
+} from "@loom/shared";
+import type {
+  MergedPost,
   CaptionMap,
-} from "./templates/content";
+  BookStructure,
+  ThreadsPost,
+  ThreadsProfile,
+} from "@loom/shared";
+import { generateCoverPage } from "./templates/cover";
+import { generateContentPageFromChunks } from "./templates/content";
 import { generateTocPage } from "./templates/toc";
-import { generatePrefacePage } from "./templates/preface";
-import { generateChapterTitlePage } from "./templates/chapter";
-import { generateLastPage } from "./templates/last";
-import { calculateLayout, PostChunk, MergedPost } from "./layout";
+import { calculateLayout, PostChunk } from "./layout";
 
 // Pretendard font CDN for PDF rendering
 const PRETENDARD_FONT_LINK = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />`;
@@ -166,57 +172,6 @@ function generateLegacyPageContents(
   return pages;
 }
 
-// Merge thread posts: group by threadId, combine content, sum likes
-function mergeThreadPosts(posts: ThreadsPost[]): MergedPost[] {
-  const merged: MergedPost[] = [];
-  const threadGroups = new Map<string, ThreadsPost[]>();
-  const seenThreadIds: string[] = [];
-
-  for (const post of posts) {
-    if (post.threadId) {
-      if (!threadGroups.has(post.threadId)) {
-        threadGroups.set(post.threadId, []);
-        seenThreadIds.push(post.threadId);
-      }
-      threadGroups.get(post.threadId)!.push(post);
-    } else {
-      // Posts without threadId: each is its own group
-      merged.push({
-        content: post.content,
-        date: new Date(post.postedAt),
-        likeCount: post.likeCount || 0,
-        imageUrls: [...post.imageUrls],
-        postIds: [post.id],
-      });
-    }
-  }
-
-  // Now insert thread groups in order of first occurrence
-  const result: MergedPost[] = [];
-  let nonThreadIdx = 0;
-  const threadInserted = new Set<string>();
-
-  for (const post of posts) {
-    if (post.threadId) {
-      if (!threadInserted.has(post.threadId)) {
-        threadInserted.add(post.threadId);
-        const group = threadGroups.get(post.threadId)!;
-        result.push({
-          content: group.map((p) => p.content).join("\n\n"),
-          date: new Date(group[0]!.postedAt),
-          likeCount: group.reduce((sum, p) => sum + (p.likeCount || 0), 0),
-          imageUrls: group.flatMap((p) => p.imageUrls),
-          postIds: group.map((p) => p.id),
-        });
-      }
-    } else {
-      result.push(merged[nonThreadIdx]!);
-      nonThreadIdx++;
-    }
-  }
-
-  return result;
-}
 
 // Height estimation constants for essay mode (in pixels)
 // Page content area: 210mm = 793.7px - 22mm*2 padding = 627px
@@ -250,7 +205,6 @@ function estimateMergedPostHeight(post: MergedPost): number {
 function splitSubChapterIntoPages(
   subChapterTitle: string,
   mergedPosts: MergedPost[],
-  profile: ThreadsProfile,
   chapterIdx: number,
   subIdx: number,
   captionMap?: CaptionMap,
@@ -287,7 +241,6 @@ function splitSubChapterIntoPages(
       return generateEssaySubChapterPage(
         subChapterTitle,
         group,
-        profile,
         chapterIdx,
         subIdx,
         captionMap,
@@ -360,7 +313,6 @@ function generateEssayPageContents(
       const subChapterPages = splitSubChapterIntoPages(
         subChapter.title,
         mergedPosts,
-        profile,
         chapterIdx,
         subIdx,
         captionMap,
@@ -381,19 +333,6 @@ function generateEssayPageContents(
   return pages;
 }
 
-// Build caption lookup map from ImageCaption array: postId -> caption (first caption wins)
-function buildCaptionMap(imageCaptions?: ImageCaption[]): CaptionMap {
-  const map: CaptionMap = new Map();
-  if (!imageCaptions) return map;
-
-  for (const cap of imageCaptions) {
-    if (!map.has(cap.postId)) {
-      map.set(cap.postId, cap.caption);
-    }
-  }
-
-  return map;
-}
 
 // Generate blank page for print-friendly spreads
 function generateBlankPage(): string {

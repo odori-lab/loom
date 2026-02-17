@@ -1,10 +1,13 @@
 import { ThreadsPost } from "@loom/shared";
+import type { MergedPost } from "@loom/shared";
+export type { MergedPost } from "@loom/shared";
 
 // Content area calculation (in pixels)
 // Page: 793.7px (210mm), Padding: 83.15px * 2 (22mm * 2)
 // Content area height: 793.7 - 166.3 = 627.4px
+// Considering page number (12mm / 2): 627.4 - 22.7 = 605px
 // Using exact value for precise splitting
-const MAX_PAGE_HEIGHT = 627;
+const MAX_PAGE_HEIGHT = 600;
 
 // Height estimates (in pixels) - based on actual rendered values
 const POST_HEADER_HEIGHT = 48; // Avatar (28px) + margins + username line
@@ -24,15 +27,6 @@ const ESSAY_LINE_HEIGHT = 24; // Larger line spacing (1.7 line-height)
 const ESSAY_CHARS_PER_LINE = 26; // Slightly wider chars at 10pt
 const ESSAY_MIN_CONTINUATION_HEIGHT =
   ESSAY_POST_HEADER_HEIGHT + ESSAY_LINE_HEIGHT * 2;
-
-// Merged post type for combining thread posts in essay mode
-export interface MergedPost {
-  content: string;
-  date: Date;
-  likeCount: number;
-  imageUrls: string[];
-  postIds?: string[];
-}
 
 export interface PostChunk {
   post: ThreadsPost;

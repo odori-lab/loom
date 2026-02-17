@@ -28,6 +28,38 @@ body {
     sans-serif;
 }
 
+/* ─── Thin scrollbar ─── */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+/* WebKit (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Prevent layout shift from scrollbar appearance */
+@utility scrollbar-stable {
+  scrollbar-gutter: stable;
+}
+
 /* === Dashboard Animations (Threads/Instagram style: fast, minimal) === */
 
 /* Card entrance - subtle fade-in with slight upward movement */

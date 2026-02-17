@@ -1,6 +1,5 @@
 import { ContentBlock, MeasuredBlock } from "./types";
 import {
-  PAGE_HEIGHT,
   SAFE_PAGE_HEIGHT,
   IMAGE_LOAD_TIMEOUT,
   IMAGE_FALLBACK_HEIGHTS,
@@ -10,6 +9,7 @@ import {
 // Block types that should NEVER be split - they are designed as single full page
 const NO_SPLIT_TYPES: Set<ContentBlock["type"]> = new Set([
   "cover",
+  "author",
   "preface",
   "chapter-title",
   "last",
@@ -68,23 +68,11 @@ export async function splitOversizedBlocks(
       continue;
     }
 
-    // For fullPage blocks (toc): compare against PAGE_HEIGHT (includes padding)
-    // For content blocks (post, sub-chapter): compare against SAFE_PAGE_HEIGHT
-    const threshold = block.fullPage ? PAGE_HEIGHT : SAFE_PAGE_HEIGHT;
-
-    if (block.measuredHeight <= threshold) {
+    if (block.measuredHeight <= SAFE_PAGE_HEIGHT) {
       result.push(block);
       continue;
     }
 
-    // Special handling for TOC blocks
-    if (block.type === "toc") {
-      const tocBlocks = await splitTocBlock(block, iframe);
-      result.push(...tocBlocks);
-      continue;
-    }
-
-    // Block is too tall - split it
     const splitBlocks = await splitBlock(block, iframe);
     result.push(...splitBlocks);
   }
@@ -93,7 +81,7 @@ export async function splitOversizedBlocks(
 }
 
 // Recursively collect splittable leaf children from an element tree
-// When a child exceeds maxHeight and has sub-children, descend into it
+// Always descends into children that have sub-children for finest granularity
 export function collectLeaves(
   element: HTMLElement,
   maxHeight: number,
@@ -112,7 +100,6 @@ export function collectLeaves(
   for (const child of children) {
     const h = Math.ceil(child.getBoundingClientRect().height);
     if (h > maxHeight && child.children.length > 0) {
-      // Child is too tall and has sub-children - go deeper
       result.push(...collectLeaves(child, maxHeight));
     } else {
       result.push({ html: child.outerHTML, height: h });
@@ -169,117 +156,6 @@ export function refineOversizedLeaves(
   }
 
   return result;
-}
-
-// Split a TOC block preserving .toc-list wrapper and .toc-header
-async function splitTocBlock(
-  block: MeasuredBlock,
-  iframe: HTMLIFrameElement,
-): Promise<MeasuredBlock[]> {
-  const iframeDoc = iframe.contentDocument;
-  if (!iframeDoc) return [block];
-
-  const container = iframeDoc.getElementById("container");
-  if (!container) return [block];
-
-  // Render the TOC to extract items
-  const wrapper = iframeDoc.createElement("div");
-  wrapper.className = "measure-block";
-  wrapper.innerHTML = block.html;
-  container.appendChild(wrapper);
-
-  try {
-    await waitForImages(wrapper);
-
-    // Extract individual toc-item elements
-    const tocItems = Array.from(wrapper.querySelectorAll(".toc-item"));
-    if (tocItems.length === 0) return [block];
-
-    // Get the header HTML
-    const headerEl = wrapper.querySelector(".toc-header");
-    const headerHtml = headerEl ? headerEl.outerHTML : "";
-
-    // Collect each item's HTML
-    const items: { html: string; height: number }[] = tocItems.map((item) => ({
-      html: (item as HTMLElement).outerHTML,
-      height: Math.ceil((item as HTMLElement).getBoundingClientRect().height),
-    }));
-
-    container.removeChild(wrapper);
-
-    // Bin-pack items into pages
-    const tocThreshold = SAFE_PAGE_HEIGHT;
-
-    // Helper to measure a TOC page with items
-    const measureTocPage = (
-      itemsHtml: string,
-      includeHeader: boolean,
-    ): number => {
-      const html = `<div class="page toc-page">${includeHeader ? headerHtml : ""}<div class="toc-list">${itemsHtml}</div></div>`;
-      const testWrapper = iframeDoc.createElement("div");
-      testWrapper.className = "measure-block";
-      testWrapper.innerHTML = html;
-      container.appendChild(testWrapper);
-      // Measure inner content height (excluding page padding)
-      const pageEl = testWrapper.querySelector(".page") as HTMLElement;
-      const contentHeight = pageEl
-        ? Math.ceil(pageEl.scrollHeight) - (793 - 627)
-        : 0;
-      container.removeChild(testWrapper);
-      return contentHeight;
-    };
-
-    const groups: { items: typeof items; includeHeader: boolean }[] = [];
-    let currentGroup: typeof items = [];
-    let isFirst = true;
-
-    for (const item of items) {
-      const testItems = [...currentGroup, item];
-      const testHtml = testItems.map((i) => i.html).join("\n");
-      const height = measureTocPage(testHtml, isFirst);
-
-      if (currentGroup.length > 0 && height > tocThreshold) {
-        groups.push({ items: currentGroup, includeHeader: isFirst });
-        isFirst = false;
-        currentGroup = [item];
-      } else {
-        currentGroup = testItems;
-      }
-    }
-    if (currentGroup.length > 0) {
-      groups.push({ items: currentGroup, includeHeader: isFirst });
-    }
-
-    if (groups.length <= 1) {
-      // Fits on one page - return original
-      return [block];
-    }
-
-    // Convert groups to MeasuredBlocks
-    return groups.map((group, i) => {
-      const itemsHtml = group.items.map((item) => item.html).join("\n");
-      const html = `<div class="page toc-page">${group.includeHeader ? headerHtml : ""}<div class="toc-list">${itemsHtml}</div></div>`;
-
-      // Measure final height
-      const testWrapper = iframeDoc.createElement("div");
-      testWrapper.className = "measure-block";
-      testWrapper.innerHTML = html;
-      container.appendChild(testWrapper);
-      const h = Math.ceil(testWrapper.getBoundingClientRect().height);
-      container.removeChild(testWrapper);
-
-      return {
-        ...block,
-        id: i === 0 ? block.id : `${block.id}-part${i + 1}`,
-        html,
-        measuredHeight: h,
-        fullPage: true,
-      };
-    });
-  } catch {
-    if (wrapper.parentNode) container.removeChild(wrapper);
-    return [block];
-  }
 }
 
 // Split a single oversized block into multiple page-sized blocks

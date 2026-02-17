@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useDashboard } from "./DashboardContext";
-import { SpinnerSvg } from "@/components/ui/Spinner";
+import { Json } from "@loom/shared";
+import { useMemo, useState } from "react";
 import {
-  TrashIcon,
-  PlusIcon,
   BookOpenIcon,
-  SearchIcon,
   DownloadIcon,
-  ChevronRightIcon,
+  PlusIcon,
+  SearchIcon,
+  TrashIcon,
 } from "@/components/ui/Icons";
+import { SpinnerSvg } from "@/components/ui/Spinner";
 import { useI18n } from "@/lib/i18n/context";
-import { Json, StoredPage } from "@loom/shared";
+import { proxyImageUrl } from "@/lib/proxy";
+import { useDashboard } from "./DashboardContext";
 
 type SortOrder = "newest" | "oldest";
 
@@ -37,55 +37,6 @@ function parseCoverData(raw: Json | null): CoverDataShape | null {
   return raw as unknown as CoverDataShape;
 }
 
-interface ChapterInfo {
-  index: number;
-  title: string;
-  startPage: number;
-  subChapterCount: number;
-}
-
-function extractChapters(pages: StoredPage[]): ChapterInfo[] {
-  const chapterMap = new Map<number, ChapterInfo>();
-  const subChapterCounts = new Map<number, Set<number>>();
-
-  for (let i = 0; i < pages.length; i++) {
-    const { meta } = pages[i];
-    if (
-      meta.type === "chapter-title" &&
-      meta.chapterIndex !== undefined &&
-      meta.chapterTitle
-    ) {
-      chapterMap.set(meta.chapterIndex, {
-        index: meta.chapterIndex,
-        title: meta.chapterTitle,
-        startPage: i + 1,
-        subChapterCount: 0,
-      });
-    }
-    if (
-      meta.type === "sub-chapter" &&
-      meta.chapterIndex !== undefined &&
-      meta.subChapterIndex !== undefined
-    ) {
-      if (!subChapterCounts.has(meta.chapterIndex)) {
-        subChapterCounts.set(meta.chapterIndex, new Set());
-      }
-      subChapterCounts.get(meta.chapterIndex)!.add(meta.subChapterIndex);
-    }
-  }
-
-  for (const [chIdx, subs] of subChapterCounts) {
-    const chapter = chapterMap.get(chIdx);
-    if (chapter) chapter.subChapterCount = subs.size;
-  }
-
-  return Array.from(chapterMap.values()).sort((a, b) => a.index - b.index);
-}
-
-function proxyImageUrl(url: string): string {
-  return `/api/proxy-image?url=${encodeURIComponent(url)}`;
-}
-
 function getBookTitle(
   title: string | null,
   coverData: CoverDataShape | null,
@@ -103,8 +54,6 @@ export function LoomsTab() {
     looms,
     selectedLoom,
     deletingId,
-    previewPages,
-    loadingPreview,
     selectLoom,
     deleteLoom,
     setActiveTab,
@@ -114,15 +63,6 @@ export function LoomsTab() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
-  const [expandedLoomId, setExpandedLoomId] = useState<string | null>(null);
-
-  // Derive chapters from previewPages for the selected/expanded loom
-  const chapters = useMemo(() => {
-    if (!previewPages || !selectedLoom || expandedLoomId !== selectedLoom.id) {
-      return [];
-    }
-    return extractChapters(previewPages);
-  }, [previewPages, selectedLoom, expandedLoomId]);
 
   const filteredLooms = useMemo(() => {
     let result = [...looms];
@@ -159,12 +99,6 @@ export function LoomsTab() {
 
   const handleRowClick = (loom: (typeof looms)[0]) => {
     selectLoom(loom);
-    setExpandedLoomId((prev) => (prev === loom.id ? null : loom.id));
-  };
-
-  const handleChapterClick = (e: React.MouseEvent, startPage?: number) => {
-    e.stopPropagation();
-    openPreviewModal(startPage);
   };
 
   if (looms.length === 0) {
@@ -226,7 +160,7 @@ export function LoomsTab() {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto px-6 pb-6">
+      <div className="flex-1 overflow-y-auto px-6 pb-6 scrollbar-stable">
         <div className="flex flex-col gap-1">
           {filteredLooms.map((loom, index) => {
             const coverData = parseCoverData(loom.cover_data);
@@ -241,9 +175,7 @@ export function LoomsTab() {
               loom.thread_display_name ||
               coverData?.name ||
               `@${loom.thread_username}`;
-            const isExpanded = expandedLoomId === loom.id;
             const isSelected = selectedLoom?.id === loom.id;
-            const loomChapters = isExpanded && isSelected ? chapters : [];
 
             return (
               <div
@@ -257,19 +189,9 @@ export function LoomsTab() {
                 {/* Loom row */}
                 <div
                   onClick={() => handleRowClick(loom)}
-                  className={`group flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all active:scale-[0.99] ${
-                    isSelected ? "bg-gray-900 text-white" : "hover:bg-[#fafafa]"
-                  }`}
+                  className={`group flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all active:scale-[0.99] ${isSelected ? "bg-[#f5f5f5]" : "hover:bg-[#fafafa]"
+                    }`}
                 >
-                  {/* Expand chevron */}
-                  <div
-                    className={`flex-shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`}
-                  >
-                    <ChevronRightIcon
-                      className={`w-4 h-4 ${isSelected ? "text-gray-400" : "text-gray-300"}`}
-                    />
-                  </div>
-
                   {/* Profile image */}
                   {profileImg ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
@@ -280,9 +202,7 @@ export function LoomsTab() {
                     />
                   ) : (
                     <div className="w-9 h-9 rounded-full border border-[#e0e0e0] bg-[#f5f5f5] flex items-center justify-center flex-shrink-0">
-                      <span
-                        className={`text-xs font-medium ${isSelected ? "text-gray-400" : "text-[#999999]"}`}
-                      >
+                      <span className="text-xs font-medium text-[#999999]">
                         {(displayName[0] || "?").toUpperCase()}
                       </span>
                     </div>
@@ -290,33 +210,16 @@ export function LoomsTab() {
 
                   {/* Title and username */}
                   <div className="min-w-0 flex-1">
-                    <p
-                      className={`text-sm font-semibold truncate leading-tight ${isSelected ? "text-white" : "text-gray-900"}`}
-                    >
+                    <p className="text-sm font-semibold truncate leading-tight text-gray-900">
                       {title}
                     </p>
-                    <p
-                      className={`text-xs truncate leading-tight mt-0.5 ${isSelected ? "text-gray-400" : "text-[#999999]"}`}
-                    >
+                    <p className="text-xs truncate leading-tight mt-0.5 text-[#999999]">
                       @{loom.thread_username}
                     </p>
                   </div>
 
-                  {/* Post count badge */}
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium flex-shrink-0 ${
-                      isSelected
-                        ? "bg-white/15 text-gray-300"
-                        : "bg-gray-100 text-[#737373]"
-                    }`}
-                  >
-                    {loom.post_count} {loom.post_count === 1 ? "post" : "posts"}
-                  </span>
-
                   {/* Date */}
-                  <span
-                    className={`text-xs flex-shrink-0 hidden sm:block ${isSelected ? "text-gray-400" : "text-[#999999]"}`}
-                  >
+                  <span className="text-xs flex-shrink-0 hidden sm:block text-[#999999]">
                     {formatDate(loom.created_at)}
                   </span>
 
@@ -325,13 +228,20 @@ export function LoomsTab() {
                     className={`flex gap-1 flex-shrink-0 ${isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"} transition-opacity duration-150`}
                   >
                     <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        selectLoom(loom);
+                        openPreviewModal();
+                      }}
+                      className="p-1.5 rounded-lg transition-all active:scale-[0.96] text-gray-400 hover:text-gray-900 hover:bg-gray-100"
+                      title="Preview"
+                    >
+                      <BookOpenIcon className="w-4 h-4" />
+                    </button>
+                    <button
                       onClick={(e) => handleDownload(e, loom.id)}
                       disabled={downloadingId === loom.id}
-                      className={`p-1.5 rounded-lg transition-all disabled:opacity-50 active:scale-[0.96] ${
-                        isSelected
-                          ? "text-gray-400 hover:text-white hover:bg-white/10"
-                          : "text-gray-400 hover:text-gray-900 hover:bg-gray-100"
-                      }`}
+                      className="p-1.5 rounded-lg transition-all disabled:opacity-50 active:scale-[0.96] text-gray-400 hover:text-gray-900 hover:bg-gray-100"
                       title="Download"
                     >
                       {downloadingId === loom.id ? (
@@ -346,11 +256,7 @@ export function LoomsTab() {
                         deleteLoom(loom.id);
                       }}
                       disabled={deletingId === loom.id}
-                      className={`p-1.5 rounded-lg transition-all disabled:opacity-50 active:scale-[0.96] ${
-                        isSelected
-                          ? "text-gray-400 hover:text-red-400 hover:bg-white/10"
-                          : "text-gray-400 hover:text-red-500 hover:bg-gray-100"
-                      }`}
+                      className="p-1.5 rounded-lg transition-all disabled:opacity-50 active:scale-[0.96] text-gray-400 hover:text-red-500 hover:bg-gray-100"
                       title="Delete"
                     >
                       {deletingId === loom.id ? (
@@ -361,71 +267,6 @@ export function LoomsTab() {
                     </button>
                   </div>
                 </div>
-
-                {/* Expanded chapters */}
-                {isExpanded && loadingPreview && (
-                  <div className="ml-[52px] mr-4 mb-2 mt-1">
-                    <div className="border border-[#f0f0f0] rounded-lg px-3 py-3 flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 rounded-full border-2 border-gray-200 border-t-gray-900 animate-spin" />
-                      <p className="text-xs text-[#999999]">Loading...</p>
-                    </div>
-                  </div>
-                )}
-
-                {isExpanded && !loadingPreview && loomChapters.length > 0 && (
-                  <div className="ml-[52px] mr-4 mb-2 mt-1">
-                    <div className="border border-[#f0f0f0] rounded-lg overflow-hidden">
-                      {loomChapters.map((chapter) => (
-                        <div
-                          key={chapter.index}
-                          onClick={(e) =>
-                            handleChapterClick(e, chapter.startPage)
-                          }
-                          style={{ animationDelay: `${chapter.index * 30}ms` }}
-                          className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[#fafafa] transition-colors border-b border-[#f0f0f0] last:border-b-0 active:scale-[0.99] [animation:dashboard-card-enter_0.2s_ease-out_both]"
-                        >
-                          {/* Chapter number */}
-                          <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center text-[11px] font-semibold text-[#737373] mt-0.5">
-                            {chapter.index + 1}
-                          </span>
-
-                          {/* Chapter info */}
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[13px] font-semibold text-gray-900 truncate leading-tight">
-                              {chapter.title}
-                            </p>
-                          </div>
-
-                          {/* Page number */}
-                          <span className="flex-shrink-0 text-[11px] text-[#999999] mt-0.5">
-                            p.{chapter.startPage}
-                          </span>
-
-                          {/* Sub-chapter count */}
-                          {chapter.subChapterCount > 0 && (
-                            <span className="flex-shrink-0 text-[11px] text-[#999999] mt-0.5">
-                              {chapter.subChapterCount}{" "}
-                              {chapter.subChapterCount === 1
-                                ? "section"
-                                : "sections"}
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Expanded but no chapters */}
-                {isExpanded && !loadingPreview && loomChapters.length === 0 && (
-                  <div className="ml-[52px] mr-4 mb-2 mt-1">
-                    <div className="border border-[#f0f0f0] rounded-lg px-3 py-3 text-center">
-                      <p className="text-xs text-[#999999]">
-                        No chapters available
-                      </p>
-                    </div>
-                  </div>
-                )}
               </div>
             );
           })}

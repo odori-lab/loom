@@ -6,6 +6,7 @@ import { SAFE_PAGE_HEIGHT } from "./constants";
 const NO_PAGE_NUMBER_TYPES: Set<ContentBlock["type"]> = new Set([
   "cover",
   "blank",
+  "author",
   "last",
   "chapter-title",
 ]);
@@ -30,6 +31,15 @@ export function assignBlocksToPages(
       continue;
     }
 
+    // Sub-chapter always starts a new page
+    if (block.type === "sub-chapter") {
+      if (currentPage.length > 0) {
+        pages.push(currentPage);
+        currentPage = [];
+        currentHeight = 0;
+      }
+    }
+
     // Check if block fits on current page (use SAFE height for margin)
     if (
       currentPage.length > 0 &&
@@ -49,31 +59,6 @@ export function assignBlocksToPages(
   // Push remaining blocks
   if (currentPage.length > 0) {
     pages.push(currentPage);
-  }
-
-  // Sub-chapter title stickiness: prevent orphaned sub-chapter headers
-  for (let i = 0; i < pages.length - 1; i++) {
-    const page = pages[i];
-    if (page.length === 0) continue;
-
-    const lastBlock = page[page.length - 1];
-    if (lastBlock.type === "sub-chapter") {
-      const nextPage = pages[i + 1];
-      const nextPageHeight = nextPage.reduce(
-        (sum, b) => sum + b.measuredHeight,
-        0,
-      );
-      if (nextPageHeight + lastBlock.measuredHeight <= SAFE_PAGE_HEIGHT) {
-        // Safe to move - combined height fits
-        page.pop();
-        nextPage.unshift(lastBlock);
-      } else {
-        // Moving would overflow next page - give sub-chapter its own page
-        page.pop();
-        pages.splice(i + 1, 0, [lastBlock]);
-        i++; // Skip the newly inserted page to avoid infinite loop
-      }
-    }
   }
 
   // Backfill pass: pull blocks from next page to fill remaining space
@@ -96,6 +81,7 @@ export function assignBlocksToPages(
 
       const firstBlock = nextPage[0];
       if (firstBlock.fullPage) break; // Don't pull fullPage blocks
+      if (firstBlock.type === "sub-chapter") break; // Sub-chapters must start on their own page
       if (firstBlock.measuredHeight > remaining) break; // Doesn't fit
 
       // Move block from next page to current page
@@ -106,6 +92,17 @@ export function assignBlocksToPages(
       if (nextPage.length === 0) {
         pages.splice(i + 1, 1);
       }
+    }
+  }
+
+  // Orphan fix: post-header should not be the last block on a page
+  for (let i = 0; i < pages.length - 1; i++) {
+    const page = pages[i];
+    if (page.length < 2) continue;
+    const lastBlock = page[page.length - 1];
+    if (lastBlock.id.startsWith("post-header-")) {
+      page.pop();
+      pages[i + 1].unshift(lastBlock);
     }
   }
 
@@ -154,11 +151,12 @@ export function pagesToHtml(pageAssignments: MeasuredBlock[][]): string[] {
       }
       htmlPages.push(html);
 
-      // Count content pages (not cover, last, or blank)
+      // Count content pages (not cover, last, blank, or author)
       if (
         page[0].type !== "cover" &&
         page[0].type !== "last" &&
-        page[0].type !== "blank"
+        page[0].type !== "blank" &&
+        page[0].type !== "author"
       ) {
         contentPageCount++;
       }
@@ -204,6 +202,22 @@ function buildPageMeta(page: MeasuredBlock[]): PageMeta {
   return meta;
 }
 
+// Build per-block PageMeta array for all blocks on a page
+function buildBlockMetas(page: MeasuredBlock[]): PageMeta[] {
+  return page.map((block) => {
+    const meta: PageMeta = { type: block.type };
+    if (block.chapterIndex !== undefined) {
+      meta.chapterIndex = block.chapterIndex;
+      meta.chapterTitle = block.chapterTitle;
+    }
+    if (block.subChapterIndex !== undefined) {
+      meta.subChapterIndex = block.subChapterIndex;
+      meta.subChapterTitle = block.subChapterTitle;
+    }
+    return meta;
+  });
+}
+
 // Convert page assignments to StoredPage[] with metadata
 export function pagesToStoredPages(
   pageAssignments: MeasuredBlock[][],
@@ -226,25 +240,27 @@ export function pagesToStoredPages(
       : "";
 
     const meta = buildPageMeta(page);
+    const blockMetas = buildBlockMetas(page);
 
     if (page.length === 1 && page[0].fullPage) {
       let html = page[0].html;
       if (showPageNumber) {
         html = html.replace(/<\/div>\s*$/, `${pageNumberHtml}</div>`);
       }
-      storedPages.push({ html, meta });
+      storedPages.push({ html, meta, blockMetas });
 
       if (
         page[0].type !== "cover" &&
         page[0].type !== "last" &&
-        page[0].type !== "blank"
+        page[0].type !== "blank" &&
+        page[0].type !== "author"
       ) {
         contentPageCount++;
       }
     } else {
       const innerHtml = page.map((block) => block.html).join("\n");
       const html = `<div class="page">\n${innerHtml}\n${pageNumberHtml}\n</div>`;
-      storedPages.push({ html, meta });
+      storedPages.push({ html, meta, blockMetas });
       contentPageCount++;
     }
   }

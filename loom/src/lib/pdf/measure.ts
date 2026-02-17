@@ -6,7 +6,7 @@ import {
   IMAGE_FALLBACK_HEIGHTS,
   DEFAULT_IMAGE_FALLBACK,
 } from "./constants";
-import { PDF_STYLES } from "./templates/styles";
+import { PDF_STYLES } from "@loom/shared";
 
 // Re-export types and functions for backward compatibility
 export type { MeasuredBlock, PageMapping } from "./types";
