@@ -106,6 +106,7 @@ export function LoomPreviewPanel({
       style={{ width: panelWidth }}
     >
       <div className="flex-1 overflow-hidden">
+        {/* 이중 loading fallback */}
         {loadingPreview ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">

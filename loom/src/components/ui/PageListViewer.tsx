@@ -77,10 +77,10 @@ function PdfMode({
 
   return (
     <div className="h-full overflow-y-auto snap-y snap-mandatory">
-      <div className="h-[40vh]" />
       <Document
         file={url}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+        // 이중 loading fallback
         loading={
           <div className="flex items-center justify-center py-20">
             <div className="w-12 h-12 rounded-full border-4 border-gray-200 border-t-gray-900 animate-spin" />
@@ -92,14 +92,15 @@ function PdfMode({
           </div>
         }
       >
+        <div className="h-[40vh]" />
         {numPages &&
           Array.from({ length: numPages }, (_, i) => (
             <div
               key={i}
-              className={`mb-6 flex justify-center snap-center${onPageClick ? " cursor-pointer" : ""}`}
+              className={`mb-6 flex justify-center snap-center ${onPageClick ? "cursor-pointer" : ""}`}
               onClick={onPageClick ? () => onPageClick(i + 1) : undefined}
             >
-              <div className="shadow-sm rounded-lg overflow-hidden">
+              <div className="shadow-sm overflow-hidden">
                 <Page
                   pageNumber={i + 1}
                   width={pageWidth}
@@ -109,8 +110,8 @@ function PdfMode({
               </div>
             </div>
           ))}
+        <div className="h-[40vh]" />
       </Document>
-      <div className="h-[40vh]" />
     </div>
   );
 }
@@ -134,7 +135,7 @@ function HtmlMode({
       {pages.map((html, i) => (
         <div
           key={i}
-          className={`mb-6 flex justify-center snap-center${onPageClick ? " cursor-pointer" : ""}`}
+          className={`mb-6 flex justify-center snap-center ${onPageClick ? "cursor-pointer" : ""}`}
           onClick={onPageClick ? () => onPageClick(i + 1) : undefined}
         >
           <div
