@@ -1,7 +1,12 @@
 "use client";
 
 import { createContext, use } from "react";
-import { ThreadsPost, ThreadsProfile, BookStructure } from "@loom/shared";
+import {
+  ThreadsPost,
+  ThreadsProfile,
+  BookStructure,
+  StoredPage,
+} from "@loom/shared";
 import { SpreadData } from "@/lib/pdf/spreads";
 import { PageMapping } from "@/lib/pdf/types";
 
@@ -52,7 +57,7 @@ export interface CreateFlowMeta {
   filteredAndSortedPosts: ThreadsPost[];
   selectedPosts: ThreadsPost[];
   orderedPosts: ThreadsPost[];
-  pages: string[];
+  pages: StoredPage[];
   spreads: SpreadData[];
   currentSpreadData: SpreadData | undefined;
   selectedCount: number;

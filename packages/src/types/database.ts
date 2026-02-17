@@ -44,8 +44,8 @@ export interface Database {
           title: string | null;
           post_count: number;
           pdf_path: string;
+          pages_path: string | null;
           cover_data: Json | null;
-          book_structure: Json | null;
           created_at: string;
         };
         Insert: {
@@ -56,8 +56,8 @@ export interface Database {
           title?: string | null;
           post_count: number;
           pdf_path: string;
+          pages_path?: string | null;
           cover_data?: Json | null;
-          book_structure?: Json | null;
           created_at?: string;
         };
         Update: {
@@ -68,8 +68,8 @@ export interface Database {
           title?: string | null;
           post_count?: number;
           pdf_path?: string;
+          pages_path?: string | null;
           cover_data?: Json | null;
-          book_structure?: Json | null;
           created_at?: string;
         };
       };

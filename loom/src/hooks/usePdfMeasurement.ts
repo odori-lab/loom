@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { ThreadsPost, ThreadsProfile, BookStructure } from "@loom/shared";
+import {
+  ThreadsPost,
+  ThreadsProfile,
+  BookStructure,
+  StoredPage,
+} from "@loom/shared";
 import { generatePageContents } from "@/lib/pdf/generator";
 import { generateContentBlocks } from "@/lib/pdf/content-blocks";
 import {
@@ -13,7 +18,7 @@ import { splitOversizedBlocks } from "@/lib/pdf/measure";
 import {
   assignBlocksToPages,
   buildPageMapping,
-  pagesToHtml,
+  pagesToStoredPages,
 } from "@/lib/pdf/measure";
 import { calculateSpreads } from "@/lib/pdf/spreads";
 import { generateTocPage } from "@/lib/pdf/templates/toc";
@@ -23,7 +28,7 @@ export function usePdfMeasurement(
   profile: ThreadsProfile | null,
   bookStructure: BookStructure | null,
 ) {
-  const [pages, setPages] = useState<string[]>([]);
+  const [pages, setPages] = useState<StoredPage[]>([]);
   const [measuring, setMeasuring] = useState(false);
   const [pageAssignmentsRef, setPageAssignmentsRef] = useState<
     MeasuredBlock[][] | null
@@ -106,18 +111,22 @@ export function usePdfMeasurement(
         }
 
         if (cancelled) return;
-        const html = pagesToHtml(pageAssignments);
+        const stored = pagesToStoredPages(pageAssignments);
         if (cancelled) return;
-        setPages(html);
+        setPages(stored);
         setPageAssignmentsRef(pageAssignments);
         setPageMappingRef(pageMapping);
       } catch {
         // Fallback to sync generation if measurement fails (SSR, etc.)
         if (!cancelled) {
+          const fallbackHtml = bookStructure
+            ? generatePageContents(orderedPosts, profile!, bookStructure)
+            : [];
           setPages(
-            bookStructure
-              ? generatePageContents(orderedPosts, profile!, bookStructure)
-              : [],
+            fallbackHtml.map((html) => ({
+              html,
+              meta: { type: "post" as const },
+            })),
           );
           setPageAssignmentsRef(null);
           setPageMappingRef(null);

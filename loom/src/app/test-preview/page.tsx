@@ -46,7 +46,7 @@ function PreviewPanel() {
 
       {/* PageListViewer */}
       <div className="flex-1 overflow-hidden">
-        <PageListViewer htmlPages={pages} width={700} />
+        <PageListViewer pages={pages.map((p) => p.html)} width={700} />
       </div>
     </div>
   );

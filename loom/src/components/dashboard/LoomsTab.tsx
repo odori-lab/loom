@@ -12,7 +12,7 @@ import {
   ChevronRightIcon,
 } from "@/components/ui/Icons";
 import { useI18n } from "@/lib/i18n/context";
-import { Json, BookStructure, BookChapter } from "@loom/shared";
+import { Json, StoredPage } from "@loom/shared";
 
 type SortOrder = "newest" | "oldest";
 
@@ -37,11 +37,49 @@ function parseCoverData(raw: Json | null): CoverDataShape | null {
   return raw as unknown as CoverDataShape;
 }
 
-function parseBookStructure(raw: Json | null): BookStructure | null {
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
-  const obj = raw as Record<string, unknown>;
-  if (!obj.chapters || !Array.isArray(obj.chapters)) return null;
-  return raw as unknown as BookStructure;
+interface ChapterInfo {
+  index: number;
+  title: string;
+  startPage: number;
+  subChapterCount: number;
+}
+
+function extractChapters(pages: StoredPage[]): ChapterInfo[] {
+  const chapterMap = new Map<number, ChapterInfo>();
+  const subChapterCounts = new Map<number, Set<number>>();
+
+  for (let i = 0; i < pages.length; i++) {
+    const { meta } = pages[i];
+    if (
+      meta.type === "chapter-title" &&
+      meta.chapterIndex !== undefined &&
+      meta.chapterTitle
+    ) {
+      chapterMap.set(meta.chapterIndex, {
+        index: meta.chapterIndex,
+        title: meta.chapterTitle,
+        startPage: i + 1,
+        subChapterCount: 0,
+      });
+    }
+    if (
+      meta.type === "sub-chapter" &&
+      meta.chapterIndex !== undefined &&
+      meta.subChapterIndex !== undefined
+    ) {
+      if (!subChapterCounts.has(meta.chapterIndex)) {
+        subChapterCounts.set(meta.chapterIndex, new Set());
+      }
+      subChapterCounts.get(meta.chapterIndex)!.add(meta.subChapterIndex);
+    }
+  }
+
+  for (const [chIdx, subs] of subChapterCounts) {
+    const chapter = chapterMap.get(chIdx);
+    if (chapter) chapter.subChapterCount = subs.size;
+  }
+
+  return Array.from(chapterMap.values()).sort((a, b) => a.index - b.index);
 }
 
 function proxyImageUrl(url: string): string {
@@ -65,6 +103,8 @@ export function LoomsTab() {
     looms,
     selectedLoom,
     deletingId,
+    previewPages,
+    loadingPreview,
     selectLoom,
     deleteLoom,
     setActiveTab,
@@ -75,6 +115,14 @@ export function LoomsTab() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [expandedLoomId, setExpandedLoomId] = useState<string | null>(null);
+
+  // Derive chapters from previewPages for the selected/expanded loom
+  const chapters = useMemo(() => {
+    if (!previewPages || !selectedLoom || expandedLoomId !== selectedLoom.id) {
+      return [];
+    }
+    return extractChapters(previewPages);
+  }, [previewPages, selectedLoom, expandedLoomId]);
 
   const filteredLooms = useMemo(() => {
     let result = [...looms];
@@ -195,8 +243,7 @@ export function LoomsTab() {
               `@${loom.thread_username}`;
             const isExpanded = expandedLoomId === loom.id;
             const isSelected = selectedLoom?.id === loom.id;
-            const bookStructure = parseBookStructure(loom.book_structure);
-            const chapters = bookStructure?.chapters || [];
+            const loomChapters = isExpanded && isSelected ? chapters : [];
 
             return (
               <div
@@ -315,62 +362,61 @@ export function LoomsTab() {
                 </div>
 
                 {/* Expanded chapters */}
-                {isExpanded && chapters.length > 0 && (
+                {isExpanded && loadingPreview && (
+                  <div className="ml-[52px] mr-4 mb-2 mt-1">
+                    <div className="border border-[#f0f0f0] rounded-lg px-3 py-3 flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 rounded-full border-2 border-gray-200 border-t-gray-900 animate-spin" />
+                      <p className="text-xs text-[#999999]">Loading...</p>
+                    </div>
+                  </div>
+                )}
+
+                {isExpanded && !loadingPreview && loomChapters.length > 0 && (
                   <div className="ml-[52px] mr-4 mb-2 mt-1">
                     <div className="border border-[#f0f0f0] rounded-lg overflow-hidden">
-                      {chapters.map(
-                        (chapter: BookChapter, chapterIndex: number) => (
-                          <div
-                            key={chapter.id}
-                            onClick={(e) =>
-                              handleChapterClick(e, chapter.startPage)
-                            }
-                            style={{ animationDelay: `${chapterIndex * 30}ms` }}
-                            className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[#fafafa] transition-colors border-b border-[#f0f0f0] last:border-b-0 active:scale-[0.99] [animation:dashboard-card-enter_0.2s_ease-out_both]"
-                          >
-                            {/* Chapter number */}
-                            <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center text-[11px] font-semibold text-[#737373] mt-0.5">
-                              {chapterIndex + 1}
-                            </span>
+                      {loomChapters.map((chapter) => (
+                        <div
+                          key={chapter.index}
+                          onClick={(e) =>
+                            handleChapterClick(e, chapter.startPage)
+                          }
+                          style={{ animationDelay: `${chapter.index * 30}ms` }}
+                          className="flex items-start gap-3 px-3 py-2.5 cursor-pointer hover:bg-[#fafafa] transition-colors border-b border-[#f0f0f0] last:border-b-0 active:scale-[0.99] [animation:dashboard-card-enter_0.2s_ease-out_both]"
+                        >
+                          {/* Chapter number */}
+                          <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center text-[11px] font-semibold text-[#737373] mt-0.5">
+                            {chapter.index + 1}
+                          </span>
 
-                            {/* Chapter info */}
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[13px] font-semibold text-gray-900 truncate leading-tight">
-                                {chapter.title}
-                              </p>
-                              {chapter.description && (
-                                <p className="text-[12px] text-[#999999] truncate leading-tight mt-0.5">
-                                  {chapter.description}
-                                </p>
-                              )}
-                            </div>
-
-                            {/* Page number */}
-                            {chapter.startPage && (
-                              <span className="flex-shrink-0 text-[11px] text-[#999999] mt-0.5">
-                                p.{chapter.startPage}
-                              </span>
-                            )}
-
-                            {/* Sub-chapter count */}
-                            {chapter.subChapters &&
-                              chapter.subChapters.length > 0 && (
-                                <span className="flex-shrink-0 text-[11px] text-[#999999] mt-0.5">
-                                  {chapter.subChapters.length}{" "}
-                                  {chapter.subChapters.length === 1
-                                    ? "section"
-                                    : "sections"}
-                                </span>
-                              )}
+                          {/* Chapter info */}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[13px] font-semibold text-gray-900 truncate leading-tight">
+                              {chapter.title}
+                            </p>
                           </div>
-                        ),
-                      )}
+
+                          {/* Page number */}
+                          <span className="flex-shrink-0 text-[11px] text-[#999999] mt-0.5">
+                            p.{chapter.startPage}
+                          </span>
+
+                          {/* Sub-chapter count */}
+                          {chapter.subChapterCount > 0 && (
+                            <span className="flex-shrink-0 text-[11px] text-[#999999] mt-0.5">
+                              {chapter.subChapterCount}{" "}
+                              {chapter.subChapterCount === 1
+                                ? "section"
+                                : "sections"}
+                            </span>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
 
                 {/* Expanded but no chapters */}
-                {isExpanded && chapters.length === 0 && (
+                {isExpanded && !loadingPreview && loomChapters.length === 0 && (
                   <div className="ml-[52px] mr-4 mb-2 mt-1">
                     <div className="border border-[#f0f0f0] rounded-lg px-3 py-3 text-center">
                       <p className="text-xs text-[#999999]">

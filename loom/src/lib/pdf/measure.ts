@@ -12,7 +12,12 @@ import { PDF_STYLES } from "./templates/styles";
 export type { MeasuredBlock, PageMapping } from "./types";
 export { MAX_PAGE_HEIGHT } from "./constants";
 export { splitOversizedBlocks } from "./splitting";
-export { assignBlocksToPages, buildPageMapping, pagesToHtml } from "./packing";
+export {
+  assignBlocksToPages,
+  buildPageMapping,
+  pagesToHtml,
+  pagesToStoredPages,
+} from "./packing";
 
 // Wait for all images in an element to load (with timeout), then apply
 // fallback dimensions for any images that failed to load

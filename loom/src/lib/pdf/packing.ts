@@ -1,4 +1,5 @@
 import { ContentBlock, MeasuredBlock, PageMapping } from "./types";
+import { StoredPage, PageMeta } from "@loom/shared";
 import { SAFE_PAGE_HEIGHT } from "./constants";
 
 // Page types that should NOT show page numbers
@@ -180,4 +181,83 @@ export function pagesToHtml(pageAssignments: MeasuredBlock[][]): string[] {
   }
 
   return htmlPages;
+}
+
+// Build PageMeta from a page's blocks
+function buildPageMeta(page: MeasuredBlock[]): PageMeta {
+  const firstBlock = page[0];
+  const meta: PageMeta = { type: firstBlock.type };
+
+  // Find chapter/sub-chapter info from any block on this page
+  for (const block of page) {
+    if (block.chapterIndex !== undefined) {
+      meta.chapterIndex = block.chapterIndex;
+      meta.chapterTitle = block.chapterTitle;
+      if (block.subChapterIndex !== undefined) {
+        meta.subChapterIndex = block.subChapterIndex;
+        meta.subChapterTitle = block.subChapterTitle;
+      }
+      break;
+    }
+  }
+
+  return meta;
+}
+
+// Convert page assignments to StoredPage[] with metadata
+export function pagesToStoredPages(
+  pageAssignments: MeasuredBlock[][],
+): StoredPage[] {
+  const storedPages: StoredPage[] = [];
+
+  // Track content pages (non-cover, non-last) for blank page logic
+  let contentPageCount = 0;
+
+  for (let i = 0; i < pageAssignments.length; i++) {
+    const page = pageAssignments[i];
+    const pageNum = i + 1; // 1-based page number
+
+    // Determine if this page should show a page number
+    const firstBlock = page[0];
+    const showPageNumber =
+      firstBlock && !NO_PAGE_NUMBER_TYPES.has(firstBlock.type);
+    const pageNumberHtml = showPageNumber
+      ? `<div class="page-number">${pageNum}</div>`
+      : "";
+
+    const meta = buildPageMeta(page);
+
+    if (page.length === 1 && page[0].fullPage) {
+      let html = page[0].html;
+      if (showPageNumber) {
+        html = html.replace(/<\/div>\s*$/, `${pageNumberHtml}</div>`);
+      }
+      storedPages.push({ html, meta });
+
+      if (
+        page[0].type !== "cover" &&
+        page[0].type !== "last" &&
+        page[0].type !== "blank"
+      ) {
+        contentPageCount++;
+      }
+    } else {
+      const innerHtml = page.map((block) => block.html).join("\n");
+      const html = `<div class="page">\n${innerHtml}\n${pageNumberHtml}\n</div>`;
+      storedPages.push({ html, meta });
+      contentPageCount++;
+    }
+  }
+
+  // Add blank page before last page if content pages are odd
+  if (contentPageCount % 2 === 1) {
+    const lastPage = storedPages.pop()!;
+    storedPages.push({
+      html: '<div class="page"></div>',
+      meta: { type: "blank" },
+    });
+    storedPages.push(lastPage);
+  }
+
+  return storedPages;
 }

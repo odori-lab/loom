@@ -96,10 +96,8 @@ export async function scrapeThreadsDirect(
 }
 
 export async function createLoomDirect(
-  posts: ThreadsPost[],
-  profile: ThreadsProfile,
+  pages: string[],
   userId: string,
-  bookStructure?: unknown,
 ): Promise<{ pdfPath: string; loomId: string }> {
   if (!WORKER_URL) {
     throw new Error("NEXT_PUBLIC_LOOM_WORKER_URL is not configured");
@@ -108,7 +106,7 @@ export async function createLoomDirect(
   const response = await fetch(`${WORKER_URL}/create-loom`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ posts, profile, userId, bookStructure }),
+    body: JSON.stringify({ pages, userId }),
   });
 
   if (!response.ok) {

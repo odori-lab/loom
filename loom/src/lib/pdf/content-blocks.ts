@@ -175,6 +175,8 @@ function generateEssayBlocks(
       html: generateChapterTitlePage(chapter, chapterIdx),
       type: "chapter-title",
       fullPage: true,
+      chapterIndex: chapterIdx,
+      chapterTitle: chapter.title,
     });
 
     // Sub-chapters
@@ -191,6 +193,10 @@ function generateEssayBlocks(
         id: `sub-chapter-${chapterIdx}-${subIdx}`,
         html: subChapterTitleHtml,
         type: "sub-chapter",
+        chapterIndex: chapterIdx,
+        chapterTitle: chapter.title,
+        subChapterIndex: subIdx,
+        subChapterTitle: subChapter.title,
       });
 
       // Gather and merge posts for this sub-chapter
@@ -211,6 +217,10 @@ function generateEssayBlocks(
           id: `post-${chapterIdx}-${subIdx}-${postIdx}`,
           html: generateMergedPostInnerHtml(mp, captionMap),
           type: "post",
+          chapterIndex: chapterIdx,
+          chapterTitle: chapter.title,
+          subChapterIndex: subIdx,
+          subChapterTitle: subChapter.title,
         });
       }
     }

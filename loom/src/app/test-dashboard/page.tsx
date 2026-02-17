@@ -32,42 +32,6 @@ const MOCK_LOOMS = [
       profileImageUrl: null,
       followerCount: 100,
     },
-    book_structure: {
-      title: "Life in Germany",
-      preface: "A collection of stories",
-      chapters: [
-        {
-          id: "ch-1",
-          title: "Daily Life",
-          description: "Everyday moments in Germany",
-          subChapters: [
-            { id: "sc-1-1", title: "Morning Routines", postIds: ["p1", "p2"] },
-            { id: "sc-1-2", title: "Work from Home", postIds: ["p3"] },
-          ],
-        },
-        {
-          id: "ch-2",
-          title: "Relationships",
-          description: "Stories about love and family",
-          subChapters: [
-            {
-              id: "sc-2-1",
-              title: "Marriage Life",
-              postIds: ["p4", "p5", "p6"],
-            },
-          ],
-        },
-        {
-          id: "ch-3",
-          title: "Reflections",
-          description: "Thoughts and observations",
-          subChapters: [
-            { id: "sc-3-1", title: "Social Life", postIds: ["p7"] },
-            { id: "sc-3-2", title: "Memories", postIds: ["p8", "p9"] },
-          ],
-        },
-      ],
-    },
     created_at: "2026-02-10T12:00:00Z",
   },
   {
@@ -85,7 +49,6 @@ const MOCK_LOOMS = [
       profileImageUrl: null,
       followerCount: 50,
     },
-    book_structure: null,
     created_at: "2026-02-08T10:00:00Z",
   },
 ] as any[];

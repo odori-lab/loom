@@ -1,3 +1,5 @@
+import { StoredPage } from "@loom/shared";
+
 export interface SpreadData {
   left: string | null;
   right: string | null;
@@ -5,13 +7,18 @@ export interface SpreadData {
   rightIdx: number;
 }
 
-export function calculateSpreads(pages: string[]): SpreadData[] {
+export function calculateSpreads(pages: StoredPage[]): SpreadData[] {
   if (pages.length === 0) return [];
 
   const result: SpreadData[] = [];
 
   // Spread 0: Cover page (right side only)
-  result.push({ left: null, right: pages[0], leftIdx: -1, rightIdx: 0 });
+  result.push({
+    left: null,
+    right: pages[0].html,
+    leftIdx: -1,
+    rightIdx: 0,
+  });
 
   // Content pages (pairs)
   const contentPages = pages.slice(1, -1); // Exclude cover and last
@@ -21,8 +28,8 @@ export function calculateSpreads(pages: string[]): SpreadData[] {
     const leftIdx = i + 1;
     const rightIdx = i + 2;
     result.push({
-      left: contentPages[i],
-      right: contentPages[i + 1] || null,
+      left: contentPages[i].html,
+      right: contentPages[i + 1]?.html || null,
       leftIdx,
       rightIdx: contentPages[i + 1] ? rightIdx : -1,
     });
@@ -30,7 +37,7 @@ export function calculateSpreads(pages: string[]): SpreadData[] {
 
   // Last page handling - always on the left (like back cover)
   result.push({
-    left: lastPage,
+    left: lastPage.html,
     right: null,
     leftIdx: pages.length - 1,
     rightIdx: -1,

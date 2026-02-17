@@ -13,8 +13,8 @@ const PageListViewer = dynamic(
 
 export interface LoomPreviewPanelProps {
   width?: number;
-  /** Override the preview URL (bypasses DashboardContext) */
-  previewUrl?: string;
+  /** Override pages (bypasses DashboardContext) */
+  pages?: string[];
   /** Override loading state */
   loading?: boolean;
   /** Override page click handler */
@@ -23,13 +23,13 @@ export interface LoomPreviewPanelProps {
   emptyState?: ReactNode;
   /** Whether there is active content to display. Defaults to checking selectedLoom from context. */
   active?: boolean;
-  /** Custom content to render instead of the PDF viewer */
+  /** Custom content to render instead of the viewer */
   children?: ReactNode;
 }
 
 export function LoomPreviewPanel({
   width,
-  previewUrl: propPreviewUrl,
+  pages: propPages,
   loading: propLoading,
   onPageClick: propOnPageClick,
   emptyState,
@@ -40,12 +40,13 @@ export function LoomPreviewPanel({
   const { t } = useI18n();
 
   const isActive = propActive ?? !!dashboard.selectedLoom;
-  const previewUrl = propPreviewUrl ?? dashboard.previewUrl;
+  const pages =
+    propPages ?? dashboard.previewPages?.map((p) => p.html) ?? null;
   const loadingPreview = propLoading ?? dashboard.loadingPreview;
   const handlePageClick =
     propOnPageClick ?? (() => dashboard.openPreviewModal());
 
-  const panelWidth = width ?? 600;
+  const panelWidth = width;
 
   // Shell-only mode: when children are provided, render the panel shell with custom content
   if (children) {
@@ -116,9 +117,9 @@ export function LoomPreviewPanel({
               </p>
             </div>
           </div>
-        ) : previewUrl ? (
+        ) : pages ? (
           <PageListViewer
-            pdfUrl={previewUrl}
+            pages={pages}
             width={panelWidth}
             onPageClick={() => handlePageClick()}
           />
@@ -129,22 +130,18 @@ export function LoomPreviewPanel({
         ) : (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-50 flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-red-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <p className="text-gray-500 text-sm">
+                {t("dashboard.preview.error")}
+              </p>
+              {dashboard.previewUrl && (
+                <a
+                  href={dashboard.previewUrl}
+                  download
+                  className="mt-3 inline-block text-sm font-medium text-black underline"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              <p className="text-gray-500">{t("dashboard.preview.error")}</p>
+                  {t("dashboard.preview.downloadPdf")}
+                </a>
+              )}
             </div>
           </div>
         )}

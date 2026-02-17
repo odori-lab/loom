@@ -9,7 +9,8 @@ import {
   ReactNode,
 } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Database } from "@loom/shared";
+import { Database, StoredPage } from "@loom/shared";
+import { fetchStoredPages } from "@/lib/api/storage";
 
 type Loom = Database["public"]["Tables"]["looms"]["Row"];
 type DashboardTab = "looms" | "create" | "setting";
@@ -19,6 +20,7 @@ interface DashboardContextValue {
   looms: Loom[];
   selectedLoom: Loom | null;
   previewUrl: string | null;
+  previewPages: StoredPage[] | null;
   loadingPreview: boolean;
   previewModalOpen: boolean;
   deletingId: string | null;
@@ -27,7 +29,7 @@ interface DashboardContextValue {
   selectLoom: (loom: Loom) => void;
   deleteLoom: (id: string) => void;
   openPreviewModal: (page?: number) => void;
-  openPreviewModalWithUrl: (url: string) => void;
+  openPreviewModalWithPages: (pages: StoredPage[]) => void;
   closePreviewModal: () => void;
   addLoom: (loom: Loom) => void;
 }
@@ -67,6 +69,7 @@ export function DashboardProvider({
   const [looms, setLooms] = useState(initialLooms);
   const [selectedLoom, setSelectedLoom] = useState<Loom | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewPages, setPreviewPages] = useState<StoredPage[] | null>(null);
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -85,12 +88,21 @@ export function DashboardProvider({
     setSelectedLoom(loom);
     setLoadingPreview(true);
     setPreviewUrl(null);
+    setPreviewPages(null);
 
     try {
       const res = await fetch(`/api/looms/${loom.id}`);
       const data = await res.json();
       if (data.downloadUrl) {
         setPreviewUrl(data.downloadUrl);
+      }
+      if (data.pagesUrl) {
+        try {
+          const pages = await fetchStoredPages(data.pagesUrl);
+          setPreviewPages(pages);
+        } catch (e) {
+          console.error("Failed to load stored pages:", e);
+        }
       }
     } catch (error) {
       console.error("Failed to load preview:", error);
@@ -110,6 +122,7 @@ export function DashboardProvider({
         setSelectedLoom((prev) => {
           if (prev?.id === id) {
             setPreviewUrl(null);
+            setPreviewPages(null);
             return null;
           }
           return prev;
@@ -126,8 +139,8 @@ export function DashboardProvider({
     setInitialPage(page ?? null);
     setPreviewModalOpen(true);
   }, []);
-  const openPreviewModalWithUrl = useCallback((url: string) => {
-    setPreviewUrl(url);
+  const openPreviewModalWithPages = useCallback((pages: StoredPage[]) => {
+    setPreviewPages(pages);
     setInitialPage(null);
     setPreviewModalOpen(true);
   }, []);
@@ -146,6 +159,7 @@ export function DashboardProvider({
       looms,
       selectedLoom,
       previewUrl,
+      previewPages,
       loadingPreview,
       previewModalOpen,
       deletingId,
@@ -154,7 +168,7 @@ export function DashboardProvider({
       selectLoom,
       deleteLoom,
       openPreviewModal,
-      openPreviewModalWithUrl,
+      openPreviewModalWithPages,
       closePreviewModal,
       addLoom,
     }),
@@ -163,6 +177,7 @@ export function DashboardProvider({
       looms,
       selectedLoom,
       previewUrl,
+      previewPages,
       loadingPreview,
       previewModalOpen,
       deletingId,
@@ -171,7 +186,7 @@ export function DashboardProvider({
       selectLoom,
       deleteLoom,
       openPreviewModal,
-      openPreviewModalWithUrl,
+      openPreviewModalWithPages,
       closePreviewModal,
       addLoom,
     ],

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuth, AuthError } from "@/lib/api/auth";
 import { parseLoomInput, ValidationError } from "@/lib/api/validation";
 import { getSignedDownloadUrl } from "@/lib/api/storage";
-import { CoverData } from "@loom/shared";
+import { CoverData, StoredPage } from "@loom/shared";
 
 // GET /api/looms - List user's looms
 export async function GET() {
@@ -61,6 +61,30 @@ export async function POST(request: Request) {
       loomId = result.loomId;
     }
 
+    // Upload pages JSON to storage if provided
+    let pagesPath: string | null = null;
+    if (body.pages && Array.isArray(body.pages)) {
+      const storedPages: StoredPage[] = body.pages;
+      const jsonPath = `${user.id}/${loomId}.json`;
+      const jsonBuffer = Buffer.from(JSON.stringify(storedPages));
+
+      const { error: pagesUploadError } = await supabase.storage
+        .from("looms-pdf")
+        .upload(jsonPath, jsonBuffer, {
+          contentType: "application/json",
+          upsert: false,
+        });
+
+      if (pagesUploadError) {
+        console.warn(
+          "[LOOM_PAGES_UPLOAD_WARN]",
+          pagesUploadError.message,
+        );
+      } else {
+        pagesPath = jsonPath;
+      }
+    }
+
     // Create loom record
     const coverData: CoverData = {
       name: profile.displayName,
@@ -78,8 +102,8 @@ export async function POST(request: Request) {
       title: body.title || null,
       post_count: posts.length,
       pdf_path: pdfPath,
+      pages_path: pagesPath,
       cover_data: coverData as any,
-      book_structure: body.bookStructure || null,
     };
 
     const { data: loom, error: insertError } = await supabase
