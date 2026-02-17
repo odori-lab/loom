@@ -82,7 +82,7 @@ export function assignBlocksToPages(
     // Skip fullPage pages (single block with fullPage flag)
     if (page.length === 1 && page[0].fullPage) continue;
 
-    let pageHeight = page.reduce((sum, b) => sum + b.measuredHeight, 0);
+    const pageHeight = page.reduce((sum, b) => sum + b.measuredHeight, 0);
     let remaining = SAFE_PAGE_HEIGHT - pageHeight;
 
     while (i + 1 < pages.length) {

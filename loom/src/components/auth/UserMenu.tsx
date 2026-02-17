@@ -5,6 +5,7 @@ import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n/context";
+import { GradientAvatar } from "@/components/ui/GradientAvatar";
 
 interface UserMenuProps {
   user: User;
@@ -28,19 +29,7 @@ export function UserMenu({ user }: UserMenuProps) {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 active:scale-[0.97] transition-all duration-150"
       >
-        {user.user_metadata.avatar_url ? (
-          <img
-            src={user.user_metadata.avatar_url}
-            alt=""
-            className="w-8 h-8 rounded-full"
-          />
-        ) : (
-          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-            <span className="text-sm font-medium text-gray-600">
-              {user.email?.[0].toUpperCase()}
-            </span>
-          </div>
-        )}
+        <GradientAvatar userId={user.id} size={32} />
       </button>
 
       {isOpen && (

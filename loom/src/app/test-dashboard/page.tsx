@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { Database } from "@loom/shared";
 import { I18nProvider } from "@/lib/i18n/context";
 import { DashboardProvider } from "@/components/dashboard/DashboardContext";
 import { LoomsTab } from "@/components/dashboard/LoomsTab";
@@ -25,6 +26,7 @@ const MOCK_LOOMS = [
     title: "Life in Germany",
     post_count: 42,
     pdf_path: "test/test.pdf",
+    pages_path: null,
     cover_data: {
       name: "Sol You",
       username: "whatthesol",
@@ -42,6 +44,7 @@ const MOCK_LOOMS = [
     title: null,
     post_count: 15,
     pdf_path: "test/test2.pdf",
+    pages_path: null,
     cover_data: {
       name: "Test User 2",
       username: "testuser2",
@@ -51,7 +54,7 @@ const MOCK_LOOMS = [
     },
     created_at: "2026-02-08T10:00:00Z",
   },
-] as any[];
+] as unknown as Database["public"]["Tables"]["looms"]["Row"][];
 
 function TestDashboard() {
   return (

@@ -1,6 +1,6 @@
 import { ThreadsProfile } from "@loom/shared";
 import { LOOM_LOGO_SVG } from "./logo";
-import { formatNumber, escapeHtml } from "@/lib/utils/format";
+import { escapeHtml } from "@/lib/utils/format";
 
 export function generateCoverPage(
   profile: ThreadsProfile,

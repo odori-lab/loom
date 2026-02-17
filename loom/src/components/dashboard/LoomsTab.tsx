@@ -272,6 +272,7 @@ export function LoomsTab() {
 
                   {/* Profile image */}
                   {profileImg ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={proxyImageUrl(profileImg)}
                       alt={displayName}

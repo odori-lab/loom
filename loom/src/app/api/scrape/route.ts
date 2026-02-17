@@ -21,10 +21,11 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ posts, profile, hasMore });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[SCRAPE_ERROR]", error);
+    const message = error instanceof Error ? error.message : "Failed to scrape threads";
     return NextResponse.json(
-      { error: error.message || "Failed to scrape threads" },
+      { error: message },
       { status: 500 },
     );
   }

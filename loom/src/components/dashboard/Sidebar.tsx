@@ -6,6 +6,7 @@ import { User } from "@supabase/supabase-js";
 import { useDashboard } from "./DashboardContext";
 import { BookOpenIcon, PlusIcon } from "@/components/ui/Icons";
 import { useI18n } from "@/lib/i18n/context";
+import { GradientAvatar } from "@/components/ui/GradientAvatar";
 
 interface SidebarProps {
   user: User;
@@ -87,23 +88,11 @@ export function Sidebar({ user }: SidebarProps) {
             isSettingActive ? "bg-gray-50" : "hover:bg-gray-50"
           }`}
         >
-          {user.user_metadata.avatar_url ? (
-            <img
-              src={user.user_metadata.avatar_url}
-              alt=""
-              className={`w-9 h-9 rounded-full shrink-0 ${isSettingActive ? "ring-2 ring-gray-900" : "border border-gray-200"}`}
-            />
-          ) : (
-            <div
-              className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${isSettingActive ? "bg-gray-900 text-white" : "bg-gray-200"}`}
-            >
-              <span
-                className={`text-sm font-medium ${isSettingActive ? "text-white" : "text-gray-600"}`}
-              >
-                {user.email?.[0].toUpperCase()}
-              </span>
-            </div>
-          )}
+          <GradientAvatar
+            userId={user.id}
+            size={36}
+            className={isSettingActive ? "ring-2 ring-gray-900" : ""}
+          />
           <div className="flex-1 text-left min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
               {user.user_metadata.full_name || user.email}

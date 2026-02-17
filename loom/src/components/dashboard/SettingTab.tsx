@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/context";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { GradientAvatar } from "@/components/ui/GradientAvatar";
 
 interface SettingTabProps {
   user: User;
@@ -22,7 +23,7 @@ export function SettingTab({ user }: SettingTabProps) {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto scrollbar-stable">
       <div className="max-w-xl mx-auto px-6 py-10">
         <h1 className="text-2xl font-bold text-gray-900 mb-8">
           {t("setting.title")}
@@ -36,19 +37,7 @@ export function SettingTab({ user }: SettingTabProps) {
           <div className="bg-white rounded-xl border border-gray-100 divide-y divide-gray-100">
             {/* Profile */}
             <div className="flex items-center gap-4 p-4">
-              {user.user_metadata.avatar_url ? (
-                <img
-                  src={user.user_metadata.avatar_url}
-                  alt=""
-                  className="w-12 h-12 rounded-full border border-gray-200"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-lg font-medium text-gray-600">
-                    {user.email?.[0].toUpperCase()}
-                  </span>
-                </div>
-              )}
+              <GradientAvatar userId={user.id} size={48} />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate">
                   {user.user_metadata.full_name || "User"}

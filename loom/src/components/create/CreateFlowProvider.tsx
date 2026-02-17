@@ -43,7 +43,7 @@ export function CreateFlowProvider({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [currentSpread, setCurrentSpread] = useState(0);
-  const [currentUsername, setCurrentUsername] = useState("");
+  const [, setCurrentUsername] = useState("");
   const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>("idle");
 
   // Composed hooks
@@ -72,12 +72,14 @@ export function CreateFlowProvider({
       selection.togglePost(id);
       setCurrentSpread(0);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selection.togglePost],
   );
 
   const toggleAll = useCallback(() => {
     selection.toggleAll();
     setCurrentSpread(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selection.toggleAll]);
 
   // Wrap organizeBook to handle error + selectedIds side effects
@@ -87,13 +89,14 @@ export function CreateFlowProvider({
       await book.organizeBook();
       // Select all posts by default after organizing
       selection.setSelectedIds(new Set(posts.map((p) => p.id)));
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
       // Fallback to mock structure if available
       if (USE_MOCK_DATA) {
         book.setBookStructure(MOCK_BOOK_STRUCTURE);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     book.organizeBook,
     book.setBookStructure,
@@ -106,6 +109,7 @@ export function CreateFlowProvider({
     book.regenerateStructure();
     setCurrentSpread(0);
     organizeBook();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [book.regenerateStructure, organizeBook]);
 
   // Actions
@@ -139,15 +143,15 @@ export function CreateFlowProvider({
         const organizeData = await organizeRes.json();
         if (!organizeRes.ok) throw new Error(organizeData.error);
         book.setBookStructure(organizeData);
-      } catch (orgErr: any) {
-        console.error("Failed to organize book:", orgErr.message);
+      } catch (orgErr) {
+        console.error("Failed to organize book:", orgErr instanceof Error ? orgErr.message : orgErr);
         // Continue without book structure - will use default ordering
       }
 
       // Phase 3: Navigate only after both phases complete
       setStep("organize");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
       setLoadingPhase("idle");
@@ -194,8 +198,8 @@ export function CreateFlowProvider({
       if (onComplete && data.loom) {
         onComplete(data.loom);
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -275,6 +279,7 @@ export function CreateFlowProvider({
         pageMapping: pdf.pageMapping,
       },
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       step,
       posts,

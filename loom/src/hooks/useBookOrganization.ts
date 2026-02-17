@@ -29,7 +29,7 @@ export function useBookOrganization(
       const result = data as BookStructure;
       setBookStructure(result);
       return result;
-    } catch (err: any) {
+    } catch (err) {
       throw err;
     } finally {
       setOrganizing(false);

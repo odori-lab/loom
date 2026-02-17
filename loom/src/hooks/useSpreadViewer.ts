@@ -2,7 +2,6 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   type RefObject,
 } from "react";
 
@@ -48,22 +47,14 @@ export function useSpreadViewer({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  // Reset when content changes
-  useEffect(() => {
+  // Reset when content changes (state-based prop tracking)
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
+  if (prevResetKey !== resetKey) {
+    setPrevResetKey(resetKey);
     setNav({ currentSpread: 0, flipState: null });
     setScale(1);
     setOffset({ x: 0, y: 0 });
-  }, [resetKey]);
-
-  // Reset zoom/pan on spread change
-  const currentSpreadRef = useRef(nav.currentSpread);
-  useEffect(() => {
-    if (currentSpreadRef.current !== nav.currentSpread) {
-      currentSpreadRef.current = nav.currentSpread;
-      setScale(1);
-      setOffset({ x: 0, y: 0 });
-    }
-  }, [nav.currentSpread]);
+  }
 
   // ── Spread navigation ──
   // Using functional setState on combined `nav` keeps these callbacks stable.
@@ -110,6 +101,9 @@ export function useSpreadViewer({
       if (!prev.flipState) return prev;
       return { currentSpread: prev.flipState.targetSpread, flipState: null };
     });
+    // Reset zoom/pan on spread change
+    setScale(1);
+    setOffset({ x: 0, y: 0 });
   }, []);
 
   const prevSpread = useCallback(() => goToSpread("backward"), [goToSpread]);
@@ -117,6 +111,9 @@ export function useSpreadViewer({
 
   const handleSliderChange = useCallback((value: number) => {
     setNav({ currentSpread: value, flipState: null });
+    // Reset zoom/pan on spread change
+    setScale(1);
+    setOffset({ x: 0, y: 0 });
   }, []);
 
   // ── Zoom ──

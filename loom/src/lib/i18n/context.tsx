@@ -20,13 +20,14 @@ export function I18nProvider({
 }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
 
+  // Sync locale from cookie after SSR hydration — legitimate browser state sync
   useEffect(() => {
     const saved = document.cookie
       .split("; ")
       .find((row) => row.startsWith("locale="))
       ?.split("=")[1] as Locale | undefined;
     if (saved && (saved === "ko" || saved === "en")) {
-      setLocaleState(saved);
+      setLocaleState(saved); // eslint-disable-line react-hooks/set-state-in-effect
     }
   }, []);
 
