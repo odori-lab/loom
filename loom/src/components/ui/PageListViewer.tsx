@@ -1,40 +1,52 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Document, Page, pdfjs } from 'react-pdf'
-import { generatePageHtml } from '@/lib/pdf/generator'
+import { useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
+import { generatePageHtml } from "@/lib/pdf/generator";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 // Source page dimensions (A5 at 96dpi)
-const SOURCE_WIDTH = 559
-const SOURCE_HEIGHT = 793
+const SOURCE_WIDTH = 559;
+const SOURCE_HEIGHT = 793;
 
 function proxyImageUrls(html: string): string {
   return html.replace(
     /(<img\s[^>]*src=")([^"]+cdninstagram\.com[^"]+)(")/g,
-    (_match, before, url, after) => `${before}/api/proxy-image?url=${encodeURIComponent(url)}${after}`
-  )
+    (_match, before, url, after) =>
+      `${before}/api/proxy-image?url=${encodeURIComponent(url)}${after}`,
+  );
 }
 
 interface PageListViewerProps {
   /** PDF mode: provide a URL to a PDF file */
-  pdfUrl?: string
+  pdfUrl?: string;
   /** HTML mode: provide an array of page HTML strings */
-  htmlPages?: string[]
+  htmlPages?: string[];
   /** Available panel width */
-  width?: number
+  width?: number;
   /** Click handler for individual pages */
-  onPageClick?: (pageNumber: number) => void
+  onPageClick?: (pageNumber: number) => void;
 }
 
-export function PageListViewer({ pdfUrl, htmlPages, width = 500, onPageClick }: PageListViewerProps) {
-  const pageDisplayWidth = Math.min(width - 48, 500) // padding on both sides, max 500px
-  const scale = pageDisplayWidth / SOURCE_WIDTH
-  const pageDisplayHeight = Math.round(SOURCE_HEIGHT * scale)
+export function PageListViewer({
+  pdfUrl,
+  htmlPages,
+  width = 500,
+  onPageClick,
+}: PageListViewerProps) {
+  const pageDisplayWidth = Math.min(width - 48, 500); // padding on both sides, max 500px
+  const scale = pageDisplayWidth / SOURCE_WIDTH;
+  const pageDisplayHeight = Math.round(SOURCE_HEIGHT * scale);
 
   if (pdfUrl) {
-    return <PdfMode url={pdfUrl} pageWidth={pageDisplayWidth} onPageClick={onPageClick} />
+    return (
+      <PdfMode
+        url={pdfUrl}
+        pageWidth={pageDisplayWidth}
+        onPageClick={onPageClick}
+      />
+    );
   }
 
   if (htmlPages) {
@@ -46,14 +58,22 @@ export function PageListViewer({ pdfUrl, htmlPages, width = 500, onPageClick }: 
         scale={scale}
         onPageClick={onPageClick}
       />
-    )
+    );
   }
 
-  return null
+  return null;
 }
 
-function PdfMode({ url, pageWidth, onPageClick }: { url: string; pageWidth: number; onPageClick?: (pageNumber: number) => void }) {
-  const [numPages, setNumPages] = useState<number | null>(null)
+function PdfMode({
+  url,
+  pageWidth,
+  onPageClick,
+}: {
+  url: string;
+  pageWidth: number;
+  onPageClick?: (pageNumber: number) => void;
+}) {
+  const [numPages, setNumPages] = useState<number | null>(null);
 
   return (
     <div className="h-full overflow-y-auto snap-y snap-mandatory">
@@ -72,26 +92,27 @@ function PdfMode({ url, pageWidth, onPageClick }: { url: string; pageWidth: numb
           </div>
         }
       >
-        {numPages && Array.from({ length: numPages }, (_, i) => (
-          <div
-            key={i}
-            className={`mb-6 flex justify-center snap-center${onPageClick ? ' cursor-pointer' : ''}`}
-            onClick={onPageClick ? () => onPageClick(i + 1) : undefined}
-          >
-            <div className="shadow-sm rounded-lg overflow-hidden">
-              <Page
-                pageNumber={i + 1}
-                width={pageWidth}
-                renderAnnotationLayer={false}
-                renderTextLayer={false}
-              />
+        {numPages &&
+          Array.from({ length: numPages }, (_, i) => (
+            <div
+              key={i}
+              className={`mb-6 flex justify-center snap-center${onPageClick ? " cursor-pointer" : ""}`}
+              onClick={onPageClick ? () => onPageClick(i + 1) : undefined}
+            >
+              <div className="shadow-sm rounded-lg overflow-hidden">
+                <Page
+                  pageNumber={i + 1}
+                  width={pageWidth}
+                  renderAnnotationLayer={false}
+                  renderTextLayer={false}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </Document>
       <div className="h-[40vh]" />
     </div>
-  )
+  );
 }
 
 function HtmlMode({
@@ -101,11 +122,11 @@ function HtmlMode({
   scale,
   onPageClick,
 }: {
-  pages: string[]
-  pageWidth: number
-  pageHeight: number
-  scale: number
-  onPageClick?: (pageNumber: number) => void
+  pages: string[];
+  pageWidth: number;
+  pageHeight: number;
+  scale: number;
+  onPageClick?: (pageNumber: number) => void;
 }) {
   return (
     <div className="h-full overflow-y-auto snap-y snap-mandatory">
@@ -113,7 +134,7 @@ function HtmlMode({
       {pages.map((html, i) => (
         <div
           key={i}
-          className={`mb-6 flex justify-center snap-center${onPageClick ? ' cursor-pointer' : ''}`}
+          className={`mb-6 flex justify-center snap-center${onPageClick ? " cursor-pointer" : ""}`}
           onClick={onPageClick ? () => onPageClick(i + 1) : undefined}
         >
           <div
@@ -128,9 +149,9 @@ function HtmlMode({
                 width: `${SOURCE_WIDTH}px`,
                 height: `${SOURCE_HEIGHT}px`,
                 transform: `scale(${scale})`,
-                transformOrigin: 'top left',
-                border: 'none',
-                overflow: 'hidden',
+                transformOrigin: "top left",
+                border: "none",
+                overflow: "hidden",
               }}
               title={`Page ${i + 1}`}
             />
@@ -139,5 +160,5 @@ function HtmlMode({
       ))}
       <div className="h-[40vh]" />
     </div>
-  )
+  );
 }

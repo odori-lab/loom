@@ -521,4 +521,4 @@ export const PDF_STYLES = `
     margin-top: 4px;
     line-height: 1.4;
   }
-`
+`;

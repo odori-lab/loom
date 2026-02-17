@@ -1,15 +1,18 @@
-import { ThreadsProfile } from '@loom/shared'
-import { LOOM_LOGO_SVG } from './logo'
-import { formatNumber, escapeHtml } from '@/lib/utils/format'
+import { ThreadsProfile } from "@loom/shared";
+import { LOOM_LOGO_SVG } from "./logo";
+import { formatNumber, escapeHtml } from "@/lib/utils/format";
 
-export function generateCoverPage(profile: ThreadsProfile, bookTitle?: string): string {
+export function generateCoverPage(
+  profile: ThreadsProfile,
+  bookTitle?: string,
+): string {
   const profileImage = profile.profileImageUrl
     ? `<img src="${profile.profileImageUrl}" alt="" class="cover-profile-image" />`
-    : `<div class="cover-profile-placeholder"><span>${profile.username[0].toUpperCase()}</span></div>`
+    : `<div class="cover-profile-placeholder"><span>${profile.username[0].toUpperCase()}</span></div>`;
 
   const bookTitleHtml = bookTitle
     ? `<div class="book-title">${escapeHtml(bookTitle)}</div>`
-    : ''
+    : "";
 
   return `
     <div class="page cover-page">
@@ -26,5 +29,5 @@ export function generateCoverPage(profile: ThreadsProfile, bookTitle?: string): 
       </div>
       <div class="cover-logo">${LOOM_LOGO_SVG}</div>
     </div>
-  `
+  `;
 }

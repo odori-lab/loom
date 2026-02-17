@@ -1,9 +1,14 @@
 import type {
   ThreadsProfile as PdfThreadsProfile,
   ThreadsPost as PdfThreadsPost,
-} from '@loom/shared';
+} from "@loom/shared";
 
-export type { BookSubChapter, BookChapter, ImageCaption, BookStructure } from '@loom/shared';
+export type {
+  BookSubChapter,
+  BookChapter,
+  ImageCaption,
+  BookStructure,
+} from "@loom/shared";
 
 export interface ScraperAccount {
   id: string;
@@ -12,7 +17,7 @@ export interface ScraperAccount {
 }
 
 export interface AccountState {
-  status: 'available' | 'in_use' | 'cooldown' | 'locked';
+  status: "available" | "in_use" | "cooldown" | "locked";
   cooldownUntil?: number;
   lastUsed?: number;
   lastError?: string;

@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { useI18n } from '@/lib/i18n/context'
+import { useI18n } from "@/lib/i18n/context";
 
 export function LanguageToggle() {
-  const { locale, setLocale } = useI18n()
+  const { locale, setLocale } = useI18n();
 
   const toggleLocale = () => {
-    setLocale(locale === 'ko' ? 'en' : 'ko')
-  }
+    setLocale(locale === "ko" ? "en" : "ko");
+  };
 
   return (
     <button
       onClick={toggleLocale}
       className="text-sm text-gray-500 hover:text-gray-700 active:scale-[0.97] transition-all duration-150 font-medium"
     >
-      {locale === 'ko' ? 'EN' : '한국어'}
+      {locale === "ko" ? "EN" : "한국어"}
     </button>
-  )
+  );
 }

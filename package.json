@@ -2,6 +2,13 @@
   "name": "loom-monorepo",
   "private": true,
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "sharp", "unrs-resolver"]
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.2"
   }
 }

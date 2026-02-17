@@ -1,12 +1,12 @@
-import { chromium } from 'playwright-extra';
-import { Browser, BrowserContext, Page } from 'playwright';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { chromium } from "playwright-extra";
+import { Browser, BrowserContext, Page } from "playwright";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import {
   ThreadsPost,
   ThreadsProfile,
   ScrapeResult,
   ScraperAccount,
-} from './types';
+} from "./types";
 
 chromium.use(StealthPlugin());
 
@@ -27,13 +27,19 @@ class ScraperWorker {
 
     if (!hasCookies && (!username || !password)) {
       throw new Error(
-        'Either THREADS_SESSION_COOKIES or both THREADS_USERNAME and THREADS_PASSWORD are required'
+        "Either THREADS_SESSION_COOKIES or both THREADS_USERNAME and THREADS_PASSWORD are required",
       );
     }
 
-    this.account = { id: 'default', username: username || '', password: password || '' };
+    this.account = {
+      id: "default",
+      username: username || "",
+      password: password || "",
+    };
     if (hasCookies) {
-      console.log('[SCRAPER] Session cookies configured (will skip login if valid)');
+      console.log(
+        "[SCRAPER] Session cookies configured (will skip login if valid)",
+      );
     }
     if (username) {
       console.log(`[SCRAPER] Loaded account: ${username}`);
@@ -43,14 +49,21 @@ class ScraperWorker {
   /**
    * Main entry point - queued scraping (one at a time)
    */
-  async scrapeProfile(targetUsername: string, limit: number = 50): Promise<ScrapeResult> {
+  async scrapeProfile(
+    targetUsername: string,
+    limit: number = 50,
+  ): Promise<ScrapeResult> {
     return new Promise<ScrapeResult>((resolve) => {
       this.taskChain = this.taskChain.then(async () => {
         const startTime = Date.now();
         console.log(`[SCRAPER] Using account: ${this.account.username}`);
 
         try {
-          const result = await this.doScrape(this.account, targetUsername, limit);
+          const result = await this.doScrape(
+            this.account,
+            targetUsername,
+            limit,
+          );
 
           resolve({
             success: true,
@@ -60,8 +73,11 @@ class ScraperWorker {
             duration: Date.now() - startTime,
           });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          console.log(`[SCRAPER] Error with account ${this.account.username}: ${errorMessage}`);
+          const errorMessage =
+            error instanceof Error ? error.message : "Unknown error";
+          console.log(
+            `[SCRAPER] Error with account ${this.account.username}: ${errorMessage}`,
+          );
 
           resolve({
             success: false,
@@ -82,16 +98,16 @@ class ScraperWorker {
       return this.browserInstance;
     }
 
-    const isDebug = process.env.SCRAPER_DEBUG === 'true';
+    const isDebug = process.env.SCRAPER_DEBUG === "true";
     console.log(`[SCRAPER] Launching browser... (debug: ${isDebug})`);
 
     this.browserInstance = await chromium.launch({
       headless: !isDebug,
       args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-blink-features=AutomationControlled',
-        '--disable-features=IsolateOrigins,site-per-process',
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-blink-features=AutomationControlled",
+        "--disable-features=IsolateOrigins,site-per-process",
       ],
     });
 
@@ -105,41 +121,43 @@ class ScraperWorker {
     const context = await browser.newContext({
       viewport: { width: 1920, height: 1080 },
       userAgent:
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       extraHTTPHeaders: {
-        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+        "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
         Accept:
-          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'none',
-        'Sec-Fetch-User': '?1',
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
       },
       ignoreHTTPSErrors: true,
     });
 
     // Add script to hide webdriver property
     await context.addInitScript(() => {
-      Object.defineProperty(navigator, 'webdriver', {
+      Object.defineProperty(navigator, "webdriver", {
         get: () => false,
       });
 
       // Override permissions
       const originalQuery = window.navigator.permissions.query;
       window.navigator.permissions.query = (parameters) =>
-        parameters.name === 'notifications'
-          ? Promise.resolve({ state: Notification.permission } as PermissionStatus)
+        parameters.name === "notifications"
+          ? Promise.resolve({
+              state: Notification.permission,
+            } as PermissionStatus)
           : originalQuery(parameters);
 
       // Mock plugins
-      Object.defineProperty(navigator, 'plugins', {
+      Object.defineProperty(navigator, "plugins", {
         get: () => [1, 2, 3, 4, 5],
       });
 
       // Mock languages
-      Object.defineProperty(navigator, 'languages', {
-        get: () => ['ko-KR', 'ko', 'en-US', 'en'],
+      Object.defineProperty(navigator, "languages", {
+        get: () => ["ko-KR", "ko", "en-US", "en"],
       });
     });
 
@@ -153,20 +171,22 @@ class ScraperWorker {
     try {
       const now = Date.now();
       if (now - this.lastLoginTime > SESSION_LIFETIME) {
-        console.log('[SCRAPER] Session expired (24h)');
+        console.log("[SCRAPER] Session expired (24h)");
         return false;
       }
 
       const cookies = await context.cookies();
       const hasThreadsSession = cookies.some(
         (cookie) =>
-          (cookie.name.includes('sessionid') || cookie.name.includes('ds_user_id')) &&
-          (cookie.domain.includes('threads.net') || cookie.domain.includes('threads.com'))
+          (cookie.name.includes("sessionid") ||
+            cookie.name.includes("ds_user_id")) &&
+          (cookie.domain.includes("threads.net") ||
+            cookie.domain.includes("threads.com")),
       );
 
       return hasThreadsSession;
     } catch (error) {
-      console.log('[SCRAPER] Error checking session validity:', error);
+      console.log("[SCRAPER] Error checking session validity:", error);
       return false;
     }
   }
@@ -174,15 +194,18 @@ class ScraperWorker {
   /**
    * Perform login to Threads
    */
-  private async loginToThreads(context: BrowserContext, account: ScraperAccount): Promise<void> {
-    const isDebug = process.env.SCRAPER_DEBUG === 'true';
+  private async loginToThreads(
+    context: BrowserContext,
+    account: ScraperAccount,
+  ): Promise<void> {
+    const isDebug = process.env.SCRAPER_DEBUG === "true";
     console.log(`[SCRAPER] Starting login for ${account.username}...`);
 
     const page = await context.newPage();
 
     // Set extra headers for the page
     await page.setExtraHTTPHeaders({
-      'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+      "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
     });
 
     // Remove webdriver property from page
@@ -192,19 +215,19 @@ class ScraperWorker {
     });
 
     // Intercept and modify network requests to add required headers
-    await page.route('**/*', async (route) => {
+    await page.route("**/*", async (route) => {
       const request = route.request();
       const headers = {
         ...request.headers(),
       };
 
       const cookies = await context.cookies();
-      const csrfCookie = cookies.find((c) => c.name === 'csrftoken');
-      if (csrfCookie && request.url().includes('/api/')) {
-        headers['X-CSRFToken'] = csrfCookie.value;
-        headers['X-Requested-With'] = 'XMLHttpRequest';
-        headers['X-IG-App-ID'] = '238260118697367';
-        headers['X-Instagram-AJAX'] = '1';
+      const csrfCookie = cookies.find((c) => c.name === "csrftoken");
+      if (csrfCookie && request.url().includes("/api/")) {
+        headers["X-CSRFToken"] = csrfCookie.value;
+        headers["X-Requested-With"] = "XMLHttpRequest";
+        headers["X-IG-App-ID"] = "238260118697367";
+        headers["X-Instagram-AJAX"] = "1";
       }
 
       await route.continue({ headers });
@@ -212,21 +235,26 @@ class ScraperWorker {
 
     try {
       // Navigate to Threads login
-      console.log('[SCRAPER] Navigating to Threads login...');
-      await page.goto('https://www.threads.net/login', {
-        waitUntil: 'networkidle',
+      console.log("[SCRAPER] Navigating to Threads login...");
+      await page.goto("https://www.threads.net/login", {
+        waitUntil: "networkidle",
         timeout: 30000,
       });
 
       await page.waitForTimeout(2000);
 
       if (isDebug) {
-        await page.screenshot({ path: '/tmp/debug-1-login-page.png', fullPage: true });
-        console.log('[DEBUG] Screenshot saved: /tmp/debug-1-login-page.png');
+        await page.screenshot({
+          path: "/tmp/debug-1-login-page.png",
+          fullPage: true,
+        });
+        console.log("[DEBUG] Screenshot saved: /tmp/debug-1-login-page.png");
       }
 
       // Wait for inputs to appear
-      await page.waitForSelector('input[type="text"], input[name="username"]', { timeout: 10000 });
+      await page.waitForSelector('input[type="text"], input[name="username"]', {
+        timeout: 10000,
+      });
 
       // Try to fill credentials using multiple methods
       let filled = false;
@@ -241,63 +269,72 @@ class ScraperWorker {
           (await passwordInput.isVisible({ timeout: 3000 }))
         ) {
           await usernameInput.fill(account.username);
-          console.log('[SCRAPER] ✓ Username filled');
+          console.log("[SCRAPER] ✓ Username filled");
           await page.waitForTimeout(500);
           await passwordInput.fill(account.password);
-          console.log('[SCRAPER] ✓ Password filled');
+          console.log("[SCRAPER] ✓ Password filled");
           filled = true;
         }
       } catch (e) {
-        console.log(`[SCRAPER] Method 1 failed: ${e instanceof Error ? e.message : 'Unknown'}`);
+        console.log(
+          `[SCRAPER] Method 1 failed: ${e instanceof Error ? e.message : "Unknown"}`,
+        );
       }
 
       // Method 2: Find by form inputs
       if (!filled) {
         try {
-          const form = page.locator('form').first();
-          const formInputs = await form.locator('input[type="text"], input[type="password"]').all();
+          const form = page.locator("form").first();
+          const formInputs = await form
+            .locator('input[type="text"], input[type="password"]')
+            .all();
           console.log(`[SCRAPER] Found ${formInputs.length} inputs in form`);
 
           if (formInputs.length >= 2) {
             await formInputs[0]!.fill(account.username);
-            console.log('[SCRAPER] ✓ Username filled (form input[0])');
+            console.log("[SCRAPER] ✓ Username filled (form input[0])");
             await page.waitForTimeout(500);
             await formInputs[1]!.fill(account.password);
-            console.log('[SCRAPER] ✓ Password filled (form input[1])');
+            console.log("[SCRAPER] ✓ Password filled (form input[1])");
             filled = true;
           }
         } catch (e) {
-          console.log(`[SCRAPER] Method 2 failed: ${e instanceof Error ? e.message : 'Unknown'}`);
+          console.log(
+            `[SCRAPER] Method 2 failed: ${e instanceof Error ? e.message : "Unknown"}`,
+          );
         }
       }
 
       if (!filled) {
-        throw new Error('Could not find or fill username/password inputs');
+        throw new Error("Could not find or fill username/password inputs");
       }
 
       if (isDebug) {
-        await page.screenshot({ path: '/tmp/debug-2-filled-form.png', fullPage: true });
-        console.log('[DEBUG] Screenshot saved: /tmp/debug-2-filled-form.png');
+        await page.screenshot({
+          path: "/tmp/debug-2-filled-form.png",
+          fullPage: true,
+        });
+        console.log("[DEBUG] Screenshot saved: /tmp/debug-2-filled-form.png");
       }
 
       // Wait before clicking login
       await page.waitForTimeout(2000);
 
       // Find and click login button
-      console.log('[SCRAPER] Looking for login button...');
+      console.log("[SCRAPER] Looking for login button...");
       let clicked = false;
 
       // Method 1: Form submit button
       try {
-        const form = page.locator('form').first();
+        const form = page.locator("form").first();
         const submitBtn = form.locator('button[type="submit"]').first();
         if (await submitBtn.isVisible({ timeout: 3000 })) {
           await submitBtn.click();
           clicked = true;
-          console.log('[SCRAPER] ✓ Clicked login button (form submit)');
+          console.log("[SCRAPER] ✓ Clicked login button (form submit)");
         }
       } catch (e) {
-        console.log('[SCRAPER] Form submit button not found');
+        console.log("[SCRAPER] Form submit button not found");
       }
 
       // Method 2: Text-based locator
@@ -305,64 +342,72 @@ class ScraperWorker {
         try {
           const loginButton = page
             .locator(
-              'button:has-text("로그인"), div[role="button"]:has-text("로그인"), button:has-text("Log in")'
+              'button:has-text("로그인"), div[role="button"]:has-text("로그인"), button:has-text("Log in")',
             )
             .first();
           if (await loginButton.isVisible({ timeout: 3000 })) {
             await loginButton.click();
             clicked = true;
-            console.log('[SCRAPER] ✓ Clicked login button (text-based)');
+            console.log("[SCRAPER] ✓ Clicked login button (text-based)");
           }
         } catch (e) {
-          console.log('[SCRAPER] Text-based button not found');
+          console.log("[SCRAPER] Text-based button not found");
         }
       }
 
       // Method 3: Press Enter
       if (!clicked) {
-        await page.locator('input[type="password"]').press('Enter');
+        await page.locator('input[type="password"]').press("Enter");
         clicked = true;
-        console.log('[SCRAPER] ✓ Pressed Enter on password field');
+        console.log("[SCRAPER] ✓ Pressed Enter on password field");
       }
 
       // Monitor for login API response
       let loginApiStatus: number | null = null;
       const responseHandler = (response: any) => {
         const url = response.url();
-        if (url.includes('/api/v1/web/accounts/login/ajax/')) {
+        if (url.includes("/api/v1/web/accounts/login/ajax/")) {
           loginApiStatus = response.status();
           console.log(`[SCRAPER] Login API response: ${loginApiStatus}`);
         }
       };
-      page.on('response', responseHandler);
+      page.on("response", responseHandler);
 
       // Wait for login request
       await page.waitForTimeout(3000);
 
       if (isDebug) {
-        await page.screenshot({ path: '/tmp/debug-3-after-login-click.png', fullPage: true });
-        console.log('[DEBUG] Screenshot saved: /tmp/debug-3-after-login-click.png');
+        await page.screenshot({
+          path: "/tmp/debug-3-after-login-click.png",
+          fullPage: true,
+        });
+        console.log(
+          "[DEBUG] Screenshot saved: /tmp/debug-3-after-login-click.png",
+        );
         console.log(`[DEBUG] Current URL: ${page.url()}`);
       }
 
-      page.off('response', responseHandler);
+      page.off("response", responseHandler);
 
       if (loginApiStatus !== null && loginApiStatus >= 400) {
-        console.log(`[SCRAPER] Login API returned ${loginApiStatus} - waiting for redirect to confirm...`);
+        console.log(
+          `[SCRAPER] Login API returned ${loginApiStatus} - waiting for redirect to confirm...`,
+        );
       }
 
       // Wait for redirect to Threads
-      console.log('[SCRAPER] Waiting for redirect to Threads...');
+      console.log("[SCRAPER] Waiting for redirect to Threads...");
       try {
         await page.waitForURL(
           (url) => {
             const urlString = url.toString();
             const isThreads =
-              urlString.includes('threads.net') || urlString.includes('threads.com');
-            const isNotLogin = !urlString.includes('/login');
+              urlString.includes("threads.net") ||
+              urlString.includes("threads.com");
+            const isNotLogin = !urlString.includes("/login");
             return isThreads && isNotLogin;
           },
-          { timeout: 15000 }
+          { timeout: 15000 },
         );
         console.log(`[SCRAPER] ✓ Redirected to: ${page.url()}`);
       } catch (e) {
@@ -370,35 +415,59 @@ class ScraperWorker {
         console.log(`[SCRAPER] Redirect timeout, current URL: ${currentUrl}`);
 
         // If login API succeeded but page didn't redirect, navigate manually
-        if (loginApiStatus === 200 && currentUrl.includes('/login')) {
-          console.log('[SCRAPER] Login API was 200 but no redirect - navigating manually...');
-          await page.goto('https://www.threads.com/', { waitUntil: 'domcontentloaded', timeout: 15000 });
+        if (loginApiStatus === 200 && currentUrl.includes("/login")) {
+          console.log(
+            "[SCRAPER] Login API was 200 but no redirect - navigating manually...",
+          );
+          await page.goto("https://www.threads.com/", {
+            waitUntil: "domcontentloaded",
+            timeout: 15000,
+          });
           console.log(`[SCRAPER] ✓ Manually navigated to: ${page.url()}`);
-        } else if (currentUrl.includes('/login')) {
+        } else if (currentUrl.includes("/login")) {
           if (isDebug) {
-            await page.screenshot({ path: '/tmp/debug-4-login-failed.png', fullPage: true });
-            console.log('[DEBUG] Screenshot saved: /tmp/debug-4-login-failed.png');
+            await page.screenshot({
+              path: "/tmp/debug-4-login-failed.png",
+              fullPage: true,
+            });
+            console.log(
+              "[DEBUG] Screenshot saved: /tmp/debug-4-login-failed.png",
+            );
           }
-          const apiInfo = loginApiStatus !== null ? ` (API status: ${loginApiStatus})` : '';
-          throw new Error(`Login failed - still on login page after timeout${apiInfo}. Check credentials.`);
+          const apiInfo =
+            loginApiStatus !== null ? ` (API status: ${loginApiStatus})` : "";
+          throw new Error(
+            `Login failed - still on login page after timeout${apiInfo}. Check credentials.`,
+          );
         }
       }
 
       // Detect challenge/verification redirect
       const postLoginUrl = page.url();
-      if (postLoginUrl.includes('challenge') || postLoginUrl.includes('/checkpoint')) {
+      if (
+        postLoginUrl.includes("challenge") ||
+        postLoginUrl.includes("/checkpoint")
+      ) {
         console.log(`[SCRAPER] Challenge/checkpoint detected: ${postLoginUrl}`);
         if (isDebug) {
-          await page.screenshot({ path: '/tmp/debug-4-challenge.png', fullPage: true });
-          console.log('[DEBUG] Screenshot saved: /tmp/debug-4-challenge.png');
+          await page.screenshot({
+            path: "/tmp/debug-4-challenge.png",
+            fullPage: true,
+          });
+          console.log("[DEBUG] Screenshot saved: /tmp/debug-4-challenge.png");
         }
-        throw new Error('Login failed - challenge/verification required. Account needs manual verification.');
+        throw new Error(
+          "Login failed - challenge/verification required. Account needs manual verification.",
+        );
       }
 
       // Handle "Save Login Info" page
       const saveLoginUrl = page.url();
-      if (saveLoginUrl.includes('onetap') || saveLoginUrl.includes('accounts/onetap')) {
-        console.log('[SCRAPER] Detected save login info page...');
+      if (
+        saveLoginUrl.includes("onetap") ||
+        saveLoginUrl.includes("accounts/onetap")
+      ) {
+        console.log("[SCRAPER] Detected save login info page...");
         try {
           const saveButton = page
             .locator('button:has-text("저장하기"), button:has-text("Save")')
@@ -408,28 +477,43 @@ class ScraperWorker {
             await page.waitForTimeout(2000);
           }
         } catch (e) {
-          console.log('[SCRAPER] Could not find save button, continuing...');
+          console.log("[SCRAPER] Could not find save button, continuing...");
         }
       }
 
       // Verify session cookies after login
       const postLoginCookies = await context.cookies();
       const relevantCookies = postLoginCookies.filter(
-        (c) => c.domain.includes('threads.net') || c.domain.includes('threads.com') || c.domain.includes('instagram.com')
+        (c) =>
+          c.domain.includes("threads.net") ||
+          c.domain.includes("threads.com") ||
+          c.domain.includes("instagram.com"),
       );
       const hasSessionCookie = relevantCookies.some(
-        (cookie) => cookie.name.includes('sessionid') || cookie.name.includes('ds_user_id')
+        (cookie) =>
+          cookie.name.includes("sessionid") ||
+          cookie.name.includes("ds_user_id"),
       );
 
-      console.log(`[SCRAPER] Post-login cookies (relevant): ${relevantCookies.map(c => `${c.name}@${c.domain}`).join(', ')}`);
+      console.log(
+        `[SCRAPER] Post-login cookies (relevant): ${relevantCookies.map((c) => `${c.name}@${c.domain}`).join(", ")}`,
+      );
 
       if (!hasSessionCookie) {
         // If redirected away from login successfully, treat as warning not error
         const finalUrl = page.url();
-        if (!finalUrl.includes('/login') && !finalUrl.includes('challenge') && !finalUrl.includes('checkpoint')) {
-          console.log('[SCRAPER] No session cookies found but redirect succeeded - proceeding cautiously');
+        if (
+          !finalUrl.includes("/login") &&
+          !finalUrl.includes("challenge") &&
+          !finalUrl.includes("checkpoint")
+        ) {
+          console.log(
+            "[SCRAPER] No session cookies found but redirect succeeded - proceeding cautiously",
+          );
         } else {
-          throw new Error('Login failed - no session cookies received and still on login/challenge page.');
+          throw new Error(
+            "Login failed - no session cookies received and still on login/challenge page.",
+          );
         }
       }
 
@@ -438,15 +522,17 @@ class ScraperWorker {
       if (exportedCookies) {
         // Update in-memory env var so session recreation uses fresh cookies
         process.env.THREADS_SESSION_COOKIES = exportedCookies;
-        console.log('[SCRAPER] === SESSION COOKIES (base64) ===');
+        console.log("[SCRAPER] === SESSION COOKIES (base64) ===");
         console.log(exportedCookies);
-        console.log('[SCRAPER] === END SESSION COOKIES ===');
-        console.log('[SCRAPER] Set THREADS_SESSION_COOKIES env var with the above value to skip login');
+        console.log("[SCRAPER] === END SESSION COOKIES ===");
+        console.log(
+          "[SCRAPER] Set THREADS_SESSION_COOKIES env var with the above value to skip login",
+        );
       }
 
       // Update last login time
       this.lastLoginTime = Date.now();
-      console.log('[SCRAPER] Login successful');
+      console.log("[SCRAPER] Login successful");
     } finally {
       await page.close();
     }
@@ -459,10 +545,10 @@ class ScraperWorker {
     if (this.contextInstance) {
       const isValid = await this.isSessionValidLocal(this.contextInstance);
       if (isValid) {
-        console.log('[SCRAPER] ♻️ Reusing existing session');
+        console.log("[SCRAPER] ♻️ Reusing existing session");
         return this.contextInstance;
       } else {
-        console.log('[SCRAPER] Session invalid, creating new one...');
+        console.log("[SCRAPER] Session invalid, creating new one...");
         try {
           await this.contextInstance.close();
         } catch (e) {
@@ -478,21 +564,28 @@ class ScraperWorker {
     // Try importing session cookies from environment variable
     const sessionCookiesEnv = process.env.THREADS_SESSION_COOKIES;
     if (sessionCookiesEnv) {
-      console.log('[SCRAPER] Found THREADS_SESSION_COOKIES, attempting cookie import...');
-      const isValid = await this.importSessionCookies(this.contextInstance, sessionCookiesEnv);
+      console.log(
+        "[SCRAPER] Found THREADS_SESSION_COOKIES, attempting cookie import...",
+      );
+      const isValid = await this.importSessionCookies(
+        this.contextInstance,
+        sessionCookiesEnv,
+      );
 
       if (isValid) {
-        console.log('[SCRAPER] Cookie import successful, skipping login');
+        console.log("[SCRAPER] Cookie import successful, skipping login");
         this.lastLoginTime = Date.now();
         return this.contextInstance;
       } else {
-        console.log('[SCRAPER] Imported cookies invalid, falling back to login...');
+        console.log(
+          "[SCRAPER] Imported cookies invalid, falling back to login...",
+        );
       }
     }
 
     if (!account.username || !account.password) {
       throw new Error(
-        'Session cookies invalid or missing, and no credentials configured. Set THREADS_USERNAME and THREADS_PASSWORD to login.'
+        "Session cookies invalid or missing, and no credentials configured. Set THREADS_USERNAME and THREADS_PASSWORD to login.",
       );
     }
 
@@ -507,14 +600,14 @@ class ScraperWorker {
   private async doScrape(
     account: ScraperAccount,
     targetUsername: string,
-    limit: number
+    limit: number,
   ): Promise<{ profile: ThreadsProfile; posts: ThreadsPost[] }> {
     const context = await this.getContext(account);
     const page = await context.newPage();
 
     // Set extra headers
     await page.setExtraHTTPHeaders({
-      'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+      "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
     });
 
     // Remove webdriver property
@@ -524,8 +617,8 @@ class ScraperWorker {
     });
 
     // Intercept requests: add auth headers + block unnecessary resources for speed
-    const BLOCKED_RESOURCE_TYPES = new Set(['image', 'media', 'font']);
-    await page.route('**/*', async (route) => {
+    const BLOCKED_RESOURCE_TYPES = new Set(["image", "media", "font"]);
+    await page.route("**/*", async (route) => {
       const request = route.request();
 
       // Block heavy resources we don't need (images, fonts, CSS)
@@ -537,12 +630,12 @@ class ScraperWorker {
       const headers = { ...request.headers() };
 
       const cookies = await context.cookies();
-      const csrfCookie = cookies.find((c) => c.name === 'csrftoken');
-      if (csrfCookie && request.url().includes('/api/')) {
-        headers['X-CSRFToken'] = csrfCookie.value;
-        headers['X-Requested-With'] = 'XMLHttpRequest';
-        headers['X-IG-App-ID'] = '238260118697367';
-        headers['X-Instagram-AJAX'] = '1';
+      const csrfCookie = cookies.find((c) => c.name === "csrftoken");
+      if (csrfCookie && request.url().includes("/api/")) {
+        headers["X-CSRFToken"] = csrfCookie.value;
+        headers["X-Requested-With"] = "XMLHttpRequest";
+        headers["X-IG-App-ID"] = "238260118697367";
+        headers["X-Instagram-AJAX"] = "1";
       }
 
       await route.continue({ headers });
@@ -578,14 +671,16 @@ class ScraperWorker {
       threadId?: string;
     }> = [];
 
-    page.on('response', async (response) => {
+    page.on("response", async (response) => {
       const url = response.url();
-      const isDebug = process.env.SCRAPER_DEBUG === 'true';
+      const isDebug = process.env.SCRAPER_DEBUG === "true";
 
       // Capture Threads GraphQL/API responses that may contain profile or post data
       if (
-        (url.includes('/api/graphql') || url.includes('/graphql/query') ||
-         url.includes('/api/v1/users/') || url.includes('web_profile_info')) &&
+        (url.includes("/api/graphql") ||
+          url.includes("/graphql/query") ||
+          url.includes("/api/v1/users/") ||
+          url.includes("web_profile_info")) &&
         response.status() === 200
       ) {
         if (isDebug) {
@@ -601,23 +696,37 @@ class ScraperWorker {
           // Try to extract profile data from the API response
           // Only update if the new extraction has MORE fields (don't let lightweight post-embedded
           // user nodes overwrite a previously extracted rich profile)
-          const extracted = this.extractProfileFromApiResponse(json, targetUsername);
+          const extracted = this.extractProfileFromApiResponse(
+            json,
+            targetUsername,
+          );
           if (extracted) {
-            const newFieldCount = Object.keys(extracted).filter(k => (extracted as any)[k] !== undefined).length;
+            const newFieldCount = Object.keys(extracted).filter(
+              (k) => (extracted as any)[k] !== undefined,
+            ).length;
             const existingFieldCount = apiProfile.data
-              ? Object.keys(apiProfile.data).filter(k => (apiProfile.data as any)[k] !== undefined).length
+              ? Object.keys(apiProfile.data).filter(
+                  (k) => (apiProfile.data as any)[k] !== undefined,
+                ).length
               : 0;
 
             if (newFieldCount > existingFieldCount) {
-              console.log(`[SCRAPER] Profile data extracted from API response (${newFieldCount} fields, prev ${existingFieldCount})`);
+              console.log(
+                `[SCRAPER] Profile data extracted from API response (${newFieldCount} fields, prev ${existingFieldCount})`,
+              );
               apiProfile.data = extracted;
             }
           }
 
           // Try to extract posts data from the API response
-          const extractedPosts = this.extractPostsFromApiResponse(json, targetUsername);
+          const extractedPosts = this.extractPostsFromApiResponse(
+            json,
+            targetUsername,
+          );
           if (extractedPosts && extractedPosts.length > 0) {
-            console.log(`[SCRAPER] Captured ${extractedPosts.length} posts from API response`);
+            console.log(
+              `[SCRAPER] Captured ${extractedPosts.length} posts from API response`,
+            );
             apiPosts.push(...extractedPosts);
           }
         } catch {
@@ -630,7 +739,7 @@ class ScraperWorker {
       // Navigate to profile (domcontentloaded is enough — SSR data is in the initial HTML)
       console.log(`[SCRAPER] Navigating to @${targetUsername} profile...`);
       await page.goto(`https://www.threads.com/@${targetUsername}`, {
-        waitUntil: 'domcontentloaded',
+        waitUntil: "domcontentloaded",
         timeout: 30000,
       });
 
@@ -640,28 +749,41 @@ class ScraperWorker {
       const pageCookies = await context.cookies();
       const hasSession = pageCookies.some(
         (c) =>
-          (c.name.includes('sessionid') || c.name.includes('ds_user_id')) &&
-          (c.domain.includes('threads.net') || c.domain.includes('threads.com') || c.domain.includes('instagram.com'))
+          (c.name.includes("sessionid") || c.name.includes("ds_user_id")) &&
+          (c.domain.includes("threads.net") ||
+            c.domain.includes("threads.com") ||
+            c.domain.includes("instagram.com")),
       );
       if (!hasSession) {
-        console.log('[SCRAPER] Session lost - no session cookies on profile page');
+        console.log(
+          "[SCRAPER] Session lost - no session cookies on profile page",
+        );
         // Invalidate session so next request re-logins
         this.lastLoginTime = 0;
         this.contextInstance = null;
-        try { await context.close(); } catch {}
-        throw new Error('Session expired during navigation. Will re-login on next request.');
+        try {
+          await context.close();
+        } catch {}
+        throw new Error(
+          "Session expired during navigation. Will re-login on next request.",
+        );
       }
 
       // Wait briefly for API responses if needed
       if (!apiProfile.data) {
-        console.log('[SCRAPER] Waiting for API profile data...');
+        console.log("[SCRAPER] Waiting for API profile data...");
         await page.waitForTimeout(1500);
       }
 
       // Fallback: extract rich profile data from SSR-embedded JSON in page scripts
       // (Threads embeds full profile data in <script> tags during SSR, which the API interceptor may miss)
-      if (!apiProfile.data?.bio && apiProfile.data?.followerCount === undefined) {
-        console.log('[SCRAPER] API profile incomplete, extracting from page embedded data...');
+      if (
+        !apiProfile.data?.bio &&
+        apiProfile.data?.followerCount === undefined
+      ) {
+        console.log(
+          "[SCRAPER] API profile incomplete, extracting from page embedded data...",
+        );
         try {
           // Use string-based evaluate to avoid TypeScript __name decorator issues
           const ssrProfile = (await page.evaluate(`
@@ -731,58 +853,75 @@ class ScraperWorker {
             full_name: string | null;
             is_verified: boolean | null;
             profile_pic_url: string | null;
-            hd_profile_pic_versions: Array<{ width: number; url: string }> | null;
+            hd_profile_pic_versions: Array<{
+              width: number;
+              url: string;
+            }> | null;
             bio_links: Array<{ url?: string; link?: string }> | null;
-            profile_tags: { edges: Array<{ node: { display_name?: string; name?: string } }> } | null;
+            profile_tags: {
+              edges: Array<{ node: { display_name?: string; name?: string } }>;
+            } | null;
             _keyCount: number;
           } | null;
 
           if (ssrProfile) {
-            console.log(`[SCRAPER] Found rich profile in page scripts (${ssrProfile._keyCount} keys)`);
+            console.log(
+              `[SCRAPER] Found rich profile in page scripts (${ssrProfile._keyCount} keys)`,
+            );
             const merged: typeof apiProfile.data = {
               ...apiProfile.data,
               displayName: ssrProfile.full_name || apiProfile.data?.displayName,
               bio: ssrProfile.biography || apiProfile.data?.bio,
-              followerCount: ssrProfile.follower_count ?? apiProfile.data?.followerCount,
+              followerCount:
+                ssrProfile.follower_count ?? apiProfile.data?.followerCount,
               isVerified: ssrProfile.is_verified ?? apiProfile.data?.isVerified,
-              profileImageUrl: ssrProfile.profile_pic_url || apiProfile.data?.profileImageUrl,
+              profileImageUrl:
+                ssrProfile.profile_pic_url || apiProfile.data?.profileImageUrl,
             };
 
             // HD profile image
-            if (Array.isArray(ssrProfile.hd_profile_pic_versions) && ssrProfile.hd_profile_pic_versions.length > 0) {
+            if (
+              Array.isArray(ssrProfile.hd_profile_pic_versions) &&
+              ssrProfile.hd_profile_pic_versions.length > 0
+            ) {
               const best = ssrProfile.hd_profile_pic_versions.reduce(
-                (a: any, b: any) => (b.width > a.width ? b : a)
+                (a: any, b: any) => (b.width > a.width ? b : a),
               );
               if (best?.url) merged.hdProfileImageUrl = best.url;
             }
 
             // Bio links
             if (Array.isArray(ssrProfile.bio_links)) {
-              const links = ssrProfile.bio_links.map((l: any) => l?.url || l?.link).filter((u: any) => typeof u === 'string');
+              const links = ssrProfile.bio_links
+                .map((l: any) => l?.url || l?.link)
+                .filter((u: any) => typeof u === "string");
               if (links.length > 0) merged.bioLinks = links;
             }
 
             // Profile tags
-            if (ssrProfile.profile_tags?.edges && Array.isArray(ssrProfile.profile_tags.edges)) {
+            if (
+              ssrProfile.profile_tags?.edges &&
+              Array.isArray(ssrProfile.profile_tags.edges)
+            ) {
               const tags = ssrProfile.profile_tags.edges
                 .map((e: any) => e?.node?.display_name || e?.node?.name)
-                .filter((t: any) => typeof t === 'string');
+                .filter((t: any) => typeof t === "string");
               if (tags.length > 0) merged.profileTags = tags;
             }
 
             apiProfile.data = merged;
           } else {
-            console.log('[SCRAPER] No rich profile found in page scripts');
+            console.log("[SCRAPER] No rich profile found in page scripts");
           }
         } catch (e) {
-          console.log('[SCRAPER] SSR profile extraction error:', e);
+          console.log("[SCRAPER] SSR profile extraction error:", e);
         }
       }
 
       // Fallback: extract initial posts from SSR-embedded JSON
       // (The most recent posts are rendered server-side and may not appear in API intercepts)
       {
-        const currentPostIds = new Set(apiPosts.map(p => p.id));
+        const currentPostIds = new Set(apiPosts.map((p) => p.id));
         try {
           const ssrPosts = (await page.evaluate(`
             (function() {
@@ -870,9 +1009,16 @@ class ScraperWorker {
               return posts;
             })()
           `)) as Array<{
-            id: string; code: string; username: string; content: string;
-            imageUrls: string[]; likeCount: number; replyCount: number;
-            repostCount: number; shareCount: number; postedAt: string;
+            id: string;
+            code: string;
+            username: string;
+            content: string;
+            imageUrls: string[];
+            likeCount: number;
+            replyCount: number;
+            repostCount: number;
+            shareCount: number;
+            postedAt: string;
             threadId?: string;
           }>;
 
@@ -885,11 +1031,13 @@ class ScraperWorker {
               }
             }
             if (newCount > 0) {
-              console.log(`[SCRAPER] Extracted ${newCount} additional posts from SSR (total SSR: ${ssrPosts.length})`);
+              console.log(
+                `[SCRAPER] Extracted ${newCount} additional posts from SSR (total SSR: ${ssrPosts.length})`,
+              );
             }
           }
         } catch (e) {
-          console.log('[SCRAPER] SSR post extraction error:', e);
+          console.log("[SCRAPER] SSR post extraction error:", e);
         }
       }
 
@@ -898,8 +1046,8 @@ class ScraperWorker {
       const profile: ThreadsProfile = {
         username: targetUsername,
         displayName: apiData?.displayName || targetUsername,
-        bio: apiData?.bio ?? '',
-        profileImageUrl: apiData?.profileImageUrl || '',
+        bio: apiData?.bio ?? "",
+        profileImageUrl: apiData?.profileImageUrl || "",
         hdProfileImageUrl: apiData?.hdProfileImageUrl,
         followerCount: apiData?.followerCount ?? 0,
         isVerified: apiData?.isVerified,
@@ -907,17 +1055,23 @@ class ScraperWorker {
         profileTags: apiData?.profileTags,
       };
 
-      console.log('[SCRAPER] Profile extracted (API):', {
+      console.log("[SCRAPER] Profile extracted (API):", {
         displayName: profile.displayName,
-        bio: profile.bio.substring(0, 50) + (profile.bio.length > 50 ? '...' : ''),
+        bio:
+          profile.bio.substring(0, 50) + (profile.bio.length > 50 ? "..." : ""),
         followerCount: profile.followerCount,
         isVerified: profile.isVerified,
         profileTags: profile.profileTags,
       });
 
       // Validate profile exists
-      if (profile.followerCount === undefined || (profile.followerCount === 0 && !apiData?.bio && !apiData?.isVerified)) {
-        throw new Error(`User @${targetUsername} not found or profile is private`);
+      if (
+        profile.followerCount === undefined ||
+        (profile.followerCount === 0 && !apiData?.bio && !apiData?.isVerified)
+      ) {
+        throw new Error(
+          `User @${targetUsername} not found or profile is private`,
+        );
       }
 
       // Scroll and collect posts via API interception
@@ -931,14 +1085,17 @@ class ScraperWorker {
       // Deduplicate helper
       const getUniqueApiPosts = () => {
         const seen = new Set<string>();
-        return apiPosts.filter(p => {
+        return apiPosts.filter((p) => {
           if (seen.has(p.id)) return false;
           seen.add(p.id);
           return true;
         });
       };
 
-      while (getUniqueApiPosts().length < limit && scrollAttempts < maxScrollAttempts) {
+      while (
+        getUniqueApiPosts().length < limit &&
+        scrollAttempts < maxScrollAttempts
+      ) {
         // Scroll down
         await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
         await page.waitForTimeout(1000);
@@ -947,7 +1104,9 @@ class ScraperWorker {
         const newHeight = await page.evaluate(() => document.body.scrollHeight);
 
         if (uniqueCount > lastApiPostCount) {
-          console.log(`[SCRAPER] Collected ${uniqueCount} unique posts from API so far...`);
+          console.log(
+            `[SCRAPER] Collected ${uniqueCount} unique posts from API so far...`,
+          );
           lastApiPostCount = uniqueCount;
           scrollAttempts = 0; // Reset on progress
         } else if (newHeight === lastHeight) {
@@ -959,35 +1118,45 @@ class ScraperWorker {
       // Build final posts array from API data
       // Sort by date descending BEFORE slicing so newest posts aren't cut off
       const uniqueApiPosts = getUniqueApiPosts();
-      uniqueApiPosts.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
-      let posts: ThreadsPost[] = uniqueApiPosts
-        .slice(0, limit)
-        .map(p => ({
-          id: p.id,
-          username: p.username,
-          content: p.content,
-          imageUrls: p.imageUrls,
-          likeCount: p.likeCount,
-          replyCount: p.replyCount,
-          repostCount: p.repostCount,
-          shareCount: p.shareCount,
-          postedAt: new Date(p.postedAt),
-          threadId: p.threadId,
-        }));
+      uniqueApiPosts.sort(
+        (a, b) =>
+          new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime(),
+      );
+      let posts: ThreadsPost[] = uniqueApiPosts.slice(0, limit).map((p) => ({
+        id: p.id,
+        username: p.username,
+        content: p.content,
+        imageUrls: p.imageUrls,
+        likeCount: p.likeCount,
+        replyCount: p.replyCount,
+        repostCount: p.repostCount,
+        shareCount: p.shareCount,
+        postedAt: new Date(p.postedAt),
+        threadId: p.threadId,
+      }));
 
       // Log thread detection
-      const threadGroups = new Set(posts.filter(p => p.threadId).map(p => p.threadId));
+      const threadGroups = new Set(
+        posts.filter((p) => p.threadId).map((p) => p.threadId),
+      );
       if (threadGroups.size > 0) {
-        const threadedPosts = posts.filter(p => p.threadId).length;
-        console.log(`[SCRAPER] Detected ${threadedPosts} posts in ${threadGroups.size} thread(s)`);
+        const threadedPosts = posts.filter((p) => p.threadId).length;
+        console.log(
+          `[SCRAPER] Detected ${threadedPosts} posts in ${threadGroups.size} thread(s)`,
+        );
       }
 
-      posts.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
+      posts.sort(
+        (a, b) =>
+          new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime(),
+      );
       console.log(`[SCRAPER] Successfully collected ${posts.length} posts`);
 
       // Validate minimum post count
       if (posts.length < 10) {
-        throw new Error(`User @${targetUsername} must have at least 10 posts (found ${posts.length})`);
+        throw new Error(
+          `User @${targetUsername} must have at least 10 posts (found ${posts.length})`,
+        );
       }
 
       return { profile, posts };
@@ -1003,7 +1172,7 @@ class ScraperWorker {
    */
   private extractPostsFromApiResponse(
     json: any,
-    targetUsername: string
+    targetUsername: string,
   ): Array<{
     id: string;
     code: string;
@@ -1042,7 +1211,7 @@ class ScraperWorker {
         if (Array.isArray(post.carousel_media)) {
           for (const media of post.carousel_media) {
             const url = media?.image_versions2?.candidates?.[0]?.url;
-            if (url && typeof url === 'string') {
+            if (url && typeof url === "string") {
               urls.push(url);
             }
           }
@@ -1051,7 +1220,7 @@ class ScraperWorker {
         // Fall back to single image
         if (urls.length === 0) {
           const url = post?.image_versions2?.candidates?.[0]?.url;
-          if (url && typeof url === 'string') {
+          if (url && typeof url === "string") {
             urls.push(url);
           }
         }
@@ -1062,7 +1231,7 @@ class ScraperWorker {
       // Extract a single post object into our result format
       const extractPost = (
         post: any,
-        threadId?: string
+        threadId?: string,
       ): {
         id: string;
         code: string;
@@ -1076,18 +1245,18 @@ class ScraperWorker {
         postedAt: string;
         threadId?: string;
       } | null => {
-        if (!post || typeof post !== 'object') return null;
+        if (!post || typeof post !== "object") return null;
 
         const username = post.user?.username;
         if (!username || username !== targetUsername) return null;
 
-        const id = String(post.pk ?? post.id ?? '');
+        const id = String(post.pk ?? post.id ?? "");
         if (!id) return null;
         if (seenIds.has(id)) return null;
         seenIds.add(id);
 
-        const code = post.code ?? '';
-        const content = post.caption?.text ?? '';
+        const code = post.code ?? "";
+        const content = post.caption?.text ?? "";
         const imageUrls = extractImageUrls(post);
         const likeCount = post.like_count ?? 0;
 
@@ -1098,9 +1267,9 @@ class ScraperWorker {
 
         const takenAt = post.taken_at;
         const postedAt =
-          typeof takenAt === 'number'
+          typeof takenAt === "number"
             ? new Date(takenAt * 1000).toISOString()
-            : '';
+            : "";
 
         const result: {
           id: string;
@@ -1136,7 +1305,7 @@ class ScraperWorker {
 
       // Recursively walk the JSON tree looking for thread_items arrays
       const findThreadNodes = (obj: any, depth: number = 0): void => {
-        if (depth > 15 || !obj || typeof obj !== 'object') return;
+        if (depth > 15 || !obj || typeof obj !== "object") return;
 
         // Check if this object has thread_items
         if (Array.isArray(obj.thread_items) && obj.thread_items.length > 0) {
@@ -1147,7 +1316,7 @@ class ScraperWorker {
           if (threadItems.length >= 2) {
             const firstPost = threadItems[0]?.post;
             if (firstPost) {
-              threadId = String(firstPost.pk ?? firstPost.id ?? '');
+              threadId = String(firstPost.pk ?? firstPost.id ?? "");
               if (!threadId) threadId = undefined;
             }
           }
@@ -1182,7 +1351,7 @@ class ScraperWorker {
       if (posts.length === 0) return null;
       return posts;
     } catch (e) {
-      console.log('[SCRAPER] Error parsing API posts data:', e);
+      console.log("[SCRAPER] Error parsing API posts data:", e);
       return null;
     }
   }
@@ -1192,8 +1361,17 @@ class ScraperWorker {
    */
   private extractProfileFromApiResponse(
     json: any,
-    targetUsername: string
-  ): { displayName?: string; bio?: string; followerCount?: number; isVerified?: boolean; profileImageUrl?: string; hdProfileImageUrl?: string; bioLinks?: string[]; profileTags?: string[] } | null {
+    targetUsername: string,
+  ): {
+    displayName?: string;
+    bio?: string;
+    followerCount?: number;
+    isVerified?: boolean;
+    profileImageUrl?: string;
+    hdProfileImageUrl?: string;
+    bioLinks?: string[];
+    profileTags?: string[];
+  } | null {
     try {
       const jsonStr = JSON.stringify(json);
 
@@ -1201,7 +1379,7 @@ class ScraperWorker {
       // (post-embedded user nodes are lightweight; the profile node has bio/follower data)
       const allUserNodes: any[] = [];
       const collectUserNodes = (obj: any, depth: number = 0): void => {
-        if (depth > 15 || !obj || typeof obj !== 'object') return;
+        if (depth > 15 || !obj || typeof obj !== "object") return;
 
         if (
           obj.username === targetUsername ||
@@ -1210,14 +1388,19 @@ class ScraperWorker {
           allUserNodes.push(obj);
         }
 
-        if (obj.user && typeof obj.user === 'object' && obj.user.username === targetUsername) {
+        if (
+          obj.user &&
+          typeof obj.user === "object" &&
+          obj.user.username === targetUsername
+        ) {
           allUserNodes.push(obj.user);
         }
 
         if (Array.isArray(obj)) {
           for (const item of obj) collectUserNodes(item, depth + 1);
         } else {
-          for (const key of Object.keys(obj)) collectUserNodes(obj[key], depth + 1);
+          for (const key of Object.keys(obj))
+            collectUserNodes(obj[key], depth + 1);
         }
       };
 
@@ -1226,13 +1409,15 @@ class ScraperWorker {
 
       // Pick the node with the most keys (most detailed profile data)
       const userData = allUserNodes.reduce((best, node) =>
-        Object.keys(node).length > Object.keys(best).length ? node : best
+        Object.keys(node).length > Object.keys(best).length ? node : best,
       );
 
-      const isDebug = process.env.SCRAPER_DEBUG === 'true';
+      const isDebug = process.env.SCRAPER_DEBUG === "true";
       if (isDebug) {
-        console.log(`[DEBUG] Found ${allUserNodes.length} user node(s), picked one with ${Object.keys(userData).length} keys`);
-        console.log(`[DEBUG] userData keys:`, Object.keys(userData).join(', '));
+        console.log(
+          `[DEBUG] Found ${allUserNodes.length} user node(s), picked one with ${Object.keys(userData).length} keys`,
+        );
+        console.log(`[DEBUG] userData keys:`, Object.keys(userData).join(", "));
       }
 
       const result: {
@@ -1247,16 +1432,23 @@ class ScraperWorker {
       } = {};
 
       // Extract display name
-      const name = userData.full_name || userData.fullName || userData.display_name || userData.displayName;
-      if (name && typeof name === 'string' && name.trim()) {
+      const name =
+        userData.full_name ||
+        userData.fullName ||
+        userData.display_name ||
+        userData.displayName;
+      if (name && typeof name === "string" && name.trim()) {
         result.displayName = name.trim();
       }
 
       // Extract bio
-      const bio = userData.biography || userData.bio || userData.bio_text ||
-                  userData.biography_with_entities?.raw_text ||
-                  userData.text_post_app_biography;
-      if (bio && typeof bio === 'string') {
+      const bio =
+        userData.biography ||
+        userData.bio ||
+        userData.bio_text ||
+        userData.biography_with_entities?.raw_text ||
+        userData.text_post_app_biography;
+      if (bio && typeof bio === "string") {
         result.bio = bio.trim();
       }
 
@@ -1268,13 +1460,13 @@ class ScraperWorker {
         userData.text_post_app_follower_count ??
         userData.edge_followed_by?.count ??
         userData.followers_count;
-      if (typeof followerCount === 'number' && followerCount >= 0) {
+      if (typeof followerCount === "number" && followerCount >= 0) {
         result.followerCount = followerCount;
       }
 
       // Extract verified status
       const isVerified = userData.is_verified ?? userData.isVerified;
-      if (typeof isVerified === 'boolean') {
+      if (typeof isVerified === "boolean") {
         result.isVerified = isVerified;
       }
 
@@ -1284,14 +1476,19 @@ class ScraperWorker {
         userData.profilePicUrl ||
         userData.hd_profile_pic_url_info?.url ||
         userData.profile_pic_url_hd;
-      if (profilePic && typeof profilePic === 'string') {
+      if (profilePic && typeof profilePic === "string") {
         result.profileImageUrl = profilePic;
       }
 
       // Extract HD profile image (highest resolution available)
-      if (Array.isArray(userData.hd_profile_pic_versions) && userData.hd_profile_pic_versions.length > 0) {
+      if (
+        Array.isArray(userData.hd_profile_pic_versions) &&
+        userData.hd_profile_pic_versions.length > 0
+      ) {
         const hdVersions = userData.hd_profile_pic_versions;
-        const best = hdVersions.reduce((a: any, b: any) => (b.width > a.width ? b : a));
+        const best = hdVersions.reduce((a: any, b: any) =>
+          b.width > a.width ? b : a,
+        );
         if (best?.url) {
           result.hdProfileImageUrl = best.url;
         }
@@ -1301,17 +1498,20 @@ class ScraperWorker {
       if (Array.isArray(userData.bio_links)) {
         const links = userData.bio_links
           .map((l: any) => l?.url || l?.link)
-          .filter((u: any) => typeof u === 'string');
+          .filter((u: any) => typeof u === "string");
         if (links.length > 0) {
           result.bioLinks = links;
         }
       }
 
       // Extract profile tags (topics/interests)
-      if (userData.profile_tags?.edges && Array.isArray(userData.profile_tags.edges)) {
+      if (
+        userData.profile_tags?.edges &&
+        Array.isArray(userData.profile_tags.edges)
+      ) {
         const tags = userData.profile_tags.edges
           .map((e: any) => e?.node?.display_name || e?.node?.name)
-          .filter((t: any) => typeof t === 'string');
+          .filter((t: any) => typeof t === "string");
         if (tags.length > 0) {
           result.profileTags = tags;
         }
@@ -1324,7 +1524,7 @@ class ScraperWorker {
 
       return null;
     } catch (e) {
-      console.log('[SCRAPER] Error parsing API profile data:', e);
+      console.log("[SCRAPER] Error parsing API profile data:", e);
       return null;
     }
   }
@@ -1340,9 +1540,9 @@ class ScraperWorker {
     try {
       const cookies = await this.contextInstance.cookies();
       const json = JSON.stringify(cookies);
-      return Buffer.from(json).toString('base64');
+      return Buffer.from(json).toString("base64");
     } catch (error) {
-      console.log('[SCRAPER] Error exporting cookies:', error);
+      console.log("[SCRAPER] Error exporting cookies:", error);
       return null;
     }
   }
@@ -1353,14 +1553,14 @@ class ScraperWorker {
    */
   private async importSessionCookies(
     context: BrowserContext,
-    base64Cookies: string
+    base64Cookies: string,
   ): Promise<boolean> {
     try {
-      const json = Buffer.from(base64Cookies, 'base64').toString('utf-8');
+      const json = Buffer.from(base64Cookies, "base64").toString("utf-8");
       const cookies = JSON.parse(json);
 
       if (!Array.isArray(cookies) || cookies.length === 0) {
-        console.log('[SCRAPER] Invalid cookie data: not an array or empty');
+        console.log("[SCRAPER] Invalid cookie data: not an array or empty");
         return false;
       }
 
@@ -1370,21 +1570,25 @@ class ScraperWorker {
       const imported = await context.cookies();
       const hasSession = imported.some(
         (c) =>
-          (c.name === 'sessionid' || c.name === 'ds_user_id') &&
-          (c.domain.includes('threads.net') ||
-            c.domain.includes('threads.com') ||
-            c.domain.includes('instagram.com'))
+          (c.name === "sessionid" || c.name === "ds_user_id") &&
+          (c.domain.includes("threads.net") ||
+            c.domain.includes("threads.com") ||
+            c.domain.includes("instagram.com")),
       );
 
       if (hasSession) {
-        console.log(`[SCRAPER] Imported ${cookies.length} cookies (session valid)`);
+        console.log(
+          `[SCRAPER] Imported ${cookies.length} cookies (session valid)`,
+        );
       } else {
-        console.log('[SCRAPER] Imported cookies but no valid session cookies found');
+        console.log(
+          "[SCRAPER] Imported cookies but no valid session cookies found",
+        );
       }
 
       return hasSession;
     } catch (error) {
-      console.log('[SCRAPER] Error importing cookies:', error);
+      console.log("[SCRAPER] Error importing cookies:", error);
       return false;
     }
   }

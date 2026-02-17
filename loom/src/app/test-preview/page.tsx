@@ -1,21 +1,22 @@
-'use client'
+"use client";
 
-import { Suspense } from 'react'
-import { CreateFlowProvider } from '@/components/create/CreateFlowProvider'
-import { useCreateFlow } from '@/components/create/CreateFlowContext'
-import { I18nProvider } from '@/lib/i18n/context'
-import dynamic from 'next/dynamic'
+import { Suspense } from "react";
+import { CreateFlowProvider } from "@/components/create/CreateFlowProvider";
+import { useCreateFlow } from "@/components/create/CreateFlowContext";
+import { I18nProvider } from "@/lib/i18n/context";
+import dynamic from "next/dynamic";
 
 const PageListViewer = dynamic(
-  () => import('@/components/ui/PageListViewer').then((mod) => mod.PageListViewer),
-  { ssr: false }
-)
+  () =>
+    import("@/components/ui/PageListViewer").then((mod) => mod.PageListViewer),
+  { ssr: false },
+);
 
 function PreviewPanel() {
   const {
     state: { measuring },
     meta: { pages, spreads, selectedCount, totalSpreads },
-  } = useCreateFlow()
+  } = useCreateFlow();
 
   return (
     <div className="h-screen flex flex-col">
@@ -28,10 +29,19 @@ function PreviewPanel() {
         data-selected={selectedCount}
         data-measuring={measuring}
       >
-        <span>Pages: <strong id="page-count">{pages.length}</strong></span>
-        <span>Spreads: <strong id="spread-count">{totalSpreads}</strong></span>
-        <span>Selected: <strong id="selected-count">{selectedCount}</strong></span>
-        <span>Measuring: <strong id="measuring-status">{measuring ? 'yes' : 'no'}</strong></span>
+        <span>
+          Pages: <strong id="page-count">{pages.length}</strong>
+        </span>
+        <span>
+          Spreads: <strong id="spread-count">{totalSpreads}</strong>
+        </span>
+        <span>
+          Selected: <strong id="selected-count">{selectedCount}</strong>
+        </span>
+        <span>
+          Measuring:{" "}
+          <strong id="measuring-status">{measuring ? "yes" : "no"}</strong>
+        </span>
       </div>
 
       {/* PageListViewer */}
@@ -39,7 +49,7 @@ function PreviewPanel() {
         <PageListViewer htmlPages={pages} width={700} />
       </div>
     </div>
-  )
+  );
 }
 
 export default function TestPreviewPage() {
@@ -51,5 +61,5 @@ export default function TestPreviewPage() {
         </CreateFlowProvider>
       </I18nProvider>
     </Suspense>
-  )
+  );
 }

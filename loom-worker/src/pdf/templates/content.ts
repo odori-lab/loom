@@ -1,21 +1,26 @@
-import { ThreadsProfile } from '@loom/shared'
-import { PostChunk, MergedPost } from '../layout'
-import { formatNumber, escapeHtml, formatDate } from '../utils'
-import { generateSubChapterTitle } from './chapter'
+import { ThreadsProfile } from "@loom/shared";
+import { PostChunk, MergedPost } from "../layout";
+import { formatNumber, escapeHtml, formatDate } from "../utils";
+import { generateSubChapterTitle } from "./chapter";
 
 // Generate content page from chunks (supports split posts)
-export function generateContentPageFromChunks(chunks: PostChunk[], profile: ThreadsProfile): string {
-  const chunksHtml = chunks.map(chunk => generateChunkHtml(chunk, profile)).join('')
+export function generateContentPageFromChunks(
+  chunks: PostChunk[],
+  profile: ThreadsProfile,
+): string {
+  const chunksHtml = chunks
+    .map((chunk) => generateChunkHtml(chunk, profile))
+    .join("");
 
   return `
     <div class="page">
       ${chunksHtml}
     </div>
-  `
+  `;
 }
 
 // Caption map type: postId -> caption (one caption per post)
-export type CaptionMap = Map<string, string>
+export type CaptionMap = Map<string, string>;
 
 // Generate essay-style sub-chapter page with merged posts and inline images
 export function generateEssaySubChapterPage(
@@ -24,94 +29,128 @@ export function generateEssaySubChapterPage(
   profile: ThreadsProfile,
   chapterIndex?: number,
   subIndex?: number,
-  captionMap?: CaptionMap
+  captionMap?: CaptionMap,
 ): string {
-  const titleHtml = generateSubChapterTitle(subChapterTitle, chapterIndex, subIndex)
-  const postsHtml = mergedPosts.map(post => generateMergedPostHtml(post, captionMap)).join('')
+  const titleHtml = generateSubChapterTitle(
+    subChapterTitle,
+    chapterIndex,
+    subIndex,
+  );
+  const postsHtml = mergedPosts
+    .map((post) => generateMergedPostHtml(post, captionMap))
+    .join("");
 
   return `
     <div class="page">
       ${titleHtml}
       ${postsHtml}
     </div>
-  `
+  `;
 }
 
 // Generate essay continuation page (no sub-chapter title, just posts)
-export function generateEssayContinuationPage(mergedPosts: MergedPost[], captionMap?: CaptionMap): string {
-  const postsHtml = mergedPosts.map(post => generateMergedPostHtml(post, captionMap)).join('')
+export function generateEssayContinuationPage(
+  mergedPosts: MergedPost[],
+  captionMap?: CaptionMap,
+): string {
+  const postsHtml = mergedPosts
+    .map((post) => generateMergedPostHtml(post, captionMap))
+    .join("");
 
   return `
     <div class="page">
       ${postsHtml}
     </div>
-  `
+  `;
 }
 
 // Generate HTML for a merged post with inline images between paragraphs
-function generateMergedPostHtml(post: MergedPost, captionMap?: CaptionMap): string {
-  const dateStr = formatDate(post.date)
+function generateMergedPostHtml(
+  post: MergedPost,
+  captionMap?: CaptionMap,
+): string {
+  const dateStr = formatDate(post.date);
 
   // Header: date + likes (hide like count if 0)
-  const likesStr = post.likeCount > 0 ? ` &middot; &#9829; ${formatNumber(post.likeCount)}` : ''
-  const headerHtml = `<div class="essay-post-header">${dateStr}${likesStr}</div>`
+  const likesStr =
+    post.likeCount > 0
+      ? ` &middot; &#9829; ${formatNumber(post.likeCount)}`
+      : "";
+  const headerHtml = `<div class="essay-post-header">${dateStr}${likesStr}</div>`;
 
   // Find caption for this post (one caption per post, covering all images)
-  let caption: string | undefined
+  let caption: string | undefined;
   if (captionMap && post.postIds) {
     for (const postId of post.postIds) {
-      const found = captionMap.get(postId)
-      if (found) { caption = found; break }
+      const found = captionMap.get(postId);
+      if (found) {
+        caption = found;
+        break;
+      }
     }
   }
 
   // Split content into paragraphs and interleave images
-  const contentHtml = generateInlineContent(post.content, post.imageUrls, caption)
+  const contentHtml = generateInlineContent(
+    post.content,
+    post.imageUrls,
+    caption,
+  );
 
   return `
     <div class="essay-post">
       ${headerHtml}
       ${contentHtml}
     </div>
-  `
+  `;
 }
 
 // Render all images for a post as a horizontal row, with optional single caption
 function renderImagesHtml(imageUrls: string[], caption?: string): string {
-  const imgsHtml = imageUrls.map(url => `<img src="${url}" alt="" class="essay-inline-image" />`).join('')
-  const captionHtml = caption ? `<figcaption class="essay-image-caption">${escapeHtml(caption)}</figcaption>` : ''
-  return `<figure class="essay-figure"><div class="essay-image-row">${imgsHtml}</div>${captionHtml}</figure>`
+  const imgsHtml = imageUrls
+    .map((url) => `<img src="${url}" alt="" class="essay-inline-image" />`)
+    .join("");
+  const captionHtml = caption
+    ? `<figcaption class="essay-image-caption">${escapeHtml(caption)}</figcaption>`
+    : "";
+  return `<figure class="essay-figure"><div class="essay-image-row">${imgsHtml}</div>${captionHtml}</figure>`;
 }
 
 // Generate content with images inline between paragraphs
-function generateInlineContent(content: string, imageUrls: string[], caption?: string): string {
+function generateInlineContent(
+  content: string,
+  imageUrls: string[],
+  caption?: string,
+): string {
   if (imageUrls.length === 0) {
-    return `<div class="essay-post-text">${escapeHtml(content)}</div>`
+    return `<div class="essay-post-text">${escapeHtml(content)}</div>`;
   }
 
-  const paragraphs = content.split('\n\n')
+  const paragraphs = content.split("\n\n");
 
   if (paragraphs.length <= 1) {
     // Single paragraph: text then all images in a row
-    return `<div class="essay-post-text">${escapeHtml(content)}</div>${renderImagesHtml(imageUrls, caption)}`
+    return `<div class="essay-post-text">${escapeHtml(content)}</div>${renderImagesHtml(imageUrls, caption)}`;
   }
 
   // Multiple paragraphs: place all images after the first paragraph
-  const result: string[] = []
+  const result: string[] = [];
   for (let i = 0; i < paragraphs.length; i++) {
-    result.push(`<div class="essay-post-text">${escapeHtml(paragraphs[i]!)}</div>`)
+    result.push(
+      `<div class="essay-post-text">${escapeHtml(paragraphs[i]!)}</div>`,
+    );
     if (i === 0) {
-      result.push(renderImagesHtml(imageUrls, caption))
+      result.push(renderImagesHtml(imageUrls, caption));
     }
   }
 
-  return result.join('')
+  return result.join("");
 }
 
 // Generate thread indicator HTML
 function generateThreadIndicator(chunk: PostChunk): string {
   if (!chunk.threadPosition || !chunk.threadTotal || chunk.threadTotal <= 1) {
-    return ''
+    return "";
   }
 
   // Reply arrow icon
@@ -123,30 +162,32 @@ function generateThreadIndicator(chunk: PostChunk): string {
       </svg>
       ${chunk.threadPosition}/${chunk.threadTotal}
     </span>
-  `
+  `;
 }
 
 // Generate HTML for a post chunk (possibly partial) - Threads-style layout
 function generateChunkHtml(chunk: PostChunk, profile: ThreadsProfile): string {
-  const { post, contentStart, contentEnd, showHeader, showStats, showImages } = chunk
+  const { post, contentStart, contentEnd, showHeader, showStats, showImages } =
+    chunk;
 
   const avatar = profile.profileImageUrl
     ? `<img src="${profile.profileImageUrl}" alt="" class="post-avatar" />`
-    : `<div class="post-avatar-placeholder"><span>${post.username[0]!.toUpperCase()}</span></div>`
+    : `<div class="post-avatar-placeholder"><span>${post.username[0]!.toUpperCase()}</span></div>`;
 
-  const dateStr = formatDate(new Date(post.postedAt))
+  const dateStr = formatDate(new Date(post.postedAt));
 
   // Get the content slice for this chunk
-  const chunkContent = post.content.slice(contentStart, contentEnd)
+  const chunkContent = post.content.slice(contentStart, contentEnd);
 
   // Add "continues on next page" indicator if crossing spread boundary
   const continuesIndicator = chunk.showContinues
     ? '<div class="post-continues">(continues...)</div>'
-    : ''
+    : "";
 
-  const imagesHtml = showImages && post.imageUrls.length > 0
-    ? `<div class="post-images">${post.imageUrls.map(url => `<img src="${url}" alt="" class="post-image" />`).join('')}</div>`
-    : ''
+  const imagesHtml =
+    showImages && post.imageUrls.length > 0
+      ? `<div class="post-images">${post.imageUrls.map((url) => `<img src="${url}" alt="" class="post-image" />`).join("")}</div>`
+      : "";
 
   // Stats without wrapper if showing continues indicator
   const statsContent = `
@@ -161,14 +202,14 @@ function generateChunkHtml(chunk: PostChunk, profile: ThreadsProfile): string {
         <svg viewBox="0 0 18 18" class="post-stat-icon post-stat-reply">
           <path d="M15.376 13.2177L16.2861 16.7955L12.7106 15.8848C12.6781 15.8848 12.6131 15.8848 12.5806 15.8848C11.3779 16.5678 9.94767 16.8931 8.41995 16.7955C4.94194 16.5353 2.08152 13.7381 1.72397 10.2578C1.2689 5.63919 5.13697 1.76863 9.75264 2.22399C13.2307 2.58177 16.0261 5.41151 16.2861 8.92429C16.4161 10.453 16.0586 11.8841 15.376 13.0876C15.376 13.1526 15.376 13.1852 15.376 13.2177Z" stroke-linejoin="round" stroke-width="1.25"></path>
         </svg>
-        ${post.replyCount > 0 ? `<span class="post-stat-count">${formatNumber(post.replyCount)}</span>` : ''}
+        ${post.replyCount > 0 ? `<span class="post-stat-count">${formatNumber(post.replyCount)}</span>` : ""}
       </span>
       <span class="post-stat">
         <svg viewBox="0 0 18 18" class="post-stat-icon post-stat-repost">
           <path d="M6.41256 1.23531C6.6349 0.971277 7.02918 0.937481 7.29321 1.15982L9.96509 3.40982C10.1022 3.52528 10.1831 3.69404 10.1873 3.87324C10.1915 4.05243 10.1186 4.2248 9.98706 4.34656L7.31518 6.81971C7.06186 7.05419 6.66643 7.03892 6.43196 6.7856C6.19748 6.53228 6.21275 6.13685 6.46607 5.90237L7.9672 4.51289H5.20312C3.68434 4.51289 2.45312 5.74411 2.45312 7.26289V9.51289V11.7629C2.45312 13.2817 3.68434 14.5129 5.20312 14.5129C5.5483 14.5129 5.82812 14.7927 5.82812 15.1379C5.82812 15.4831 5.5483 15.7629 5.20312 15.7629C2.99399 15.7629 1.20312 13.972 1.20312 11.7629V9.51289V7.26289C1.20312 5.05375 2.99399 3.26289 5.20312 3.26289H7.85002L6.48804 2.11596C6.22401 1.89362 6.19021 1.49934 6.41256 1.23531Z"></path>
           <path d="M11.5874 17.7904C11.3651 18.0545 10.9708 18.0883 10.7068 17.8659L8.03491 15.6159C7.89781 15.5005 7.81687 15.3317 7.81267 15.1525C7.80847 14.9733 7.8814 14.801 8.01294 14.6792L10.6848 12.206C10.9381 11.9716 11.3336 11.9868 11.568 12.2402C11.8025 12.4935 11.7872 12.8889 11.5339 13.1234L10.0328 14.5129H12.7969C14.3157 14.5129 15.5469 13.2816 15.5469 11.7629V9.51286V7.26286C15.5469 5.74408 14.3157 4.51286 12.7969 4.51286C12.4517 4.51286 12.1719 4.23304 12.1719 3.88786C12.1719 3.54269 12.4517 3.26286 12.7969 3.26286C15.006 3.26286 16.7969 5.05373 16.7969 7.26286V9.51286V11.7629C16.7969 13.972 15.006 15.7629 12.7969 15.7629H10.15L11.512 16.9098C11.776 17.1321 11.8098 17.5264 11.5874 17.7904Z"></path>
         </svg>
-        ${post.repostCount > 0 ? `<span class="post-stat-count">${formatNumber(post.repostCount)}</span>` : ''}
+        ${post.repostCount > 0 ? `<span class="post-stat-count">${formatNumber(post.repostCount)}</span>` : ""}
       </span>
       <span class="post-stat">
         <svg viewBox="0 0 18 18" class="post-stat-icon post-stat-share">
@@ -177,18 +218,19 @@ function generateChunkHtml(chunk: PostChunk, profile: ThreadsProfile): string {
         </svg>
       </span>
     </div>
-  `
+  `;
 
-  const statsHtml = showStats ? statsContent : continuesIndicator
+  const statsHtml = showStats ? statsContent : continuesIndicator;
 
   // Thread indicator for self-reply chains
-  const threadIndicatorHtml = generateThreadIndicator(chunk)
+  const threadIndicatorHtml = generateThreadIndicator(chunk);
 
   // Determine if post is part of a thread (not the first post in the thread)
-  const isThreadReply = chunk.threadPosition && chunk.threadPosition > 1
+  const isThreadReply = chunk.threadPosition && chunk.threadPosition > 1;
 
   // Threads-style layout: header row (grid) + content (full width)
-  const headerRowHtml = showHeader ? `
+  const headerRowHtml = showHeader
+    ? `
     <div class="post-row-header">
       <div class="post-avatar-cell">${avatar}</div>
       <div class="post-header">
@@ -197,15 +239,20 @@ function generateChunkHtml(chunk: PostChunk, profile: ThreadsProfile): string {
         ${threadIndicatorHtml}
       </div>
     </div>
-  ` : (chunk.showContinued ? '<div class="post-continuation">(...continued)</div>' : '')
+  `
+    : chunk.showContinued
+      ? '<div class="post-continuation">(...continued)</div>'
+      : "";
 
   // Build CSS classes
   const postClasses = [
-    'post',
-    !chunk.isFirstChunk ? 'post-continuation-chunk' : '',
-    !chunk.isLastChunk ? 'post-continues-chunk' : '',
-    isThreadReply ? 'post-threaded' : ''
-  ].filter(Boolean).join(' ')
+    "post",
+    !chunk.isFirstChunk ? "post-continuation-chunk" : "",
+    !chunk.isLastChunk ? "post-continues-chunk" : "",
+    isThreadReply ? "post-threaded" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return `
     <div class="${postClasses}">
@@ -214,5 +261,5 @@ function generateChunkHtml(chunk: PostChunk, profile: ThreadsProfile): string {
       ${imagesHtml}
       ${statsHtml}
     </div>
-  `
+  `;
 }

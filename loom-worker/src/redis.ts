@@ -1,7 +1,7 @@
-import Redis from 'ioredis';
+import Redis from "ioredis";
 
 const redisUrl = process.env.REDIS_URL;
-const useInMemory = process.env.USE_IN_MEMORY_STORE === 'true' || !redisUrl;
+const useInMemory = process.env.USE_IN_MEMORY_STORE === "true" || !redisUrl;
 
 // In-memory fallback for local testing
 class InMemoryStore {
@@ -17,20 +17,20 @@ class InMemoryStore {
     return item.value;
   }
 
-  async set(key: string, value: string, ...args: unknown[]): Promise<'OK'> {
+  async set(key: string, value: string, ...args: unknown[]): Promise<"OK"> {
     let expireAt: number | undefined;
     // Handle EX option (seconds)
-    const exIndex = args.indexOf('EX');
-    if (exIndex !== -1 && typeof args[exIndex + 1] === 'number') {
+    const exIndex = args.indexOf("EX");
+    if (exIndex !== -1 && typeof args[exIndex + 1] === "number") {
       expireAt = Date.now() + (args[exIndex + 1] as number) * 1000;
     }
     this.store.set(key, { value, expireAt });
-    return 'OK';
+    return "OK";
   }
 
-  async setex(key: string, seconds: number, value: string): Promise<'OK'> {
+  async setex(key: string, seconds: number, value: string): Promise<"OK"> {
     this.store.set(key, { value, expireAt: Date.now() + seconds * 1000 });
-    return 'OK';
+    return "OK";
   }
 
   async del(key: string): Promise<number> {
@@ -54,7 +54,7 @@ type RedisLike = Redis | InMemoryStore;
 let redis: RedisLike;
 
 if (useInMemory) {
-  console.log('[REDIS] Using in-memory store (local testing mode)');
+  console.log("[REDIS] Using in-memory store (local testing mode)");
   redis = new InMemoryStore();
 } else {
   redis = new Redis(redisUrl!, {
@@ -62,12 +62,12 @@ if (useInMemory) {
     retryStrategy: (times) => Math.min(times * 100, 3000),
   });
 
-  redis.on('error', (err) => {
-    console.error('Redis connection error:', err);
+  redis.on("error", (err) => {
+    console.error("Redis connection error:", err);
   });
 
-  redis.on('connect', () => {
-    console.log('Connected to Redis');
+  redis.on("connect", () => {
+    console.log("Connected to Redis");
   });
 }
 
