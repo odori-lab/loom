@@ -15,7 +15,7 @@ const PageListViewer = dynamic(
 function PreviewPanel() {
   const {
     state: { measuring },
-    meta: { pages, spreads, selectedCount, totalSpreads },
+    meta: { pages, selectedCount, totalSpreads },
   } = useCreateFlow();
 
   return (

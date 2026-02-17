@@ -1,16 +1,16 @@
 "use client";
 
-import { useResizable } from "@/hooks/useResizable";
-import { User } from "@supabase/supabase-js";
 import { Database } from "@loom/shared";
-import { DashboardProvider, useDashboard } from "./DashboardContext";
-import { Sidebar } from "./Sidebar";
-import { LoomsTab } from "./LoomsTab";
-import { LoomPreviewPanel } from "./LoomPreviewPanel";
-import { CreateTabContent, CreateTabRightPanel } from "./CreateTab";
-import { SettingTab } from "./SettingTab";
-import { CreateFlowProvider } from "@/components/create/CreateFlowProvider";
+import { User } from "@supabase/supabase-js";
 import dynamic from "next/dynamic";
+import { CreateFlowProvider } from "@/components/create/CreateFlowProvider";
+import { useResizable } from "@/hooks/useResizable";
+import { CreateTabContent, CreateTabRightPanel } from "./CreateTab";
+import { DashboardProvider, useDashboard } from "./DashboardContext";
+import { LoomPreviewPanel } from "./LoomPreviewPanel";
+import { LoomsTab } from "./LoomsTab";
+import { SettingTab } from "./SettingTab";
+import { Sidebar } from "./Sidebar";
 
 const PreviewModal = dynamic(
   () => import("./PreviewModal").then((mod) => mod.PreviewModal),

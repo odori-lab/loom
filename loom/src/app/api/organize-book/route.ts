@@ -128,10 +128,11 @@ ${JSON.stringify(postData, null, 2)}
     }
 
     return NextResponse.json(bookStructure);
-  } catch (error: any) {
+  } catch (error) {
     console.error("[ORGANIZE_BOOK_ERROR]", error);
+    const message = error instanceof Error ? error.message : "Failed to organize book";
     return NextResponse.json(
-      { error: error.message || "Failed to organize book" },
+      { error: message },
       { status: 500 },
     );
   }

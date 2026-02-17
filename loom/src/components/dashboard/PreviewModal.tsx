@@ -107,7 +107,6 @@ function HtmlSpreadViewer({
   pages: StoredPage[];
   initialPage?: number | null;
 }) {
-  const { t } = useI18n();
   const numPages = pages.length;
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -319,6 +318,7 @@ export function PreviewModal() {
             {selectedLoom ? (
               <>
                 {profileImageUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={`/api/proxy-image?url=${encodeURIComponent(profileImageUrl)}`}
                     alt=""

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuth, AuthError } from "@/lib/api/auth";
 import { parseLoomInput, ValidationError } from "@/lib/api/validation";
 import { getSignedDownloadUrl } from "@/lib/api/storage";
-import { CoverData, StoredPage } from "@loom/shared";
+import { CoverData, StoredPage, Database, Json } from "@loom/shared";
 
 // GET /api/looms - List user's looms
 export async function GET() {
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
       followerCount: profile.followerCount,
     };
 
-    const loomData = {
+    const loomData: Database["public"]["Tables"]["looms"]["Insert"] = {
       id: loomId,
       user_id: user.id,
       thread_username: profile.username,
@@ -103,14 +103,16 @@ export async function POST(request: Request) {
       post_count: posts.length,
       pdf_path: pdfPath,
       pages_path: pagesPath,
-      cover_data: coverData as any,
+      cover_data: coverData as unknown as Json,
     };
 
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     const { data: loom, error: insertError } = await supabase
       .from("looms")
       .insert(loomData as any)
       .select()
       .single();
+    /* eslint-enable @typescript-eslint/no-explicit-any */
 
     if (insertError) {
       console.error(

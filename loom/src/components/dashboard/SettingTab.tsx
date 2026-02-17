@@ -37,6 +37,7 @@ export function SettingTab({ user }: SettingTabProps) {
             {/* Profile */}
             <div className="flex items-center gap-4 p-4">
               {user.user_metadata.avatar_url ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={user.user_metadata.avatar_url}
                   alt=""

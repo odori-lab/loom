@@ -21,13 +21,13 @@ export function TOCSidebar({ className }: TOCSidebarProps) {
   } = useCreateFlow();
   const { t } = useI18n();
 
+  const postMap = useMemo(() => new Map(posts.map((p) => [p.id, p])), [posts]);
+
   if (!profile) return null;
 
   const totalSubChapters = bookStructure
     ? bookStructure.chapters.reduce((sum, ch) => sum + ch.subChapters.length, 0)
     : 0;
-
-  const postMap = useMemo(() => new Map(posts.map((p) => [p.id, p])), [posts]);
 
   const handleNavigate = (blockId: string) => {
     const spreadIdx = blockToSpread.get(blockId);
@@ -47,6 +47,7 @@ export function TOCSidebar({ className }: TOCSidebarProps) {
       <div className="px-4 py-3 border-b border-gray-100">
         <div className="flex items-center gap-2 mb-2">
           {profile.profileImageUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={proxyImageUrl(profile.profileImageUrl)}
               alt=""
