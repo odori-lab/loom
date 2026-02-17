@@ -1,53 +1,67 @@
-'use client'
+"use client";
 
-import { useCreateFlow } from '@/components/create/CreateFlowContext'
-import { useDashboard } from './DashboardContext'
-import { LoomPreviewPanel } from './LoomPreviewPanel'
-import { ProgressIndicator } from '@/components/create/ProgressIndicator'
-import { ErrorBanner } from '@/components/create/ErrorBanner'
-import { UsernameStep } from '@/components/create/UsernameStep'
-import { TOCSidebar } from '@/components/create/TOCSidebar'
-import { CompleteStep } from '@/components/create/CompleteStep'
-import dynamic from 'next/dynamic'
+import { useCreateFlow } from "@/components/create/CreateFlowContext";
+import { useDashboard } from "./DashboardContext";
+import { LoomPreviewPanel } from "./LoomPreviewPanel";
+import { ProgressIndicator } from "@/components/create/ProgressIndicator";
+import { ErrorBanner } from "@/components/create/ErrorBanner";
+import { UsernameStep } from "@/components/create/UsernameStep";
+import { TOCSidebar } from "@/components/create/TOCSidebar";
+import { CompleteStep } from "@/components/create/CompleteStep";
+import dynamic from "next/dynamic";
 
 const PageListViewer = dynamic(
-  () => import('@/components/ui/PageListViewer').then((mod) => mod.PageListViewer),
-  { ssr: false }
-)
+  () =>
+    import("@/components/ui/PageListViewer").then((mod) => mod.PageListViewer),
+  { ssr: false },
+);
 
 export function CreateTabContent() {
-  const { state: { step, profile } } = useCreateFlow()
-  const { setActiveTab } = useDashboard()
+  const {
+    state: { step, profile },
+  } = useCreateFlow();
+  const { setActiveTab } = useDashboard();
 
-  if (step === 'organize' && profile) {
+  if (step === "organize" && profile) {
     return (
       <TOCSidebar className="flex-1 flex flex-col bg-white overflow-hidden" />
-    )
+    );
   }
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center" style={{ animation: 'fadeIn 0.3s ease-out both' }}>
+    <div
+      className="flex-1 flex flex-col items-center justify-center"
+      style={{ animation: "fadeIn 0.3s ease-out both" }}
+    >
       <div className="w-full max-w-3xl mx-auto px-6" key={step}>
-        <div className="flex items-center justify-center mb-16" style={{ animation: 'fadeInUp 0.5s ease-out both' }}>
+        <div
+          className="flex items-center justify-center mb-16"
+          style={{ animation: "fadeInUp 0.5s ease-out both" }}
+        >
           <ProgressIndicator />
         </div>
 
         <ErrorBanner className="mb-8" />
 
-        {step === 'username' && <UsernameStep />}
-        {step === 'complete' && <CompleteStep onViewLooms={() => setActiveTab('looms')} />}
+        {step === "username" && <UsernameStep />}
+        {step === "complete" && (
+          <CompleteStep onViewLooms={() => setActiveTab("looms")} />
+        )}
       </div>
     </div>
-  )
+  );
 }
 
 export function CreateTabRightPanel({ width }: { width?: number }) {
-  const { state: { step, profile, downloadUrl }, meta: { pages } } = useCreateFlow()
-  const { openPreviewModalWithUrl } = useDashboard()
+  const {
+    state: { step, profile, downloadUrl },
+    meta: { pages },
+  } = useCreateFlow();
+  const { openPreviewModalWithUrl } = useDashboard();
 
-  const showPanel = (step === 'organize' || step === 'complete') && profile
+  const showPanel = (step === "organize" || step === "complete") && profile;
 
-  if (!showPanel) return null
+  if (!showPanel) return null;
 
   // After PDF generation: show actual PDF in LoomPreviewPanel
   if (downloadUrl) {
@@ -58,16 +72,13 @@ export function CreateTabRightPanel({ width }: { width?: number }) {
         previewUrl={downloadUrl}
         onPageClick={() => openPreviewModalWithUrl(downloadUrl)}
       />
-    )
+    );
   }
 
   // During organize: show HTML pages in PageListViewer inside LoomPreviewPanel shell
   return (
     <LoomPreviewPanel width={width} active={true}>
-      <PageListViewer
-        htmlPages={pages}
-        width={width}
-      />
+      <PageListViewer htmlPages={pages} width={width} />
     </LoomPreviewPanel>
-  )
+  );
 }

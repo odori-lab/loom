@@ -378,4 +378,4 @@ export const PDF_STYLES = `
     font-size: 8pt;
     color: #999;
   }
-`
+`;

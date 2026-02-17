@@ -1,35 +1,42 @@
-import { BookStructure } from '@loom/shared'
-import { escapeHtml } from '@/lib/utils/format'
-import { PageMapping } from '../measure'
+import { BookStructure } from "@loom/shared";
+import { escapeHtml } from "@/lib/utils/format";
+import { PageMapping } from "../measure";
 
-export function generateTocPage(bookStructure: BookStructure, pageMapping?: PageMapping): string {
+export function generateTocPage(
+  bookStructure: BookStructure,
+  pageMapping?: PageMapping,
+): string {
   const chaptersHtml = bookStructure.chapters
     .map((chapter, index) => {
-      const chapterNum = index + 1
+      const chapterNum = index + 1;
 
       const subChaptersHtml = chapter.subChapters
         .map((sub, subIdx) => {
-          const subPageNum = pageMapping?.get(`sub-chapter-${index}-${subIdx}`)
-          const subPageSpan = subPageNum ? `<span class="toc-page-number">${subPageNum}</span>` : ''
-          return `<div class="toc-sub-chapter"><span>${chapterNum}.${subIdx + 1} ${escapeHtml(sub.title)}</span>${subPageSpan}</div>`
+          const subPageNum = pageMapping?.get(`sub-chapter-${index}-${subIdx}`);
+          const subPageSpan = subPageNum
+            ? `<span class="toc-page-number">${subPageNum}</span>`
+            : "";
+          return `<div class="toc-sub-chapter"><span>${chapterNum}.${subIdx + 1} ${escapeHtml(sub.title)}</span>${subPageSpan}</div>`;
         })
-        .join('')
+        .join("");
 
-      const chapterPageNum = pageMapping?.get(`chapter-${index}`)
-      const chapterPageSpan = chapterPageNum ? `<span class="toc-page-number">${chapterPageNum}</span>` : ''
+      const chapterPageNum = pageMapping?.get(`chapter-${index}`);
+      const chapterPageSpan = chapterPageNum
+        ? `<span class="toc-page-number">${chapterPageNum}</span>`
+        : "";
 
       return `
         <div class="toc-item">
           <div class="toc-chapter-number">${chapterNum}</div>
           <div class="toc-chapter-info">
             <div class="toc-chapter-title"><span>${escapeHtml(chapter.title)}</span>${chapterPageSpan}</div>
-            ${chapter.description ? `<div class="toc-chapter-desc">${escapeHtml(chapter.description)}</div>` : ''}
-            ${subChaptersHtml ? `<div class="toc-sub-chapters">${subChaptersHtml}</div>` : ''}
+            ${chapter.description ? `<div class="toc-chapter-desc">${escapeHtml(chapter.description)}</div>` : ""}
+            ${subChaptersHtml ? `<div class="toc-sub-chapters">${subChaptersHtml}</div>` : ""}
           </div>
         </div>
-      `
+      `;
     })
-    .join('')
+    .join("");
 
   return `
     <div class="page toc-page">
@@ -38,5 +45,5 @@ export function generateTocPage(bookStructure: BookStructure, pageMapping?: Page
         ${chaptersHtml}
       </div>
     </div>
-  `
+  `;
 }

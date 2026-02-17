@@ -1,22 +1,30 @@
-import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
-import { scraperWorker } from './scraper-worker';
-import { renderPagesToPdf, renderHtmlToPdf } from './pdf-renderer';
-import { generatePageContents, generatePageHtml, generateAllPagesHtml } from './pdf/generator';
-import { getSupabase } from './supabase';
-import crypto from 'crypto';
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import { scraperWorker } from "./scraper-worker";
+import { renderPagesToPdf, renderHtmlToPdf } from "./pdf-renderer";
+import {
+  generatePageContents,
+  generatePageHtml,
+  generateAllPagesHtml,
+} from "./pdf/generator";
+import { getSupabase } from "./supabase";
+import crypto from "crypto";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: "10mb" }));
 
 // API key authentication middleware
 const WORKER_API_KEY = process.env.WORKER_API_KEY;
 
-function requireAuth(req: express.Request, res: express.Response, next: express.NextFunction): void {
+function requireAuth(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+): void {
   if (!WORKER_API_KEY) {
     // No key configured = auth disabled (local dev)
     next();
@@ -25,7 +33,7 @@ function requireAuth(req: express.Request, res: express.Response, next: express.
 
   const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${WORKER_API_KEY}`) {
-    res.status(401).json({ error: 'Unauthorized' });
+    res.status(401).json({ error: "Unauthorized" });
     return;
   }
 
@@ -33,16 +41,16 @@ function requireAuth(req: express.Request, res: express.Response, next: express.
 }
 
 // Health check
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 // Scrape endpoint (public — called directly from client to bypass Vercel timeout)
-app.post('/scrape', async (req, res) => {
+app.post("/scrape", async (req, res) => {
   const { username, limit = 50 } = req.body;
 
   if (!username) {
-    res.status(400).json({ error: 'Username is required' });
+    res.status(400).json({ error: "Username is required" });
     return;
   }
 
@@ -56,40 +64,42 @@ app.post('/scrape', async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    console.error('Scrape error:', error);
+    console.error("Scrape error:", error);
     res.status(500).json({
-      error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      error: "Internal server error",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });
 
 // Export session cookies endpoint
-app.post('/export-cookies', requireAuth, async (_req, res) => {
+app.post("/export-cookies", requireAuth, async (_req, res) => {
   try {
     const cookies = await scraperWorker.exportSessionCookies();
 
     if (!cookies) {
-      res.status(404).json({ error: 'No active session. Run /scrape first to establish a session.' });
+      res.status(404).json({
+        error: "No active session. Run /scrape first to establish a session.",
+      });
       return;
     }
 
     res.json({ cookies });
   } catch (error) {
-    console.error('Export cookies error:', error);
+    console.error("Export cookies error:", error);
     res.status(500).json({
-      error: 'Failed to export cookies',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      error: "Failed to export cookies",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });
 
 // Generate PDF endpoint
-app.post('/generate-pdf', requireAuth, async (req, res) => {
+app.post("/generate-pdf", requireAuth, async (req, res) => {
   const { pages } = req.body;
 
   if (!pages || !Array.isArray(pages) || pages.length === 0) {
-    res.status(400).json({ error: 'pages array is required' });
+    res.status(400).json({ error: "pages array is required" });
     return;
   }
 
@@ -98,39 +108,43 @@ app.post('/generate-pdf', requireAuth, async (req, res) => {
     const startTime = Date.now();
     const pdfBuffer = await renderPagesToPdf(pages);
     const duration = Date.now() - startTime;
-    console.log(`[PDF] Generated PDF (${pdfBuffer.length} bytes) in ${duration}ms`);
+    console.log(
+      `[PDF] Generated PDF (${pdfBuffer.length} bytes) in ${duration}ms`,
+    );
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Length', pdfBuffer.length.toString());
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Length", pdfBuffer.length.toString());
     res.send(pdfBuffer);
   } catch (error) {
-    console.error('PDF generation error:', error);
+    console.error("PDF generation error:", error);
     res.status(500).json({
-      error: 'Failed to generate PDF',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      error: "Failed to generate PDF",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });
 
 // Create loom endpoint (public — called directly from client to bypass Vercel timeout)
-app.post('/create-loom', async (req, res) => {
+app.post("/create-loom", async (req, res) => {
   const { posts, profile, userId, bookStructure } = req.body;
 
   if (!posts || !Array.isArray(posts) || posts.length === 0) {
-    res.status(400).json({ error: 'posts array is required' });
+    res.status(400).json({ error: "posts array is required" });
     return;
   }
   if (!profile) {
-    res.status(400).json({ error: 'profile is required' });
+    res.status(400).json({ error: "profile is required" });
     return;
   }
   if (!userId) {
-    res.status(400).json({ error: 'userId is required' });
+    res.status(400).json({ error: "userId is required" });
     return;
   }
 
   try {
-    console.log(`[CreateLoom] Generating PDF for ${posts.length} posts by @${profile.username}...`);
+    console.log(
+      `[CreateLoom] Generating PDF for ${posts.length} posts by @${profile.username}...`,
+    );
     const startTime = Date.now();
 
     // 1. Generate page contents (same logic as frontend preview)
@@ -146,17 +160,17 @@ app.post('/create-loom', async (req, res) => {
     const loomId = crypto.randomUUID();
     const pdfPath = `${userId}/${loomId}.pdf`;
 
-    const { error: uploadError } = await getSupabase().storage
-      .from('looms-pdf')
+    const { error: uploadError } = await getSupabase()
+      .storage.from("looms-pdf")
       .upload(pdfPath, pdfBuffer, {
-        contentType: 'application/pdf',
+        contentType: "application/pdf",
         upsert: false,
       });
 
     if (uploadError) {
-      console.error('[CreateLoom] Upload error:', uploadError);
+      console.error("[CreateLoom] Upload error:", uploadError);
       res.status(500).json({
-        error: 'Failed to upload PDF',
+        error: "Failed to upload PDF",
         message: uploadError.message,
       });
       return;
@@ -164,7 +178,9 @@ app.post('/create-loom', async (req, res) => {
 
     const duration = Date.now() - startTime;
     const sizeMB = (pdfBuffer.length / (1024 * 1024)).toFixed(2);
-    console.log(`[CreateLoom] Done in ${duration}ms - ${sizeMB}MB (${pdfBuffer.length} bytes), path: ${pdfPath}`);
+    console.log(
+      `[CreateLoom] Done in ${duration}ms - ${sizeMB}MB (${pdfBuffer.length} bytes), path: ${pdfPath}`,
+    );
 
     res.json({
       success: true,
@@ -172,10 +188,10 @@ app.post('/create-loom', async (req, res) => {
       loomId,
     });
   } catch (error) {
-    console.error('[CreateLoom] Error:', error);
+    console.error("[CreateLoom] Error:", error);
     res.status(500).json({
-      error: 'Failed to create loom',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      error: "Failed to create loom",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });

@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 let _supabase: SupabaseClient | null = null;
 
@@ -10,7 +10,7 @@ export function getSupabase(): SupabaseClient {
 
   if (!supabaseUrl || !supabaseServiceRoleKey) {
     throw new Error(
-      'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set to use Supabase features.'
+      "SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set to use Supabase features.",
     );
   }
 

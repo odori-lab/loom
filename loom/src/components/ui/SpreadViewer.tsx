@@ -1,118 +1,159 @@
-import { type ReactNode, type RefObject } from 'react'
-import { type FlipState } from '@/hooks/useSpreadViewer'
-import { useI18n } from '@/lib/i18n/context'
-import { ChevronLeftIcon, ChevronRightIcon } from '@/components/ui/Icons'
+import { type ReactNode, type RefObject } from "react";
+import { type FlipState } from "@/hooks/useSpreadViewer";
+import { useI18n } from "@/lib/i18n/context";
+import { ChevronLeftIcon, ChevronRightIcon } from "@/components/ui/Icons";
 
 /* ─── FlipContainer ─── */
 
 interface FlipContainerProps<T> {
-  flipState: FlipState | null
-  handleFlipEnd: () => void
-  pageWidth: number
-  current: { left: T; right: T }
-  target: { left: T; right: T } | null
-  renderPage: (data: T, side: 'left' | 'right', noShadow?: boolean) => ReactNode
+  flipState: FlipState | null;
+  handleFlipEnd: () => void;
+  pageWidth: number;
+  current: { left: T; right: T };
+  target: { left: T; right: T } | null;
+  renderPage: (
+    data: T,
+    side: "left" | "right",
+    noShadow?: boolean,
+  ) => ReactNode;
 }
 
 interface FlipPageProps<T> {
-  flipState: FlipState
-  handleFlipEnd: () => void
-  pageWidth: number
-  direction: 'forward' | 'backward'
-  flipTransform: string
-  frontPage: T
-  backPage: T
-  behindPage: T
-  renderPage: (data: T, side: 'left' | 'right', noShadow?: boolean) => ReactNode
+  flipState: FlipState;
+  handleFlipEnd: () => void;
+  pageWidth: number;
+  direction: "forward" | "backward";
+  flipTransform: string;
+  frontPage: T;
+  backPage: T;
+  behindPage: T;
+  renderPage: (
+    data: T,
+    side: "left" | "right",
+    noShadow?: boolean,
+  ) => ReactNode;
 }
 
 function FlipPage<T>({
-  flipState, handleFlipEnd, pageWidth, direction, flipTransform,
-  frontPage, backPage, behindPage, renderPage,
+  flipState,
+  handleFlipEnd,
+  pageWidth,
+  direction,
+  flipTransform,
+  frontPage,
+  backPage,
+  behindPage,
+  renderPage,
 }: FlipPageProps<T>) {
-  const isForward = direction === 'forward'
-  const side = isForward ? 'right' : 'left'
-  const backSide = isForward ? 'left' : 'right'
-  const origin = isForward ? 'left center' : 'right center'
-  const backRotation = isForward ? 'rotateY(180deg)' : 'rotateY(-180deg)'
+  const isForward = direction === "forward";
+  const side = isForward ? "right" : "left";
+  const backSide = isForward ? "left" : "right";
+  const origin = isForward ? "left center" : "right center";
+  const backRotation = isForward ? "rotateY(180deg)" : "rotateY(-180deg)";
 
   return (
-    <div style={{ width: pageWidth, position: 'relative' }}>
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+    <div style={{ width: pageWidth, position: "relative" }}>
+      <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
         {renderPage(behindPage, side)}
       </div>
       <div
         style={{
-          position: 'relative',
+          position: "relative",
           zIndex: 1,
-          transformStyle: 'preserve-3d',
+          transformStyle: "preserve-3d",
           transformOrigin: origin,
           transform: flipTransform,
-          transition: flipState.phase === 'animating' ? 'transform 0.6s ease-in-out' : 'none',
+          transition:
+            flipState.phase === "animating"
+              ? "transform 0.6s ease-in-out"
+              : "none",
         }}
         onTransitionEnd={handleFlipEnd}
       >
-        <div style={{ backfaceVisibility: 'hidden' }}>
+        <div style={{ backfaceVisibility: "hidden" }}>
           {renderPage(frontPage, side, true)}
         </div>
-        <div style={{ backfaceVisibility: 'hidden', transform: backRotation, position: 'absolute', inset: 0 }}>
+        <div
+          style={{
+            backfaceVisibility: "hidden",
+            transform: backRotation,
+            position: "absolute",
+            inset: 0,
+          }}
+        >
           {renderPage(backPage, backSide, true)}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function FlipContainer<T>({
-  flipState, handleFlipEnd, pageWidth, current, target, renderPage,
+  flipState,
+  handleFlipEnd,
+  pageWidth,
+  current,
+  target,
+  renderPage,
 }: FlipContainerProps<T>) {
   // Normal (no flip)
   if (!flipState || !target) {
     return (
       <div className="flex gap-0.5">
-        {renderPage(current.left, 'left')}
-        {renderPage(current.right, 'right')}
+        {renderPage(current.left, "left")}
+        {renderPage(current.right, "right")}
       </div>
-    )
+    );
   }
 
-  const isForward = flipState.direction === 'forward'
-  const flipTransform = flipState.phase === 'animating'
-    ? `rotateY(${isForward ? -180 : 180}deg)`
-    : 'rotateY(0deg)'
+  const isForward = flipState.direction === "forward";
+  const flipTransform =
+    flipState.phase === "animating"
+      ? `rotateY(${isForward ? -180 : 180}deg)`
+      : "rotateY(0deg)";
 
-  const staticPage = isForward ? current.left : current.right
-  const staticSide = isForward ? 'left' : 'right'
+  const staticPage = isForward ? current.left : current.right;
+  const staticSide = isForward ? "left" : "right";
 
   return (
-    <div style={{ perspective: '2000px' }} className="flex gap-0.5">
+    <div style={{ perspective: "2000px" }} className="flex gap-0.5">
       {isForward ? (
         <>
-          <div style={{ width: pageWidth, position: 'relative', zIndex: 0 }}>
+          <div style={{ width: pageWidth, position: "relative", zIndex: 0 }}>
             {renderPage(staticPage, staticSide)}
           </div>
           <FlipPage
-            flipState={flipState} handleFlipEnd={handleFlipEnd}
-            pageWidth={pageWidth} direction="forward" flipTransform={flipTransform}
-            frontPage={current.right} backPage={target.left} behindPage={target.right}
+            flipState={flipState}
+            handleFlipEnd={handleFlipEnd}
+            pageWidth={pageWidth}
+            direction="forward"
+            flipTransform={flipTransform}
+            frontPage={current.right}
+            backPage={target.left}
+            behindPage={target.right}
             renderPage={renderPage}
           />
         </>
       ) : (
         <>
           <FlipPage
-            flipState={flipState} handleFlipEnd={handleFlipEnd}
-            pageWidth={pageWidth} direction="backward" flipTransform={flipTransform}
-            frontPage={current.left} backPage={target.right} behindPage={target.left}
+            flipState={flipState}
+            handleFlipEnd={handleFlipEnd}
+            pageWidth={pageWidth}
+            direction="backward"
+            flipTransform={flipTransform}
+            frontPage={current.left}
+            backPage={target.right}
+            behindPage={target.left}
             renderPage={renderPage}
           />
-          <div style={{ width: pageWidth, position: 'relative', zIndex: 0 }}>
+          <div style={{ width: pageWidth, position: "relative", zIndex: 0 }}>
             {renderPage(staticPage, staticSide)}
           </div>
         </>
       )}
     </div>
-  )
+  );
 }
 
 /* ─── SpreadViewerContainer ───
@@ -120,25 +161,34 @@ export function FlipContainer<T>({
    Consumers put their content (FlipContainer etc.) inside as children. */
 
 interface SpreadViewerContainerProps {
-  containerRef: RefObject<HTMLDivElement | null>
-  scale: number
-  isDragging: boolean
-  resetZoom: () => void
-  handleMouseDown: (e: React.MouseEvent) => void
-  handleMouseMove: (e: React.MouseEvent) => void
-  handleMouseUp: () => void
-  currentSpread: number
-  totalSpreads: number
-  flipState: FlipState | null
-  prevSpread: () => void
-  nextSpread: () => void
-  children: ReactNode
+  containerRef: RefObject<HTMLDivElement | null>;
+  scale: number;
+  isDragging: boolean;
+  resetZoom: () => void;
+  handleMouseDown: (e: React.MouseEvent) => void;
+  handleMouseMove: (e: React.MouseEvent) => void;
+  handleMouseUp: () => void;
+  currentSpread: number;
+  totalSpreads: number;
+  flipState: FlipState | null;
+  prevSpread: () => void;
+  nextSpread: () => void;
+  children: ReactNode;
 }
 
 export function SpreadViewerContainer({
-  containerRef, scale, isDragging, resetZoom,
-  handleMouseDown, handleMouseMove, handleMouseUp,
-  currentSpread, totalSpreads, flipState, prevSpread, nextSpread,
+  containerRef,
+  scale,
+  isDragging,
+  resetZoom,
+  handleMouseDown,
+  handleMouseMove,
+  handleMouseUp,
+  currentSpread,
+  totalSpreads,
+  flipState,
+  prevSpread,
+  nextSpread,
   children,
 }: SpreadViewerContainerProps) {
   return (
@@ -150,7 +200,9 @@ export function SpreadViewerContainer({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onDoubleClick={resetZoom}
-      style={{ cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+      style={{
+        cursor: scale > 1 ? (isDragging ? "grabbing" : "grab") : "default",
+      }}
     >
       {children}
       <NavArrows
@@ -161,45 +213,56 @@ export function SpreadViewerContainer({
         nextSpread={nextSpread}
       />
     </div>
-  )
+  );
 }
 
 /* ─── ZoomTransform ───
    Inner wrapper that applies zoom scale + pan offset. */
 
 interface ZoomTransformProps {
-  scale: number
-  offset: { x: number; y: number }
-  isDragging: boolean
-  children: ReactNode
+  scale: number;
+  offset: { x: number; y: number };
+  isDragging: boolean;
+  children: ReactNode;
 }
 
-export function ZoomTransform({ scale, offset, isDragging, children }: ZoomTransformProps) {
+export function ZoomTransform({
+  scale,
+  offset,
+  isDragging,
+  children,
+}: ZoomTransformProps) {
   return (
     <div
       style={{
         transform: `scale(${scale}) translate(${offset.x / scale}px, ${offset.y / scale}px)`,
-        transformOrigin: 'center center',
-        transition: isDragging ? 'none' : 'transform 0.15s ease-out',
+        transformOrigin: "center center",
+        transition: isDragging ? "none" : "transform 0.15s ease-out",
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 /* ─── NavArrows ─── */
 
 interface NavArrowsProps {
-  currentSpread: number
-  totalSpreads: number
-  flipState: FlipState | null
-  prevSpread: () => void
-  nextSpread: () => void
+  currentSpread: number;
+  totalSpreads: number;
+  flipState: FlipState | null;
+  prevSpread: () => void;
+  nextSpread: () => void;
 }
 
-function NavArrows({ currentSpread, totalSpreads, flipState, prevSpread, nextSpread }: NavArrowsProps) {
-  if (totalSpreads === 0) return null
+function NavArrows({
+  currentSpread,
+  totalSpreads,
+  flipState,
+  prevSpread,
+  nextSpread,
+}: NavArrowsProps) {
+  if (totalSpreads === 0) return null;
   return (
     <>
       <button
@@ -219,23 +282,27 @@ function NavArrows({ currentSpread, totalSpreads, flipState, prevSpread, nextSpr
         <ChevronRightIcon className="w-5 h-5 text-gray-600" />
       </button>
     </>
-  )
+  );
 }
 
 /* ─── SpreadSlider ─── */
 
 interface SpreadSliderProps {
-  currentSpread: number
-  totalSpreads: number
-  onSliderChange: (value: number) => void
+  currentSpread: number;
+  totalSpreads: number;
+  onSliderChange: (value: number) => void;
 }
 
-export function SpreadSlider({ currentSpread, totalSpreads, onSliderChange }: SpreadSliderProps) {
-  const { t } = useI18n()
+export function SpreadSlider({
+  currentSpread,
+  totalSpreads,
+  onSliderChange,
+}: SpreadSliderProps) {
+  const { t } = useI18n();
   return (
     <>
       <span className="text-sm text-gray-400 whitespace-nowrap min-w-[90px] shrink-0">
-        {t('create.preview.spread')} {currentSpread + 1} / {totalSpreads}
+        {t("create.preview.spread")} {currentSpread + 1} / {totalSpreads}
       </span>
       <input
         type="range"
@@ -250,19 +317,24 @@ export function SpreadSlider({ currentSpread, totalSpreads, onSliderChange }: Sp
           [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:cursor-pointer"
       />
     </>
-  )
+  );
 }
 
 /* ─── ZoomControls ─── */
 
 interface ZoomControlsProps {
-  scale: number
-  zoomIn: () => void
-  zoomOut: () => void
-  resetZoom: () => void
+  scale: number;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
 }
 
-export function ZoomControls({ scale, zoomIn, zoomOut, resetZoom }: ZoomControlsProps) {
+export function ZoomControls({
+  scale,
+  zoomIn,
+  zoomOut,
+  resetZoom,
+}: ZoomControlsProps) {
   return (
     <div className="flex items-center gap-1 shrink-0">
       <button
@@ -271,8 +343,18 @@ export function ZoomControls({ scale, zoomIn, zoomOut, resetZoom }: ZoomControls
         className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 active:scale-[0.97] transition-all duration-150"
         title="Zoom out (-)"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M20 12H4"
+          />
         </svg>
       </button>
       <button
@@ -289,10 +371,20 @@ export function ZoomControls({ scale, zoomIn, zoomOut, resetZoom }: ZoomControls
         className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 active:scale-[0.97] transition-all duration-150"
         title="Zoom in (+)"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 4v16m8-8H4"
+          />
         </svg>
       </button>
     </div>
-  )
+  );
 }

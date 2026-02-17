@@ -1,4 +1,4 @@
-import { escapeHtml } from '../utils'
+import { escapeHtml } from "../utils";
 
 export function generatePrefacePage(preface: string): string {
   return `
@@ -6,5 +6,5 @@ export function generatePrefacePage(preface: string): string {
       <div class="preface-header">Preface</div>
       <div class="preface-text">${escapeHtml(preface)}</div>
     </div>
-  `
+  `;
 }

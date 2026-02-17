@@ -1,56 +1,97 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Spinner } from '@/components/ui/Spinner'
-import { ArrowRightIcon } from '@/components/ui/Icons'
-import { useCreateFlow } from './CreateFlowContext'
-import { useI18n } from '@/lib/i18n/context'
+import { useState } from "react";
+import { Spinner } from "@/components/ui/Spinner";
+import { ArrowRightIcon } from "@/components/ui/Icons";
+import { useCreateFlow } from "./CreateFlowContext";
+import { useI18n } from "@/lib/i18n/context";
 
-function SubmitButtonContent({ loading, loadingPhase }: { loading: boolean; loadingPhase?: string }) {
-  const { t } = useI18n()
+function SubmitButtonContent({
+  loading,
+  loadingPhase,
+}: {
+  loading: boolean;
+  loadingPhase?: string;
+}) {
+  const { t } = useI18n();
   if (loading) {
     return (
       <>
         <Spinner size="md" className="text-white" />
-        {loadingPhase === 'organizing' ? t('create.username.organizing') : t('create.username.scraping')}
+        {loadingPhase === "organizing"
+          ? t("create.username.organizing")
+          : t("create.username.scraping")}
       </>
-    )
+    );
   }
   return (
     <>
-      {t('create.username.continue')}
+      {t("create.username.continue")}
       <ArrowRightIcon />
     </>
-  )
+  );
 }
 
 export function UsernameStep() {
-  const { state: { loading, loadingPhase, error }, actions: { submitUsername } } = useCreateFlow()
-  const { t } = useI18n()
-  const [username, setUsername] = useState('')
+  const {
+    state: { loading, loadingPhase, error },
+    actions: { submitUsername },
+  } = useCreateFlow();
+  const { t } = useI18n();
+  const [username, setUsername] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!username.trim()) return
-    submitUsername(username.trim())
-  }
+    e.preventDefault();
+    if (!username.trim()) return;
+    submitUsername(username.trim());
+  };
 
   return (
-    <div className="max-w-md mx-auto text-center" style={{ animation: 'fadeInUp 0.5s ease-out both' }}>
+    <div
+      className="max-w-md mx-auto text-center"
+      style={{ animation: "fadeInUp 0.5s ease-out both" }}
+    >
       <div className="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <svg
+          className="w-10 h-10 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
         </svg>
       </div>
 
-      <h1 className="text-4xl font-bold text-gray-900 mb-3" style={{ animation: 'fadeInUp 0.5s ease-out 0.08s both' }}>{t('create.title')}</h1>
-      <p className="text-lg text-gray-500 mb-10" style={{ animation: 'fadeInUp 0.5s ease-out 0.16s both' }}>
-        {t('create.username.description')}
+      <h1
+        className="text-4xl font-bold text-gray-900 mb-3"
+        style={{ animation: "fadeInUp 0.5s ease-out 0.08s both" }}
+      >
+        {t("create.title")}
+      </h1>
+      <p
+        className="text-lg text-gray-500 mb-10"
+        style={{ animation: "fadeInUp 0.5s ease-out 0.16s both" }}
+      >
+        {t("create.username.description")}
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-4" style={{ animation: 'fadeInUp 0.5s ease-out 0.24s both' }}>
-        <div className="relative" style={error ? { animation: 'shake 0.4s ease-in-out' } : undefined}>
-          <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-lg font-medium">@</span>
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4"
+        style={{ animation: "fadeInUp 0.5s ease-out 0.24s both" }}
+      >
+        <div
+          className="relative"
+          style={error ? { animation: "shake 0.4s ease-in-out" } : undefined}
+        >
+          <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-lg font-medium">
+            @
+          </span>
           <input
             type="text"
             value={username}
@@ -69,16 +110,22 @@ export function UsernameStep() {
           {loading && (
             <div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
-              style={{ animation: 'shimmer 1.5s infinite linear', backgroundSize: '200% 100%' }}
+              style={{
+                animation: "shimmer 1.5s infinite linear",
+                backgroundSize: "200% 100%",
+              }}
             />
           )}
           <SubmitButtonContent loading={loading} loadingPhase={loadingPhase} />
         </button>
       </form>
 
-      <p className="mt-8 text-sm text-gray-400" style={{ animation: 'fadeInUp 0.5s ease-out 0.32s both' }}>
-        {t('create.username.helper')}
+      <p
+        className="mt-8 text-sm text-gray-400"
+        style={{ animation: "fadeInUp 0.5s ease-out 0.32s both" }}
+      >
+        {t("create.username.helper")}
       </p>
     </div>
-  )
+  );
 }

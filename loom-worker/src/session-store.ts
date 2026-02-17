@@ -1,5 +1,5 @@
-import { StoredSession } from './types';
-import { redis } from './redis';
+import { StoredSession } from "./types";
+import { redis } from "./redis";
 
 // Session TTL: 7 days in seconds
 const SESSION_TTL = 7 * 24 * 60 * 60;
@@ -11,7 +11,9 @@ function getSessionKey(accountId: string): string {
   return `threads:session:${accountId}`;
 }
 
-export async function getSession(accountId: string): Promise<StoredSession | null> {
+export async function getSession(
+  accountId: string,
+): Promise<StoredSession | null> {
   const key = getSessionKey(accountId);
   const data = await redis.get(key);
 
@@ -27,7 +29,10 @@ export async function getSession(accountId: string): Promise<StoredSession | nul
   }
 }
 
-export async function saveSession(accountId: string, session: StoredSession): Promise<void> {
+export async function saveSession(
+  accountId: string,
+  session: StoredSession,
+): Promise<void> {
   const key = getSessionKey(accountId);
   const data = JSON.stringify(session);
 
