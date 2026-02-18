@@ -4,6 +4,7 @@ import {
   generateEssayPageContents,
   generateBlankPage,
   generateLastPage,
+  PRETENDARD_FONT_LINK,
 } from "@loom/shared";
 import type {
   BookStructure,
@@ -13,9 +14,6 @@ import type {
 import { generateCoverPage } from "./templates/cover";
 import { generateContentPageFromChunks } from "./templates/content";
 import { calculateLayout, PostChunk } from "./layout";
-
-// Pretendard font CDN for PDF rendering
-const PRETENDARD_FONT_LINK = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />`;
 
 // Generate HTML for a single page
 export function generatePageHtml(pageContent: string): string {
