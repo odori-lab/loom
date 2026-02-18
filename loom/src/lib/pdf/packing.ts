@@ -11,6 +11,20 @@ const NO_PAGE_NUMBER_TYPES: Set<ContentBlock["type"]> = new Set([
   "chapter-title",
 ]);
 
+// Find the index of the preface page (or first content page after author) for display numbering.
+// Display page number = absoluteIndex - prefaceIndex + 1, so preface = 1.
+function findPrefaceIndex(pageAssignments: MeasuredBlock[][]): number {
+  for (let i = 0; i < pageAssignments.length; i++) {
+    if (pageAssignments[i][0]?.type === "preface") return i;
+  }
+  // Fallback: first page after author pages
+  for (let i = 0; i < pageAssignments.length; i++) {
+    const t = pageAssignments[i][0]?.type;
+    if (t !== "cover" && t !== "blank" && t !== "author") return i;
+  }
+  return 0;
+}
+
 // Assign measured blocks to pages using first-fit bin packing
 export function assignBlocksToPages(
   measuredBlocks: MeasuredBlock[],
@@ -109,15 +123,17 @@ export function assignBlocksToPages(
   return pages;
 }
 
-// Build a mapping from block IDs to 1-based page numbers
+// Build a mapping from block IDs to display page numbers.
+// Display numbering starts from preface = 1.
 export function buildPageMapping(
   pageAssignments: MeasuredBlock[][],
 ): PageMapping {
+  const prefaceIdx = findPrefaceIndex(pageAssignments);
   const mapping: PageMapping = new Map();
   for (let pageIdx = 0; pageIdx < pageAssignments.length; pageIdx++) {
-    const pageNum = pageIdx + 1; // 1-based
+    const displayNum = pageIdx - prefaceIdx + 1;
     for (const block of pageAssignments[pageIdx]) {
-      mapping.set(block.id, pageNum);
+      mapping.set(block.id, displayNum);
     }
   }
   return mapping;
@@ -126,20 +142,18 @@ export function buildPageMapping(
 // Convert page assignments to HTML strings
 export function pagesToHtml(pageAssignments: MeasuredBlock[][]): string[] {
   const htmlPages: string[] = [];
-
-  // Track content pages (non-cover, non-last) for blank page logic
-  let contentPageCount = 0;
+  const prefaceIdx = findPrefaceIndex(pageAssignments);
 
   for (let i = 0; i < pageAssignments.length; i++) {
     const page = pageAssignments[i];
-    const pageNum = i + 1; // 1-based page number
+    const displayNum = i - prefaceIdx + 1;
 
     // Determine if this page should show a page number
     const firstBlock = page[0];
     const showPageNumber =
       firstBlock && !NO_PAGE_NUMBER_TYPES.has(firstBlock.type);
     const pageNumberHtml = showPageNumber
-      ? `<div class="page-number">${pageNum}</div>`
+      ? `<div class="page-number">${displayNum}</div>`
       : "";
 
     if (page.length === 1 && page[0].fullPage) {
@@ -150,33 +164,39 @@ export function pagesToHtml(pageAssignments: MeasuredBlock[][]): string[] {
         html = html.replace(/<\/div>\s*$/, `${pageNumberHtml}</div>`);
       }
       htmlPages.push(html);
-
-      // Count content pages (not cover, last, blank, or author)
-      if (
-        page[0].type !== "cover" &&
-        page[0].type !== "last" &&
-        page[0].type !== "blank" &&
-        page[0].type !== "author"
-      ) {
-        contentPageCount++;
-      }
     } else {
       // Content page with multiple blocks: wrap in page div
       const innerHtml = page.map((block) => block.html).join("\n");
+      // Add spacer for TOC continuation pages (toc-part2, toc-part3, etc.)
+      const hasTocContinuation = page.some((block) => {
+        const match = block.id.match(/^toc-part(\d+)$/);
+        return match && parseInt(match[1], 10) > 1;
+      });
+      const spacerHtml = hasTocContinuation
+        ? '<div class="toc-continuation-spacer"></div>\n'
+        : "";
       htmlPages.push(
-        `<div class="page">\n${innerHtml}\n${pageNumberHtml}\n</div>`,
+        `<div class="page">\n${spacerHtml}${innerHtml}\n${pageNumberHtml}\n</div>`,
       );
-      contentPageCount++;
     }
   }
 
-  // Add blank page before last page if content pages are odd
-  if (contentPageCount % 2 === 1) {
-    // Insert blank page before the last page
-    const lastPage = htmlPages.pop()!;
+  // Ensure last page ends on even absolute position.
+  // Pop the last page, check remaining count, insert blanks as needed.
+  const lastPage = htmlPages.pop()!;
+  const remaining = htmlPages.length; // absolute count of pages before last
+  if (remaining % 2 === 0) {
+    // remaining is even → last would be at odd position → add one blank
     htmlPages.push('<div class="page"></div>');
-    htmlPages.push(lastPage);
+  } else {
+    // remaining is odd → last would be at even position → add blank-with-number + blank
+    const blankDisplayNum = remaining - prefaceIdx + 1;
+    htmlPages.push(
+      `<div class="page"><div class="page-number">${blankDisplayNum}</div></div>`,
+    );
+    htmlPages.push('<div class="page"></div>');
   }
+  htmlPages.push(lastPage);
 
   return htmlPages;
 }
@@ -223,20 +243,18 @@ export function pagesToStoredPages(
   pageAssignments: MeasuredBlock[][],
 ): StoredPage[] {
   const storedPages: StoredPage[] = [];
-
-  // Track content pages (non-cover, non-last) for blank page logic
-  let contentPageCount = 0;
+  const prefaceIdx = findPrefaceIndex(pageAssignments);
 
   for (let i = 0; i < pageAssignments.length; i++) {
     const page = pageAssignments[i];
-    const pageNum = i + 1; // 1-based page number
+    const displayNum = i - prefaceIdx + 1;
 
     // Determine if this page should show a page number
     const firstBlock = page[0];
     const showPageNumber =
       firstBlock && !NO_PAGE_NUMBER_TYPES.has(firstBlock.type);
     const pageNumberHtml = showPageNumber
-      ? `<div class="page-number">${pageNum}</div>`
+      ? `<div class="page-number">${displayNum}</div>`
       : "";
 
     const meta = buildPageMeta(page);
@@ -248,32 +266,43 @@ export function pagesToStoredPages(
         html = html.replace(/<\/div>\s*$/, `${pageNumberHtml}</div>`);
       }
       storedPages.push({ html, meta, blockMetas });
-
-      if (
-        page[0].type !== "cover" &&
-        page[0].type !== "last" &&
-        page[0].type !== "blank" &&
-        page[0].type !== "author"
-      ) {
-        contentPageCount++;
-      }
     } else {
       const innerHtml = page.map((block) => block.html).join("\n");
-      const html = `<div class="page">\n${innerHtml}\n${pageNumberHtml}\n</div>`;
+      // Add spacer for TOC continuation pages (toc-part2, toc-part3, etc.)
+      const hasTocContinuation = page.some((block) => {
+        const match = block.id.match(/^toc-part(\d+)$/);
+        return match && parseInt(match[1], 10) > 1;
+      });
+      const spacerHtml = hasTocContinuation
+        ? '<div class="toc-continuation-spacer"></div>\n'
+        : "";
+      const html = `<div class="page">\n${spacerHtml}${innerHtml}\n${pageNumberHtml}\n</div>`;
       storedPages.push({ html, meta, blockMetas });
-      contentPageCount++;
     }
   }
 
-  // Add blank page before last page if content pages are odd
-  if (contentPageCount % 2 === 1) {
-    const lastPage = storedPages.pop()!;
+  // Ensure last page ends on even absolute position.
+  const lastPage = storedPages.pop()!;
+  const remaining = storedPages.length;
+  if (remaining % 2 === 0) {
+    // remaining is even → last would be at odd position → add one blank
     storedPages.push({
       html: '<div class="page"></div>',
       meta: { type: "blank" },
     });
-    storedPages.push(lastPage);
+  } else {
+    // remaining is odd → last would be at even position → add blank-with-number + blank
+    const blankDisplayNum = remaining - prefaceIdx + 1;
+    storedPages.push({
+      html: `<div class="page"><div class="page-number">${blankDisplayNum}</div></div>`,
+      meta: { type: "blank" },
+    });
+    storedPages.push({
+      html: '<div class="page"></div>',
+      meta: { type: "blank" },
+    });
   }
+  storedPages.push(lastPage);
 
   return storedPages;
 }
