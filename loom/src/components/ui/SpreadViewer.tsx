@@ -1,157 +1,161 @@
-import type { ReactNode, RefObject } from "react";
+import {
+  type ReactNode,
+  type RefObject,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/ui/Icons";
 import type { FlipState } from "@/hooks/useSpreadViewer";
-import { useI18n } from "@/lib/i18n/context";
 
-/* ─── FlipContainer ─── */
+/* ─── FlipContainer (CSS animation + stagger + two-phase cleanup) ─── */
 
 interface FlipContainerProps<T> {
-  flipState: FlipState | null;
-  handleFlipEnd: () => void;
+  currentSpread: number;
+  flips: FlipState[];
+  getSpreadData: (index: number) => { left: T; right: T } | null;
+  handleFlipEnd: (id: number) => void;
   pageWidth: number;
-  current: { left: T; right: T };
-  target: { left: T; right: T } | null;
   renderPage: (
     data: T,
     side: "left" | "right",
     noShadow?: boolean,
   ) => ReactNode;
-}
-
-interface FlipPageProps<T> {
-  flipState: FlipState;
-  handleFlipEnd: () => void;
-  pageWidth: number;
-  direction: "forward" | "backward";
-  flipTransform: string;
-  frontPage: T;
-  backPage: T;
-  behindPage: T;
-  renderPage: (
-    data: T,
-    side: "left" | "right",
-    noShadow?: boolean,
-  ) => ReactNode;
-}
-
-function FlipPage<T>({
-  flipState,
-  handleFlipEnd,
-  pageWidth,
-  direction,
-  flipTransform,
-  frontPage,
-  backPage,
-  behindPage,
-  renderPage,
-}: FlipPageProps<T>) {
-  const isForward = direction === "forward";
-  const side = isForward ? "right" : "left";
-  const backSide = isForward ? "left" : "right";
-  const origin = isForward ? "left center" : "right center";
-  const backRotation = isForward ? "rotateY(180deg)" : "rotateY(-180deg)";
-
-  return (
-    <div style={{ width: pageWidth, position: "relative" }}>
-      <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-        {renderPage(behindPage, side)}
-      </div>
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          transformStyle: "preserve-3d",
-          transformOrigin: origin,
-          transform: flipTransform,
-          transition:
-            flipState.phase === "animating"
-              ? "transform 0.6s ease-in-out"
-              : "none",
-        }}
-        onTransitionEnd={handleFlipEnd}
-      >
-        <div style={{ backfaceVisibility: "hidden" }}>
-          {renderPage(frontPage, side, true)}
-        </div>
-        <div
-          style={{
-            backfaceVisibility: "hidden",
-            transform: backRotation,
-            position: "absolute",
-            inset: 0,
-          }}
-        >
-          {renderPage(backPage, backSide, true)}
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export function FlipContainer<T>({
-  flipState,
+  currentSpread,
+  flips,
+  getSpreadData,
   handleFlipEnd,
   pageWidth,
-  current,
-  target,
   renderPage,
 }: FlipContainerProps<T>) {
-  // Normal (no flip)
-  if (!flipState || !target) {
-    return (
-      <div className="flex gap-0.5">
-        {renderPage(current.left, "left")}
-        {renderPage(current.right, "right")}
-      </div>
-    );
-  }
+  const currentData = getSpreadData(currentSpread);
+  if (!currentData) return null;
 
-  const isForward = flipState.direction === "forward";
-  const flipTransform =
-    flipState.phase === "animating"
-      ? `rotateY(${isForward ? -180 : 180}deg)`
-      : "rotateY(0deg)";
+  const activeFlips = flips.filter((f) => !f.done);
+  const hasActive = activeFlips.length > 0;
+  const isForward = hasActive && activeFlips[0].direction === "forward";
+  const isBackward = hasActive && activeFlips[0].direction === "backward";
+  const finalTarget = hasActive
+    ? activeFlips[activeFlips.length - 1].targetSpread
+    : currentSpread;
+  const finalData = hasActive ? getSpreadData(finalTarget) : null;
 
-  const staticPage = isForward ? current.left : current.right;
-  const staticSide = isForward ? "left" : "right";
+  // Base pages shown underneath the flip stack
+  const leftBase = isBackward && finalData ? finalData.left : currentData.left;
+  const rightBase = isForward && finalData ? finalData.right : currentData.right;
 
+  // Stable DOM: always two containers, flip elements are abs-positioned children
   return (
     <div style={{ perspective: "2000px" }} className="flex gap-0.5">
-      {isForward ? (
-        <>
-          <div style={{ width: pageWidth, position: "relative", zIndex: 0 }}>
-            {renderPage(staticPage, staticSide)}
-          </div>
-          <FlipPage
-            flipState={flipState}
-            handleFlipEnd={handleFlipEnd}
-            pageWidth={pageWidth}
-            direction="forward"
-            flipTransform={flipTransform}
-            frontPage={current.right}
-            backPage={target.left}
-            behindPage={target.right}
-            renderPage={renderPage}
-          />
-        </>
-      ) : (
-        <>
-          <FlipPage
-            flipState={flipState}
-            handleFlipEnd={handleFlipEnd}
-            pageWidth={pageWidth}
-            direction="backward"
-            flipTransform={flipTransform}
-            frontPage={current.left}
-            backPage={target.right}
-            behindPage={target.left}
-            renderPage={renderPage}
-          />
-          <div style={{ width: pageWidth, position: "relative", zIndex: 0 }}>
-            {renderPage(staticPage, staticSide)}
-          </div>
-        </>
-      )}
+      {/* Left side */}
+      <div style={{ width: pageWidth, position: "relative" }}>
+        <div style={{ position: "relative", zIndex: 0 }}>
+          {renderPage(leftBase, "left")}
+        </div>
+        {/* Backward flip stack */}
+        {flips
+          .filter((f) => f.direction === "backward")
+          .map((flip, i, arr) => {
+            const fromData = getSpreadData(flip.fromSpread);
+            const toData = getSpreadData(flip.targetSpread);
+            if (!fromData || !toData) return null;
+            const zIndex = arr.length - i;
+            return (
+              <div
+                key={flip.id}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex,
+                  transformStyle: "preserve-3d",
+                  transformOrigin: "right center",
+                  ...(flip.done
+                    ? { transform: "rotateY(180deg)" }
+                    : {
+                        animation: `sv-flip-backward 0.4s ease-in-out ${flip.staggerDelay}ms both`,
+                      }),
+                }}
+                onAnimationEnd={(e) => {
+                  if (e.target === e.currentTarget) handleFlipEnd(flip.id);
+                }}
+              >
+                <div
+                  style={{
+                    backfaceVisibility: "hidden",
+                  }}
+                >
+                  {renderPage(fromData.left, "left", true)}
+                </div>
+                <div
+                  style={{
+                    backfaceVisibility: "hidden",
+                    transform: "rotateY(-180deg)",
+                    position: "absolute",
+                    inset: 0,
+                  }}
+                >
+                  {renderPage(toData.right, "right", true)}
+                </div>
+              </div>
+            );
+          })}
+      </div>
+      {/* Right side */}
+      <div style={{ width: pageWidth, position: "relative" }}>
+        <div style={{ position: "relative", zIndex: 0 }}>
+          {renderPage(rightBase, "right")}
+        </div>
+        {/* Forward flip stack */}
+        {flips
+          .filter((f) => f.direction === "forward")
+          .map((flip, i, arr) => {
+            const fromData = getSpreadData(flip.fromSpread);
+            const toData = getSpreadData(flip.targetSpread);
+            if (!fromData || !toData) return null;
+            const zIndex = arr.length - i;
+            return (
+              <div
+                key={flip.id}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex,
+                  transformStyle: "preserve-3d",
+                  transformOrigin: "left center",
+                  ...(flip.done
+                    ? { transform: "rotateY(-180deg)" }
+                    : {
+                        animation: `sv-flip-forward 0.4s ease-in-out ${flip.staggerDelay}ms both`,
+                      }),
+                }}
+                onAnimationEnd={(e) => {
+                  if (e.target === e.currentTarget) handleFlipEnd(flip.id);
+                }}
+              >
+                <div
+                  style={{
+                    backfaceVisibility: "hidden",
+                  }}
+                >
+                  {renderPage(fromData.right, "right", true)}
+                </div>
+                <div
+                  style={{
+                    backfaceVisibility: "hidden",
+                    transform: "rotateY(180deg)",
+                    position: "absolute",
+                    inset: 0,
+                  }}
+                >
+                  {renderPage(toData.left, "left", true)}
+                </div>
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 }
@@ -168,9 +172,8 @@ interface SpreadViewerContainerProps {
   handleMouseDown: (e: React.MouseEvent) => void;
   handleMouseMove: (e: React.MouseEvent) => void;
   handleMouseUp: () => void;
-  currentSpread: number;
+  targetSpread: number;
   totalSpreads: number;
-  flipState: FlipState | null;
   prevSpread: () => void;
   nextSpread: () => void;
   children: ReactNode;
@@ -184,9 +187,8 @@ export function SpreadViewerContainer({
   handleMouseDown,
   handleMouseMove,
   handleMouseUp,
-  currentSpread,
+  targetSpread,
   totalSpreads,
-  flipState,
   prevSpread,
   nextSpread,
   children,
@@ -206,9 +208,8 @@ export function SpreadViewerContainer({
     >
       {children}
       <NavArrows
-        currentSpread={currentSpread}
+        targetSpread={targetSpread}
         totalSpreads={totalSpreads}
-        flipState={flipState}
         prevSpread={prevSpread}
         nextSpread={nextSpread}
       />
@@ -248,17 +249,15 @@ export function ZoomTransform({
 /* ─── NavArrows ─── */
 
 interface NavArrowsProps {
-  currentSpread: number;
+  targetSpread: number;
   totalSpreads: number;
-  flipState: FlipState | null;
   prevSpread: () => void;
   nextSpread: () => void;
 }
 
 function NavArrows({
-  currentSpread,
+  targetSpread,
   totalSpreads,
-  flipState,
   prevSpread,
   nextSpread,
 }: NavArrowsProps) {
@@ -268,7 +267,7 @@ function NavArrows({
       <button
         onClick={prevSpread}
         onMouseDown={(e) => e.stopPropagation()}
-        disabled={currentSpread === 0 || !!flipState}
+        disabled={targetSpread === 0}
         className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.97] transition-all duration-150 z-10"
       >
         <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
@@ -276,7 +275,7 @@ function NavArrows({
       <button
         onClick={nextSpread}
         onMouseDown={(e) => e.stopPropagation()}
-        disabled={currentSpread >= totalSpreads - 1 || !!flipState}
+        disabled={targetSpread >= totalSpreads - 1}
         className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white shadow-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.97] transition-all duration-150 z-10"
       >
         <ChevronRightIcon className="w-5 h-5 text-gray-600" />
@@ -289,34 +288,97 @@ function NavArrows({
 
 interface SpreadSliderProps {
   currentSpread: number;
+  targetSpread: number;
   totalSpreads: number;
   onSliderChange: (value: number) => void;
 }
 
 export function SpreadSlider({
-  currentSpread,
+  currentSpread: _currentSpread,
+  targetSpread,
   totalSpreads,
   onSliderChange,
 }: SpreadSliderProps) {
-  const { t } = useI18n();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [dragPercent, setDragPercent] = useState<number | null>(null);
+  const lastEmittedSpread = useRef<number | null>(null);
+  const hasMoved = useRef(false);
+
+  const snappedPercent =
+    totalSpreads > 1 ? targetSpread / (totalSpreads - 1) : 0;
+  const displayPercent = dragPercent ?? snappedPercent;
+
+  const getRatio = useCallback((clientX: number) => {
+    const track = trackRef.current;
+    if (!track) return 0;
+    const rect = track.getBoundingClientRect();
+    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  }, []);
+
+  const updateDrag = useCallback(
+    (ratio: number) => {
+      setDragPercent(ratio);
+      const spread = Math.round(ratio * (totalSpreads - 1));
+      if (spread !== lastEmittedSpread.current) {
+        lastEmittedSpread.current = spread;
+        onSliderChange(spread);
+      }
+    },
+    [totalSpreads, onSliderChange],
+  );
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      hasMoved.current = false;
+      lastEmittedSpread.current = targetSpread;
+    },
+    [targetSpread],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (lastEmittedSpread.current === null) return;
+      hasMoved.current = true;
+      updateDrag(getRatio(e.clientX));
+    },
+    [getRatio, updateDrag],
+  );
+
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (lastEmittedSpread.current === null) return;
+      if (!hasMoved.current) {
+        // Click (no drag) — emit target, thumb transitions via CSS
+        const spread = Math.round(getRatio(e.clientX) * (totalSpreads - 1));
+        onSliderChange(spread);
+      }
+      setDragPercent(null);
+      lastEmittedSpread.current = null;
+    },
+    [getRatio, totalSpreads, onSliderChange],
+  );
+
   return (
-    <>
-      <span className="text-sm text-gray-400 whitespace-nowrap min-w-[90px] shrink-0">
-        {t("create.preview.spread")} {currentSpread + 1} / {totalSpreads}
-      </span>
-      <input
-        type="range"
-        min={0}
-        max={totalSpreads - 1}
-        value={currentSpread}
-        onChange={(e) => onSliderChange(Number(e.target.value))}
-        className="flex-1 h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-gray-900
-          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
-          [&::-webkit-slider-thumb]:bg-gray-900 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
-          [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-gray-900
-          [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:cursor-pointer"
+    <div
+      ref={trackRef}
+      className="flex-1 relative h-5 flex items-center cursor-pointer"
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+    >
+      {/* Track */}
+      <div className="w-full h-1.5 bg-gray-200 rounded-full" />
+      {/* Thumb */}
+      <div
+        className="absolute w-4 h-4 bg-gray-900 rounded-full -translate-x-1/2 pointer-events-none"
+        style={{
+          left: `${displayPercent * 100}%`,
+          transition: dragPercent !== null ? "none" : "left 0.3s ease-out",
+        }}
       />
-    </>
+    </div>
   );
 }
 

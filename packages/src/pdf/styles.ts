@@ -299,7 +299,7 @@ export const PDF_STYLES = `
   }
 
   .toc-continuation-spacer {
-    height: 51px; /* Matches .toc-header height + margin */
+    height: 60px; /* Matches .toc-header height + margin */
   }
 
   /* ========================================
