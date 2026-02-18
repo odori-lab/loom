@@ -17,7 +17,7 @@ import {
 
 type Loom = Database["public"]["Tables"]["looms"]["Row"];
 
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 const STEPS = ["username", "organize", "complete"] as const;
 
 interface CreateFlowProviderProps {
