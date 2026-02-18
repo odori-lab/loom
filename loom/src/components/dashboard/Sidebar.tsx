@@ -1,12 +1,12 @@
 "use client";
 
+import type { User } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
-import { User } from "@supabase/supabase-js";
-import { useDashboard } from "./DashboardContext";
+import { GradientAvatar } from "@/components/ui/GradientAvatar";
 import { BookOpenIcon, PlusIcon } from "@/components/ui/Icons";
 import { useI18n } from "@/lib/i18n/context";
-import { GradientAvatar } from "@/components/ui/GradientAvatar";
+import { useDashboard } from "./DashboardContext";
 
 interface SidebarProps {
   user: User;

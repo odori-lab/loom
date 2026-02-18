@@ -1,6 +1,6 @@
 import { escapeHtml } from "../../format";
+import type { ThreadsProfile } from "../../types/threads";
 import { LOOM_LOGO_SVG } from "../logo";
-import { ThreadsProfile } from "../../types/threads";
 
 export function generateCoverPage(
   profile: ThreadsProfile,

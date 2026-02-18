@@ -1,4 +1,4 @@
-import { ThreadsProfile, escapeHtml } from "@loom/shared";
+import { escapeHtml, type ThreadsProfile } from "@loom/shared";
 
 export function generateAuthorPage(profile: ThreadsProfile): string {
   const profileImage = profile.profileImageUrl

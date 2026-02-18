@@ -1,19 +1,19 @@
 "use client";
 
-import { useState, useMemo, useCallback, ReactNode } from "react";
-import { ThreadsPost, ThreadsProfile, Database } from "@loom/shared";
-import { scrapeThreadsDirect, createLoomDirect } from "@/lib/worker-client";
-import { createClient } from "@/lib/supabase/client";
-import {
-  CreateFlowContext,
-  CreateFlowContextValue,
-  Step,
-  LoadingPhase,
-} from "./CreateFlowContext";
-import { MOCK_PROFILE, MOCK_POSTS, MOCK_BOOK_STRUCTURE } from "@/lib/mockdata";
-import { usePostSelection } from "@/hooks/usePostSelection";
+import type { Database, ThreadsPost, ThreadsProfile } from "@loom/shared";
+import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { useBookOrganization } from "@/hooks/useBookOrganization";
 import { usePdfMeasurement } from "@/hooks/usePdfMeasurement";
+import { usePostSelection } from "@/hooks/usePostSelection";
+import { MOCK_BOOK_STRUCTURE, MOCK_POSTS, MOCK_PROFILE } from "@/lib/mockdata";
+import { createClient } from "@/lib/supabase/client";
+import { createLoomDirect, scrapeThreadsDirect } from "@/lib/worker-client";
+import {
+  CreateFlowContext,
+  type CreateFlowContextValue,
+  type LoadingPhase,
+  type Step,
+} from "./CreateFlowContext";
 
 type Loom = Database["public"]["Tables"]["looms"]["Row"];
 
@@ -144,7 +144,10 @@ export function CreateFlowProvider({
         if (!organizeRes.ok) throw new Error(organizeData.error);
         book.setBookStructure(organizeData);
       } catch (orgErr) {
-        console.error("Failed to organize book:", orgErr instanceof Error ? orgErr.message : orgErr);
+        console.error(
+          "Failed to organize book:",
+          orgErr instanceof Error ? orgErr.message : orgErr,
+        );
         // Continue without book structure - will use default ordering
       }
 
@@ -314,6 +317,12 @@ export function CreateFlowProvider({
       toggleAll,
       organizeBook,
       regenerateStructure,
+      createAnother,
+      generateLoom,
+      goBack,
+      nextSpread,
+      prevSpread,
+      submitUsername,
     ],
   );
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { useI18n } from "@/lib/i18n/context";
+import { createClient } from "@/lib/supabase/client";
 
 function LoginContent() {
   const searchParams = useSearchParams();

@@ -1,6 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function MyPage() {
   const supabase = await createClient();

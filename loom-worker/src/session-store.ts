@@ -1,5 +1,5 @@
-import { StoredSession } from "./types";
 import { redis } from "./redis";
+import type { StoredSession } from "./types";
 
 // Session TTL: 7 days in seconds
 const SESSION_TTL = 7 * 24 * 60 * 60;

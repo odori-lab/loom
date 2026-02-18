@@ -1,6 +1,6 @@
-import { ContentBlock, MeasuredBlock, PageMapping } from "./types";
-import { StoredPage, PageMeta } from "@loom/shared";
+import type { PageMeta, StoredPage } from "@loom/shared";
 import { SAFE_PAGE_HEIGHT } from "./constants";
+import type { ContentBlock, MeasuredBlock, PageMapping } from "./types";
 
 // Page types that should NOT show page numbers
 const NO_PAGE_NUMBER_TYPES: Set<ContentBlock["type"]> = new Set([

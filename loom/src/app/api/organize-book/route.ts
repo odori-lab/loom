@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { BookStructure, ThreadsPost, ThreadsProfile } from "@loom/shared";
+import type { BookStructure, ThreadsPost, ThreadsProfile } from "@loom/shared";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -133,10 +133,8 @@ ${JSON.stringify(postData, null, 2)}
     return NextResponse.json(bookStructure);
   } catch (error) {
     console.error("[ORGANIZE_BOOK_ERROR]", error);
-    const message = error instanceof Error ? error.message : "Failed to organize book";
-    return NextResponse.json(
-      { error: message },
-      { status: 500 },
-    );
+    const message =
+      error instanceof Error ? error.message : "Failed to organize book";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

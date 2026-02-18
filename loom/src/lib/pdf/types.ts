@@ -31,4 +31,4 @@ export type PageMapping = Map<string, number>;
 
 // ─── Layout types (re-exported from @loom/shared) ───
 
-export type { MergedPost, CaptionMap } from "@loom/shared";
+export type { CaptionMap, MergedPost } from "@loom/shared";

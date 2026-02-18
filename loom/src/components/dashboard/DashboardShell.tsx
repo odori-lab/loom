@@ -1,7 +1,7 @@
 "use client";
 
-import { Database } from "@loom/shared";
-import { User } from "@supabase/supabase-js";
+import type { Database } from "@loom/shared";
+import type { User } from "@supabase/supabase-js";
 import dynamic from "next/dynamic";
 import { CreateFlowProvider } from "@/components/create/CreateFlowProvider";
 import { useResizable } from "@/hooks/useResizable";

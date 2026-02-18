@@ -1,8 +1,8 @@
+import type { CoverData, Database, Json, StoredPage } from "@loom/shared";
 import { NextResponse } from "next/server";
-import { requireAuth, AuthError } from "@/lib/api/auth";
-import { parseLoomInput, ValidationError } from "@/lib/api/validation";
+import { AuthError, requireAuth } from "@/lib/api/auth";
 import { getSignedDownloadUrl } from "@/lib/api/storage";
-import { CoverData, StoredPage, Database, Json } from "@loom/shared";
+import { parseLoomInput, ValidationError } from "@/lib/api/validation";
 
 // GET /api/looms - List user's looms
 export async function GET() {
@@ -76,10 +76,7 @@ export async function POST(request: Request) {
         });
 
       if (pagesUploadError) {
-        console.warn(
-          "[LOOM_PAGES_UPLOAD_WARN]",
-          pagesUploadError.message,
-        );
+        console.warn("[LOOM_PAGES_UPLOAD_WARN]", pagesUploadError.message);
       } else {
         pagesPath = jsonPath;
       }

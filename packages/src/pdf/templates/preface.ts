@@ -1,7 +1,7 @@
 import { escapeHtml } from "../../format";
 
 export function generatePrefacePage(preface: string): string {
-	return `
+  return `
     <div class="page preface-page">
       <div class="preface-header">Preface</div>
       <div class="preface-text">${escapeHtml(preface)}</div>

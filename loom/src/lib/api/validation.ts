@@ -1,4 +1,4 @@
-import { ThreadsPost, ThreadsProfile } from "@loom/shared";
+import type { ThreadsPost, ThreadsProfile } from "@loom/shared";
 
 export class ValidationError extends Error {
   constructor(message: string) {

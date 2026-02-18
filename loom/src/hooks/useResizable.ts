@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, RefObject } from "react";
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 export function useResizable(
   initial: number,

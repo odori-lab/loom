@@ -1,5 +1,5 @@
 // Client-side worker API — calls loom-worker directly to bypass Vercel timeout
-import { ThreadsPost, ThreadsProfile } from "@loom/shared";
+import type { ThreadsPost, ThreadsProfile } from "@loom/shared";
 
 const WORKER_URL = process.env.NEXT_PUBLIC_LOOM_WORKER_URL?.replace(/\/+$/, "");
 

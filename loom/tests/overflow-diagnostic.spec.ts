@@ -13,7 +13,7 @@ test.describe("Overflow Diagnostic - Detailed Analysis", () => {
     await page.waitForFunction(
       () => {
         const el = document.getElementById("page-count");
-        return el && parseInt(el.textContent || "0") > 0;
+        return el && parseInt(el.textContent || "0", 10) > 0;
       },
       { timeout: 15_000 },
     );
@@ -22,9 +22,11 @@ test.describe("Overflow Diagnostic - Detailed Analysis", () => {
   test("diagnose overflow root causes across all spreads", async ({ page }) => {
     const spreadCount = parseInt(
       (await page.locator("#spread-count").textContent()) || "0",
+      10,
     );
     const pageCount = parseInt(
       (await page.locator("#page-count").textContent()) || "0",
+      10,
     );
     console.log(`\n=== OVERFLOW DIAGNOSTIC ===`);
     console.log(`Total pages: ${pageCount}, Total spreads: ${spreadCount}`);

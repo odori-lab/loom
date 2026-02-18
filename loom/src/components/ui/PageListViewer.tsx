@@ -1,6 +1,6 @@
 "use client";
 
-import { PAGE_WIDTH, PAGE_HEIGHT } from "@/lib/pdf/constants";
+import { PAGE_HEIGHT, PAGE_WIDTH } from "@/lib/pdf/constants";
 import { generatePageHtml } from "@/lib/pdf/generator";
 import { proxyImageUrls } from "@/lib/proxy";
 

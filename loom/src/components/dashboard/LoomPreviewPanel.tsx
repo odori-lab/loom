@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useI18n } from "@/lib/i18n/context";
 import { useDashboard } from "./DashboardContext";
 
@@ -40,8 +40,7 @@ export function LoomPreviewPanel({
   const { t } = useI18n();
 
   const isActive = propActive ?? !!dashboard.selectedLoom;
-  const pages =
-    propPages ?? dashboard.previewPages?.map((p) => p.html) ?? null;
+  const pages = propPages ?? dashboard.previewPages?.map((p) => p.html) ?? null;
   const loadingPreview = propLoading ?? dashboard.loadingPreview;
   const handlePageClick =
     propOnPageClick ?? (() => dashboard.openPreviewModal());

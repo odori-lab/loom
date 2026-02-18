@@ -1,28 +1,28 @@
+import type { CaptionMap, MergedPost } from "@loom/shared";
 import {
-  ThreadsPost,
-  ThreadsProfile,
-  BookStructure,
-  formatNumber,
+  type BookStructure,
+  buildCaptionMap,
   escapeHtml,
   formatDate,
-  generateTocPage,
-  generatePrefacePage,
+  formatNumber,
   generateChapterTitlePage,
-  generateSubChapterTitle,
   generateLastPage,
+  generatePrefacePage,
+  generateSubChapterTitle,
+  generateTocPage,
   mergeThreadPosts,
-  buildCaptionMap,
+  type ThreadsPost,
+  type ThreadsProfile,
 } from "@loom/shared";
-import type { CaptionMap, MergedPost } from "@loom/shared";
-import { ContentBlock } from "./types";
-import { generateCoverPage } from "./templates/cover";
 import { generateAuthorPage } from "./templates/author";
+import { generateCoverPage } from "./templates/cover";
+import type { ContentBlock } from "./types";
 
 // Re-export ContentBlock type for backward compatibility
 export type { ContentBlock } from "./types";
 
 // Generate a single merged post's inner HTML (no page wrapper)
-function generateMergedPostInnerHtml(
+function _generateMergedPostInnerHtml(
   post: MergedPost,
   captionMap?: CaptionMap,
 ): string {
@@ -197,11 +197,7 @@ function generateEssayBlocks(
       const mergedPosts = mergeThreadPosts(subChapterPosts);
 
       // Generate individual element-level blocks for natural page packing
-      for (
-        let postIdx = 0;
-        postIdx < mergedPosts.length;
-        postIdx++
-      ) {
+      for (let postIdx = 0; postIdx < mergedPosts.length; postIdx++) {
         const mp = mergedPosts[postIdx];
         const dateStr = formatDate(mp.date);
         const likesStr =
@@ -221,9 +217,7 @@ function generateEssayBlocks(
         });
 
         // Text paragraph blocks
-        const paragraphs = mp.content
-          .split("\n\n")
-          .filter((p) => p.trim());
+        const paragraphs = mp.content.split("\n\n").filter((p) => p.trim());
         for (let pIdx = 0; pIdx < paragraphs.length; pIdx++) {
           blocks.push({
             id: `post-text-${chapterIdx}-${subIdx}-${postIdx}-${pIdx}`,

@@ -1,28 +1,28 @@
+import type { BookStructure, ThreadsPost, ThreadsProfile } from "@loom/shared";
 import {
-  generatePageHtml as sharedGeneratePageHtml,
-  generateAllPagesHtml as sharedGenerateAllPagesHtml,
-  generateEssayPageContents,
   generateBlankPage,
+  generateEssayPageContents,
   generateLastPage,
   PRETENDARD_FONT_LINK,
+  generateAllPagesHtml as sharedGenerateAllPagesHtml,
+  generatePageHtml as sharedGeneratePageHtml,
 } from "@loom/shared";
-import type {
-  BookStructure,
-  ThreadsPost,
-  ThreadsProfile,
-} from "@loom/shared";
-import { generateCoverPage } from "./templates/cover";
+import { calculateLayout, type PostChunk } from "./layout";
 import { generateContentPageFromChunks } from "./templates/content";
-import { calculateLayout, PostChunk } from "./layout";
+import { generateCoverPage } from "./templates/cover";
 
 // Generate HTML for a single page
 export function generatePageHtml(pageContent: string): string {
-  return sharedGeneratePageHtml(pageContent, { fontLink: PRETENDARD_FONT_LINK });
+  return sharedGeneratePageHtml(pageContent, {
+    fontLink: PRETENDARD_FONT_LINK,
+  });
 }
 
 // Generate a single HTML document containing all pages (optimized for single-pass PDF rendering)
 export function generateAllPagesHtml(pageContents: string[]): string {
-  return sharedGenerateAllPagesHtml(pageContents, { fontLink: PRETENDARD_FONT_LINK });
+  return sharedGenerateAllPagesHtml(pageContents, {
+    fontLink: PRETENDARD_FONT_LINK,
+  });
 }
 
 // Check if two page indices are in the same spread

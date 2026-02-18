@@ -1,6 +1,6 @@
+import type { Database } from "@loom/shared";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { Database } from "@loom/shared";
 
 export async function createClient() {
   const cookieStore = await cookies();

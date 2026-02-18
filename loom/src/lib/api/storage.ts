@@ -1,5 +1,5 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-import { StoredPage } from "@loom/shared";
+import type { StoredPage } from "@loom/shared";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SIGNED_URL_EXPIRY = 3600; // 1 hour
 

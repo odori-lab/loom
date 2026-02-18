@@ -1,13 +1,13 @@
+import type { Database } from "@loom/shared";
 import { NextResponse } from "next/server";
-import { Database } from "@loom/shared";
-import { requireAuth, AuthError } from "@/lib/api/auth";
+import { AuthError, requireAuth } from "@/lib/api/auth";
 import { getSignedDownloadUrl, getSignedUrl } from "@/lib/api/storage";
 
 type Loom = Database["public"]["Tables"]["looms"]["Row"];
 
 // GET /api/looms/[id] - Get loom details with download URL
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -57,7 +57,7 @@ export async function GET(
 
 // DELETE /api/looms/[id] - Delete a loom
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {

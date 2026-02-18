@@ -1,13 +1,13 @@
 import type {
-  ThreadsProfile as PdfThreadsProfile,
   ThreadsPost as PdfThreadsPost,
+  ThreadsProfile as PdfThreadsProfile,
 } from "@loom/shared";
 
 export type {
-  BookSubChapter,
   BookChapter,
-  ImageCaption,
   BookStructure,
+  BookSubChapter,
+  ImageCaption,
 } from "@loom/shared";
 
 export interface ScraperAccount {

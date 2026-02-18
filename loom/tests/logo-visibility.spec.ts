@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("Cover & Last page logo visibility", () => {
   test.beforeEach(async ({ page }) => {
@@ -17,7 +17,7 @@ test.describe("Cover & Last page logo visibility", () => {
     await page.waitForFunction(
       () => {
         const el = document.getElementById("page-count");
-        return el && parseInt(el.textContent || "0") > 0;
+        return el && parseInt(el.textContent || "0", 10) > 0;
       },
       { timeout: 15_000 },
     );
@@ -51,9 +51,9 @@ test.describe("Cover & Last page logo visibility", () => {
       }
 
       const imgEl = logoImg as HTMLImageElement;
-      const computed = iframe.contentWindow!.getComputedStyle(imgEl);
+      const computed = iframe.contentWindow?.getComputedStyle(imgEl);
       const containerComputed =
-        iframe.contentWindow!.getComputedStyle(logoContainer);
+        iframe.contentWindow?.getComputedStyle(logoContainer);
       const rect = imgEl.getBoundingClientRect();
 
       return {
@@ -85,12 +85,12 @@ test.describe("Cover & Last page logo visibility", () => {
 
     // Assertions
     expect(logoInfo).not.toBeNull();
-    expect(logoInfo!.found).toBe(true);
-    expect(logoInfo!.isVisible).toBe(true);
+    expect(logoInfo?.found).toBe(true);
+    expect(logoInfo?.isVisible).toBe(true);
     // Cover logo should be 36px
-    expect(logoInfo!.width).toBeCloseTo(36, 0);
-    expect(logoInfo!.height).toBeCloseTo(36, 0);
-    expect(parseFloat(logoInfo!.opacity!)).toBeCloseTo(0.5, 1);
+    expect(logoInfo?.width).toBeCloseTo(36, 0);
+    expect(logoInfo?.height).toBeCloseTo(36, 0);
+    expect(parseFloat(logoInfo?.opacity!)).toBeCloseTo(0.5, 1);
   });
 
   test("last page logo should be visible and properly sized", async ({
@@ -98,6 +98,7 @@ test.describe("Cover & Last page logo visibility", () => {
   }) => {
     const pageCount = parseInt(
       (await page.locator("#page-count").textContent()) || "0",
+      10,
     );
     console.log(`Total pages: ${pageCount}`);
 
@@ -115,7 +116,11 @@ test.describe("Cover & Last page logo visibility", () => {
 
       const lastPage = doc.querySelector(".last-page");
       if (!lastPage)
-        return { found: false, isLastPage: false, bodyHTML: doc.body.innerHTML };
+        return {
+          found: false,
+          isLastPage: false,
+          bodyHTML: doc.body.innerHTML,
+        };
 
       const logoImg = lastPage.querySelector("img");
 
@@ -130,7 +135,7 @@ test.describe("Cover & Last page logo visibility", () => {
         };
       }
 
-      const computed = iframe.contentWindow!.getComputedStyle(logoImg);
+      const computed = iframe.contentWindow?.getComputedStyle(logoImg);
       const rect = logoImg.getBoundingClientRect();
 
       return {
@@ -159,11 +164,11 @@ test.describe("Cover & Last page logo visibility", () => {
 
     // Assertions
     expect(logoInfo).not.toBeNull();
-    expect(logoInfo!.found).toBe(true);
-    expect(logoInfo!.isVisible).toBe(true);
+    expect(logoInfo?.found).toBe(true);
+    expect(logoInfo?.isVisible).toBe(true);
     // Last page logo should be 56px
-    expect(logoInfo!.width).toBeCloseTo(56, 0);
-    expect(logoInfo!.height).toBeCloseTo(56, 0);
-    expect(parseFloat(logoInfo!.opacity!)).toBeCloseTo(0.75, 1);
+    expect(logoInfo?.width).toBeCloseTo(56, 0);
+    expect(logoInfo?.height).toBeCloseTo(56, 0);
+    expect(parseFloat(logoInfo?.opacity!)).toBeCloseTo(0.75, 1);
   });
 });

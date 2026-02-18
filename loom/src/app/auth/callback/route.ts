@@ -1,6 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@loom/shared";
 import { NextResponse } from "next/server";
-import { Database } from "@loom/shared";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -24,12 +24,13 @@ export async function GET(request: Request) {
           .single();
 
         if (!profile) {
-          const profileData: Database["public"]["Tables"]["profiles"]["Insert"] = {
-            id: user.id,
-            email: user.email!,
-            name: user.user_metadata.full_name || user.user_metadata.name,
-            avatar_url: user.user_metadata.avatar_url,
-          };
+          const profileData: Database["public"]["Tables"]["profiles"]["Insert"] =
+            {
+              id: user.id,
+              email: user.email!,
+              name: user.user_metadata.full_name || user.user_metadata.name,
+              avatar_url: user.user_metadata.avatar_url,
+            };
           /* eslint-disable @typescript-eslint/no-explicit-any */
           const { error: insertError } = await supabase
             .from("profiles")

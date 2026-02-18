@@ -1,11 +1,11 @@
 "use client";
 
-import { User } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { useI18n } from "@/lib/i18n/context";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { GradientAvatar } from "@/components/ui/GradientAvatar";
+import { useI18n } from "@/lib/i18n/context";
+import { createClient } from "@/lib/supabase/client";
 
 interface SettingTabProps {
   user: User;

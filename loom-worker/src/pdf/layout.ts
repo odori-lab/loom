@@ -1,5 +1,5 @@
-import { ThreadsPost } from "@loom/shared";
-import type { MergedPost } from "@loom/shared";
+import type { ThreadsPost } from "@loom/shared";
+
 export type { MergedPost } from "@loom/shared";
 
 // Content area calculation (in pixels)
