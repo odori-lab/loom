@@ -20,8 +20,8 @@ RUN pnpm install --frozen-lockfile
 # Install Playwright Chromium with system dependencies
 RUN cd loom-worker && npx playwright install --with-deps chromium
 
-# Build worker
-RUN pnpm --filter @loom/worker build
+# Build shared package first, then worker
+RUN pnpm --filter @loom/shared build && pnpm --filter @loom/worker build
 
 WORKDIR /app/loom-worker
 

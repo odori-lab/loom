@@ -243,12 +243,7 @@ export const PDF_STYLES = `
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .toc-item:last-child {
-    border-bottom: none;
+    padding-bottom: 32px;
   }
 
   /* TOC items when placed directly in page (split TOC) */
@@ -256,13 +251,8 @@ export const PDF_STYLES = `
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 32px;
     margin-bottom: 4px;
-  }
-
-  .toc-content > .toc-item:last-child {
-    border-bottom: none;
   }
 
   .toc-chapter-number {
@@ -322,7 +312,7 @@ export const PDF_STYLES = `
   }
 
   .toc-sub-chapter .toc-page-number {
-    font-size: 8pt;
+    font-size: 6pt;
   }
 
   /* ========================================
@@ -469,14 +459,16 @@ export const PDF_STYLES = `
 
   .essay-image-row {
     display: flex;
-    gap: 6px;
+    column-gap: 6px;
+    row-gap: 6px;
     justify-content: center;
+    align-content: center;
     flex-wrap: wrap;
   }
 
   .essay-inline-image {
     max-width: 100%;
-    max-height: 200px;
+    max-height: 150px;
     min-height: 100px;
     object-fit: contain;
     border-radius: 8px;
@@ -488,7 +480,7 @@ export const PDF_STYLES = `
     flex: 0 1 auto;
     min-width: 0;
     max-width: 100%;
-    max-height: 200px;
+    max-height: 150px;
     min-height: 100px;
     object-fit: contain;
   }
