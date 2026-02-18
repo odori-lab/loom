@@ -20,7 +20,22 @@ export { PDF_STYLES } from "./pdf/styles";
 export { mergeThreadPosts, buildCaptionMap } from "./pdf/merge";
 export type { PageMapping } from "./pdf/templates/toc";
 
+// PDF constants
+export {
+  PAGE_WIDTH,
+  PAGE_HEIGHT,
+  PAGE_PADDING_TOP,
+  PAGE_PADDING_SIDE,
+  MAX_PAGE_HEIGHT,
+  SAFE_PAGE_HEIGHT,
+  IMAGE_LOAD_TIMEOUT,
+  IMAGE_FALLBACK_HEIGHTS,
+  DEFAULT_IMAGE_FALLBACK,
+  ESSAY,
+} from "./pdf/constants";
+
 // PDF templates
+export { generateCoverPage } from "./pdf/templates/cover";
 export { generateLastPage } from "./pdf/templates/last";
 export {
   generateChapterTitlePage,
@@ -32,3 +47,18 @@ export {
   generateEssaySubChapterPage,
   generateEssayContinuationPage,
 } from "./pdf/templates/content";
+
+// PDF spreads
+export { calculateSpreads } from "./pdf/spreads";
+export type { SpreadData } from "./pdf/spreads";
+
+// PDF generator
+export {
+  generatePageHtml,
+  generateAllPagesHtml,
+  generateEssayPageContents,
+  estimateMergedPostHeight,
+  splitSubChapterIntoPages,
+  generateBlankPage,
+} from "./pdf/generator";
+export type { GeneratePageHtmlOptions } from "./pdf/generator";
