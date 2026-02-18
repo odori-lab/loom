@@ -1,9 +1,12 @@
 import { type RefObject, useCallback, useEffect, useState } from "react";
 
 export interface FlipState {
+  id: number;
   direction: "forward" | "backward";
+  fromSpread: number;
   targetSpread: number;
-  phase: "pending" | "animating";
+  done: boolean;
+  staggerDelay: number;
 }
 
 // Zoom constants
@@ -12,10 +15,13 @@ const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.25;
 const WHEEL_ZOOM_STEP = 0.1;
 
-// Combined state for spread navigation — keeps goToSpread/handleFlipEnd stable
+const MAX_FLIPS = 8;
+const STAGGER_MS = 150;
+
 interface SpreadNav {
   currentSpread: number;
-  flipState: FlipState | null;
+  flips: FlipState[];
+  nextFlipId: number;
 }
 
 interface UseSpreadViewerOptions {
@@ -24,6 +30,67 @@ interface UseSpreadViewerOptions {
   pageHeight: number;
   containerRef: RefObject<HTMLDivElement | null>;
   resetKey?: string | number;
+}
+
+/** Create flip chain from current latest position to `value`. */
+function computeFlipsTo(
+  prev: SpreadNav,
+  value: number,
+  totalSpreads: number,
+): SpreadNav {
+  // Use only active (non-done) flips for computation
+  const activeFlips = prev.flips.filter((f) => !f.done);
+
+  const latest =
+    activeFlips.length > 0
+      ? activeFlips[activeFlips.length - 1].targetSpread
+      : prev.currentSpread;
+  if (value === latest || value < 0 || value >= totalSpreads) return prev;
+
+  const direction: "forward" | "backward" =
+    value > latest ? "forward" : "backward";
+  const step = direction === "forward" ? 1 : -1;
+
+  // Direction change → complete all existing flips instantly
+  let flips = [...activeFlips];
+  let { currentSpread } = prev;
+  if (flips.length > 0 && flips[0].direction !== direction) {
+    currentSpread = latest;
+    flips = [];
+  }
+
+  // Add one flip per step
+  const firstNewId = prev.nextFlipId;
+  let id = firstNewId;
+  let from = latest;
+  while (from !== value) {
+    flips.push({
+      id: id++,
+      direction,
+      fromSpread: from,
+      targetSpread: from + step,
+      done: false,
+      staggerDelay: 0, // set after capping
+    });
+    from += step;
+  }
+
+  // Cap oldest flips
+  while (flips.length > MAX_FLIPS) {
+    currentSpread = flips[0].targetSpread;
+    flips.shift();
+  }
+
+  // Set stagger delays for new flips only (existing keep theirs)
+  let newIdx = 0;
+  for (const f of flips) {
+    if (f.id >= firstNewId) {
+      f.staggerDelay = newIdx * STAGGER_MS;
+      newIdx++;
+    }
+  }
+
+  return { currentSpread, flips, nextFlipId: id };
 }
 
 export function useSpreadViewer({
@@ -35,7 +102,8 @@ export function useSpreadViewer({
 }: UseSpreadViewerOptions) {
   const [nav, setNav] = useState<SpreadNav>({
     currentSpread: 0,
-    flipState: null,
+    flips: [],
+    nextFlipId: 0,
   });
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -46,70 +114,76 @@ export function useSpreadViewer({
   const [prevResetKey, setPrevResetKey] = useState(resetKey);
   if (prevResetKey !== resetKey) {
     setPrevResetKey(resetKey);
-    setNav({ currentSpread: 0, flipState: null });
+    setNav({ currentSpread: 0, flips: [], nextFlipId: 0 });
     setScale(1);
     setOffset({ x: 0, y: 0 });
   }
 
   // ── Spread navigation ──
-  // Using functional setState on combined `nav` keeps these callbacks stable.
 
   const goToSpread = useCallback(
     (direction: "forward" | "backward") => {
       setNav((prev) => {
-        if (prev.flipState) return prev;
-        const target =
-          direction === "forward"
-            ? prev.currentSpread + 1
-            : prev.currentSpread - 1;
-        if (target < 0 || target >= totalSpreads) return prev;
-        return {
-          ...prev,
-          flipState: {
-            direction,
-            targetSpread: target,
-            phase: "pending" as const,
-          },
-        };
+        const activeFlips = prev.flips.filter((f) => !f.done);
+        const latest =
+          activeFlips.length > 0
+            ? activeFlips[activeFlips.length - 1].targetSpread
+            : prev.currentSpread;
+        const target = direction === "forward" ? latest + 1 : latest - 1;
+        return computeFlipsTo(prev, target, totalSpreads);
       });
     },
     [totalSpreads],
   );
 
-  // Trigger CSS transition one frame after flip starts
-  useEffect(() => {
-    if (!nav.flipState || nav.flipState.phase !== "pending") return;
-    const id = requestAnimationFrame(() => {
-      setNav((prev) => {
-        if (!prev.flipState || prev.flipState.phase !== "pending") return prev;
-        return {
-          ...prev,
-          flipState: { ...prev.flipState, phase: "animating" },
-        };
-      });
-    });
-    return () => cancelAnimationFrame(id);
-  }, [nav.flipState]);
-
-  const handleFlipEnd = useCallback(() => {
+  // Mark flip as done + advance currentSpread (keep element in DOM for 1 frame)
+  const handleFlipEnd = useCallback((flipId: number) => {
     setNav((prev) => {
-      if (!prev.flipState) return prev;
-      return { currentSpread: prev.flipState.targetSpread, flipState: null };
+      const idx = prev.flips.findIndex((f) => f.id === flipId);
+      if (idx === -1) return prev;
+      const completed = prev.flips[idx];
+      // Advance currentSpread only when the oldest active flip completes
+      const firstActiveIdx = prev.flips.findIndex((f) => !f.done);
+      const newCurrent =
+        idx === firstActiveIdx
+          ? completed.targetSpread
+          : prev.currentSpread;
+      return {
+        ...prev,
+        currentSpread: newCurrent,
+        flips: prev.flips.map((f) =>
+          f.id === flipId ? { ...f, done: true } : f,
+        ),
+      };
     });
-    // Reset zoom/pan on spread change
     setScale(1);
     setOffset({ x: 0, y: 0 });
   }, []);
+
+  // Cleanup done flips on next frame (prevents DOM flicker)
+  useEffect(() => {
+    const hasDone = nav.flips.some((f) => f.done);
+    if (!hasDone) return;
+    const id = requestAnimationFrame(() => {
+      setNav((prev) => ({
+        ...prev,
+        flips: prev.flips.filter((f) => !f.done),
+      }));
+    });
+    return () => cancelAnimationFrame(id);
+  }, [nav.flips]);
 
   const prevSpread = useCallback(() => goToSpread("backward"), [goToSpread]);
   const nextSpread = useCallback(() => goToSpread("forward"), [goToSpread]);
 
-  const handleSliderChange = useCallback((value: number) => {
-    setNav({ currentSpread: value, flipState: null });
-    // Reset zoom/pan on spread change
-    setScale(1);
-    setOffset({ x: 0, y: 0 });
-  }, []);
+  const handleSliderChange = useCallback(
+    (value: number) => {
+      setNav((prev) => computeFlipsTo(prev, value, totalSpreads));
+      setScale(1);
+      setOffset({ x: 0, y: 0 });
+    },
+    [totalSpreads],
+  );
 
   // ── Zoom ──
 
@@ -198,9 +272,15 @@ export function useSpreadViewer({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [prevSpread, nextSpread, zoomIn, zoomOut, resetZoom]);
 
+  const activeFlips = nav.flips.filter((f) => !f.done);
+
   return {
     currentSpread: nav.currentSpread,
-    flipState: nav.flipState,
+    targetSpread:
+      activeFlips.length > 0
+        ? activeFlips[activeFlips.length - 1].targetSpread
+        : nav.currentSpread,
+    flips: nav.flips,
     scale,
     offset,
     isDragging,

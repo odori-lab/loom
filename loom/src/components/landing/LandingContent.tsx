@@ -175,7 +175,7 @@ export function LandingContent({ user }: LandingContentProps) {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Image src="/icon-white.png" alt="Loom" width={32} height={32} />
+            <Image src="/icon-white.png" alt="Loom" width={48} height={48} />
             <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
               Loom
             </span>
@@ -276,13 +276,12 @@ export function LandingContent({ user }: LandingContentProps) {
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50 rounded-3xl -z-10 group-hover:scale-105 transition-transform" />
                 <div className="p-8">
                   <div
-                    className={`w-14 h-14 mb-6 rounded-2xl bg-gradient-to-br ${
-                      item.color === "purple"
-                        ? "from-purple-500 to-purple-600"
-                        : item.color === "blue"
-                          ? "from-blue-500 to-blue-600"
-                          : "from-green-500 to-green-600"
-                    } text-white flex items-center justify-center text-xl font-bold shadow-lg`}
+                    className={`w-14 h-14 mb-6 rounded-2xl bg-gradient-to-br ${item.color === "purple"
+                      ? "from-purple-500 to-purple-600"
+                      : item.color === "blue"
+                        ? "from-blue-500 to-blue-600"
+                        : "from-green-500 to-green-600"
+                      } text-white flex items-center justify-center text-xl font-bold shadow-lg`}
                   >
                     {item.step}
                   </div>

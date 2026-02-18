@@ -360,6 +360,26 @@ body {
   animation-delay: 1000ms;
 }
 
+/* === Spread Viewer — page flip animations === */
+
+@keyframes sv-flip-forward {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(-180deg);
+  }
+}
+
+@keyframes sv-flip-backward {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(180deg);
+  }
+}
+
 /* === Create Flow Specific Animations === */
 
 /* Book page flip */

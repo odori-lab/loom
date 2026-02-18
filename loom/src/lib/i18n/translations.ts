@@ -70,10 +70,10 @@ export const translations = {
     "dashboard.preview.loading": "미리보기 로딩 중...",
     "dashboard.preview.error": "미리보기를 불러오지 못했습니다",
     "dashboard.preview.downloadPdf": "PDF 다운로드",
-    "dashboard.preview.toc": "목차",
     "dashboard.preview.cover": "표지",
+    "dashboard.preview.author": "작가",
     "dashboard.preview.preface": "서문",
-    "dashboard.preview.tableOfContents": "목차 페이지",
+    "dashboard.preview.tableOfContents": "목차",
     "dashboard.preview.last": "마지막",
 
     // My Page
@@ -223,10 +223,10 @@ export const translations = {
     "dashboard.preview.loading": "Loading preview...",
     "dashboard.preview.error": "Failed to load preview",
     "dashboard.preview.downloadPdf": "Download PDF",
-    "dashboard.preview.toc": "Contents",
     "dashboard.preview.cover": "Cover",
+    "dashboard.preview.author": "Author",
     "dashboard.preview.preface": "Preface",
-    "dashboard.preview.tableOfContents": "Table of Contents",
+    "dashboard.preview.tableOfContents": "Contents",
     "dashboard.preview.last": "End",
 
     // My Page

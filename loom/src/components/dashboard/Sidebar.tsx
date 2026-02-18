@@ -52,7 +52,7 @@ export function Sidebar({ user }: SidebarProps) {
       {/* Header */}
       <div className="h-16 px-6 flex items-center border-b border-gray-100">
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/icon-white.png" alt="Loom" width={28} height={28} />
+          <Image src="/icon-white.png" alt="Loom" width={48} height={48} />
           <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
             Loom
           </span>
@@ -67,11 +67,10 @@ export function Sidebar({ user }: SidebarProps) {
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-150 text-left ${
-                isActive
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-150 text-left ${isActive
                   ? "bg-gray-900 text-white"
                   : "text-gray-500 hover:bg-gray-100"
-              }`}
+                }`}
             >
               <Icon className="w-5 h-5" />
               {label}
@@ -84,9 +83,8 @@ export function Sidebar({ user }: SidebarProps) {
       <div className="border-t border-gray-100">
         <button
           onClick={() => setActiveTab("setting")}
-          className={`w-full flex items-center gap-3 px-6 py-4 transition-colors duration-150 active:scale-[0.98] ${
-            isSettingActive ? "bg-gray-50" : "hover:bg-gray-50"
-          }`}
+          className={`w-full flex items-center gap-3 px-6 py-4 transition-colors duration-150 active:scale-[0.98] ${isSettingActive ? "bg-gray-50" : "hover:bg-gray-50"
+            }`}
         >
           <GradientAvatar
             userId={user.id}
