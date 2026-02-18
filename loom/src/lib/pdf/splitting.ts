@@ -1,10 +1,10 @@
-import { ContentBlock, MeasuredBlock } from "./types";
 import {
-  SAFE_PAGE_HEIGHT,
-  IMAGE_LOAD_TIMEOUT,
-  IMAGE_FALLBACK_HEIGHTS,
   DEFAULT_IMAGE_FALLBACK,
+  IMAGE_FALLBACK_HEIGHTS,
+  IMAGE_LOAD_TIMEOUT,
+  SAFE_PAGE_HEIGHT,
 } from "./constants";
+import type { ContentBlock, MeasuredBlock } from "./types";
 
 // Block types that should NEVER be split - they are designed as single full page
 const NO_SPLIT_TYPES: Set<ContentBlock["type"]> = new Set([
@@ -206,8 +206,7 @@ async function splitBlock(
       const groupHtml = `<div class="${rootClassName}">${group.map((c) => c.html).join("\n")}</div>`;
       const testWrapper = iframeDoc.createElement("div");
       testWrapper.className = "measure-block";
-      testWrapper.innerHTML =
-        groupHtml + '<div style="height:0;margin:0;padding:0;border:0;"></div>';
+      testWrapper.innerHTML = `${groupHtml}<div style="height:0;margin:0;padding:0;border:0;"></div>`;
       container.appendChild(testWrapper);
       const h = Math.ceil(testWrapper.getBoundingClientRect().height);
       container.removeChild(testWrapper);

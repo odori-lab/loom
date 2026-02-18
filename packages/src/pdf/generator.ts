@@ -1,18 +1,18 @@
-import type { ThreadsPost, ThreadsProfile } from "../types/threads";
 import type { BookStructure } from "../types/book";
-import type { MergedPost, CaptionMap } from "../types/pdf";
-import { mergeThreadPosts, buildCaptionMap } from "./merge";
-import { PDF_STYLES } from "./styles";
-import { generateCoverPage } from "./templates/cover";
-import { generateTocPage } from "./templates/toc";
-import { generatePrefacePage } from "./templates/preface";
-import { generateChapterTitlePage } from "./templates/chapter";
-import { generateLastPage } from "./templates/last";
-import {
-  generateEssaySubChapterPage,
-  generateEssayContinuationPage,
-} from "./templates/content";
+import type { CaptionMap, MergedPost } from "../types/pdf";
+import type { ThreadsPost, ThreadsProfile } from "../types/threads";
 import { ESSAY } from "./constants";
+import { buildCaptionMap, mergeThreadPosts } from "./merge";
+import { PDF_STYLES } from "./styles";
+import { generateChapterTitlePage } from "./templates/chapter";
+import {
+  generateEssayContinuationPage,
+  generateEssaySubChapterPage,
+} from "./templates/content";
+import { generateCoverPage } from "./templates/cover";
+import { generateLastPage } from "./templates/last";
+import { generatePrefacePage } from "./templates/preface";
+import { generateTocPage } from "./templates/toc";
 
 export interface GeneratePageHtmlOptions {
   fontLink?: string;
@@ -159,7 +159,9 @@ export function generateEssayPageContents(
   pages.push(generateCoverPage(profile, bookStructure.title));
 
   // 2. Table of Contents page (wrapped in page div)
-  pages.push(`<div class="page toc-page">${generateTocPage(bookStructure)}</div>`);
+  pages.push(
+    `<div class="page toc-page">${generateTocPage(bookStructure)}</div>`,
+  );
 
   // 3. Preface page
   if (bookStructure.preface) {

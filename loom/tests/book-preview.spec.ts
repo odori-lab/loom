@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("BookPreview - Page Navigation & Content Overflow", () => {
   test.beforeEach(async ({ page }) => {
@@ -18,7 +18,7 @@ test.describe("BookPreview - Page Navigation & Content Overflow", () => {
     await page.waitForFunction(
       () => {
         const el = document.getElementById("page-count");
-        return el && parseInt(el.textContent || "0") > 0;
+        return el && parseInt(el.textContent || "0", 10) > 0;
       },
       { timeout: 15_000 },
     );
@@ -34,8 +34,8 @@ test.describe("BookPreview - Page Navigation & Content Overflow", () => {
       `Pages: ${pageCount}, Spreads: ${spreadCount}, Selected: ${selectedCount}`,
     );
 
-    expect(parseInt(pageCount || "0")).toBeGreaterThan(0);
-    expect(parseInt(spreadCount || "0")).toBeGreaterThan(0);
+    expect(parseInt(pageCount || "0", 10)).toBeGreaterThan(0);
+    expect(parseInt(spreadCount || "0", 10)).toBeGreaterThan(0);
 
     // Take initial screenshot
     await page.screenshot({
@@ -47,6 +47,7 @@ test.describe("BookPreview - Page Navigation & Content Overflow", () => {
   test("should navigate forward through all spreads", async ({ page }) => {
     const spreadCount = parseInt(
       (await page.locator("#spread-count").textContent()) || "0",
+      10,
     );
     console.log(`Total spreads: ${spreadCount}`);
 
@@ -119,6 +120,7 @@ test.describe("BookPreview - Page Navigation & Content Overflow", () => {
   test("should handle slider navigation", async ({ page }) => {
     const spreadCount = parseInt(
       (await page.locator("#spread-count").textContent()) || "0",
+      10,
     );
 
     // Find the range slider
@@ -154,6 +156,7 @@ test.describe("BookPreview - Page Navigation & Content Overflow", () => {
   test("should check iframe content for overflow", async ({ page }) => {
     const spreadCount = parseInt(
       (await page.locator("#spread-count").textContent()) || "0",
+      10,
     );
     console.log(`Checking ${spreadCount} spreads for content overflow...`);
 
@@ -261,9 +264,11 @@ test.describe("BookPreview - Page Navigation & Content Overflow", () => {
   }) => {
     const pageCount = parseInt(
       (await page.locator("#page-count").textContent()) || "0",
+      10,
     );
     const spreadCount = parseInt(
       (await page.locator("#spread-count").textContent()) || "0",
+      10,
     );
 
     console.log(`Pages: ${pageCount}, Spreads: ${spreadCount}`);

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { ThreadsPost, BookStructure } from "@loom/shared";
-import { SortOrder } from "@/components/create/CreateFlowContext";
+import type { BookStructure, ThreadsPost } from "@loom/shared";
+import { useCallback, useMemo, useState } from "react";
+import type { SortOrder } from "@/components/create/CreateFlowContext";
 
 export function usePostSelection(
   posts: ThreadsPost[],

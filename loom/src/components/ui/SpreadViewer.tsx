@@ -1,7 +1,7 @@
-import { type ReactNode, type RefObject } from "react";
-import { type FlipState } from "@/hooks/useSpreadViewer";
-import { useI18n } from "@/lib/i18n/context";
+import type { ReactNode, RefObject } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/ui/Icons";
+import type { FlipState } from "@/hooks/useSpreadViewer";
+import { useI18n } from "@/lib/i18n/context";
 
 /* ─── FlipContainer ─── */
 

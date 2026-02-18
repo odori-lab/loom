@@ -1,23 +1,23 @@
-import { ContentBlock, MeasuredBlock } from "./types";
-import {
-  PAGE_WIDTH,
-  PAGE_HEIGHT,
-  IMAGE_LOAD_TIMEOUT,
-  IMAGE_FALLBACK_HEIGHTS,
-  DEFAULT_IMAGE_FALLBACK,
-} from "./constants";
 import { PDF_STYLES, PRETENDARD_FONT_LINK } from "@loom/shared";
+import {
+  DEFAULT_IMAGE_FALLBACK,
+  IMAGE_FALLBACK_HEIGHTS,
+  IMAGE_LOAD_TIMEOUT,
+  PAGE_HEIGHT,
+  PAGE_WIDTH,
+} from "./constants";
+import type { ContentBlock, MeasuredBlock } from "./types";
 
-// Re-export types and functions for backward compatibility
-export type { MeasuredBlock, PageMapping } from "./types";
 export { MAX_PAGE_HEIGHT } from "./constants";
-export { splitOversizedBlocks } from "./splitting";
 export {
   assignBlocksToPages,
   buildPageMapping,
   pagesToHtml,
   pagesToStoredPages,
 } from "./packing";
+export { splitOversizedBlocks } from "./splitting";
+// Re-export types and functions for backward compatibility
+export type { MeasuredBlock, PageMapping } from "./types";
 
 // Wait for all images in an element to load (with timeout), then apply
 // fallback dimensions for any images that failed to load
@@ -117,8 +117,7 @@ export async function measureBlockHeights(
     const wrapper = iframeDoc.createElement("div");
     wrapper.className = "measure-block";
     // Add dummy sibling to prevent :last-child from zeroing margins
-    wrapper.innerHTML =
-      block.html + '<div style="height:0;margin:0;padding:0;border:0;"></div>';
+    wrapper.innerHTML = `${block.html}<div style="height:0;margin:0;padding:0;border:0;"></div>`;
     container.appendChild(wrapper);
 
     await waitForImages(wrapper);

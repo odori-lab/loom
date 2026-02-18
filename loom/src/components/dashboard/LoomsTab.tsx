@@ -1,6 +1,6 @@
 "use client";
 
-import { Json } from "@loom/shared";
+import type { Json } from "@loom/shared";
 import { useMemo, useState } from "react";
 import {
   BookOpenIcon,
@@ -189,8 +189,9 @@ export function LoomsTab() {
                 {/* Loom row */}
                 <div
                   onClick={() => handleRowClick(loom)}
-                  className={`group flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all active:scale-[0.99] ${isSelected ? "bg-[#f5f5f5]" : "hover:bg-[#fafafa]"
-                    }`}
+                  className={`group flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all active:scale-[0.99] ${
+                    isSelected ? "bg-[#f5f5f5]" : "hover:bg-[#fafafa]"
+                  }`}
                 >
                   {/* Profile image */}
                   {profileImg ? (

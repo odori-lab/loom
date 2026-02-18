@@ -1,14 +1,14 @@
 "use client";
 
-import { createContext, use } from "react";
-import {
-  ThreadsPost,
-  ThreadsProfile,
+import type {
   BookStructure,
   StoredPage,
+  ThreadsPost,
+  ThreadsProfile,
 } from "@loom/shared";
-import { SpreadData } from "@/lib/pdf/spreads";
-import { PageMapping } from "@/lib/pdf/types";
+import { createContext, use } from "react";
+import type { SpreadData } from "@/lib/pdf/spreads";
+import type { PageMapping } from "@/lib/pdf/types";
 
 export type Step = "username" | "organize" | "complete";
 export type SortOrder = "newest" | "oldest";

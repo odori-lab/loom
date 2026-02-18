@@ -1,5 +1,5 @@
-import { chromium, Browser } from "playwright";
-import { writeFileSync } from "fs";
+import { writeFileSync } from "node:fs";
+import { type Browser, chromium } from "playwright";
 import sharp from "sharp";
 
 let browserInstance: Browser | null = null;

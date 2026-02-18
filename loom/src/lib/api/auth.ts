@@ -1,5 +1,5 @@
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { SupabaseClient, User } from "@supabase/supabase-js";
 
 export class AuthError extends Error {
   constructor(message = "Unauthorized") {

@@ -1,5 +1,10 @@
-import { ThreadsProfile, escapeHtml, formatNumber, formatDate } from "@loom/shared";
-import { PostChunk } from "../layout";
+import {
+  escapeHtml,
+  formatDate,
+  formatNumber,
+  type ThreadsProfile,
+} from "@loom/shared";
+import type { PostChunk } from "../layout";
 
 // Generate content page from chunks (supports split posts) - WORKER ONLY (legacy Threads style)
 export function generateContentPageFromChunks(
@@ -42,7 +47,7 @@ function generateChunkHtml(chunk: PostChunk, profile: ThreadsProfile): string {
 
   const avatar = profile.profileImageUrl
     ? `<img src="${profile.profileImageUrl}" alt="" class="post-avatar" />`
-    : `<div class="post-avatar-placeholder"><span>${post.username[0]!.toUpperCase()}</span></div>`;
+    : `<div class="post-avatar-placeholder"><span>${post.username[0]?.toUpperCase()}</span></div>`;
 
   const dateStr = formatDate(new Date(post.postedAt));
 

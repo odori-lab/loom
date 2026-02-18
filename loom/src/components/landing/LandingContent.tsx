@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import type { User } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
-import { User } from "@supabase/supabase-js";
-import { useI18n } from "@/lib/i18n/context";
-import { UserMenu } from "@/components/auth/UserMenu";
+import { useCallback, useEffect, useRef } from "react";
 import { LoginButton } from "@/components/auth/LoginButton";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { useI18n } from "@/lib/i18n/context";
 
 function useScrollAnimation() {
   const ref = useRef<HTMLDivElement>(null);

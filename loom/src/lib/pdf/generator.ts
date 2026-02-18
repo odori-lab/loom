@@ -1,19 +1,21 @@
 import {
-  ThreadsPost,
-  ThreadsProfile,
-  BookStructure,
-  generatePageHtml as sharedGeneratePageHtml,
+  type BookStructure,
   generateEssayPageContents,
   PRETENDARD_FONT_LINK,
+  generatePageHtml as sharedGeneratePageHtml,
+  type ThreadsPost,
+  type ThreadsProfile,
 } from "@loom/shared";
 
+export type { MergedPost } from "@loom/shared";
 // Re-export for existing consumers
 export { mergeThreadPosts } from "@loom/shared";
-export type { MergedPost } from "@loom/shared";
 
 // Generate HTML for a single page (used by both PDF and Preview)
 export function generatePageHtml(pageContent: string): string {
-  return sharedGeneratePageHtml(pageContent, { fontLink: PRETENDARD_FONT_LINK });
+  return sharedGeneratePageHtml(pageContent, {
+    fontLink: PRETENDARD_FONT_LINK,
+  });
 }
 
 // Generate page contents (array of page HTML strings)

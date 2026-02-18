@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("PDF Consistency - Font, Logo, TOC, Heights", () => {
   test.beforeEach(async ({ page }) => {
@@ -17,7 +17,7 @@ test.describe("PDF Consistency - Font, Logo, TOC, Heights", () => {
     await page.waitForFunction(
       () => {
         const el = document.getElementById("page-count");
-        return el && parseInt(el.textContent || "0") > 0;
+        return el && parseInt(el.textContent || "0", 10) > 0;
       },
       { timeout: 15_000 },
     );
@@ -33,7 +33,8 @@ test.describe("PDF Consistency - Font, Logo, TOC, Heights", () => {
       if (iframes.length === 0) return { error: "No iframes found" };
 
       const iframe = iframes[0] as HTMLIFrameElement;
-      if (!iframe.contentDocument) return { error: "Cannot access iframe document" };
+      if (!iframe.contentDocument)
+        return { error: "Cannot access iframe document" };
 
       const doc = iframe.contentDocument;
 
@@ -138,6 +139,7 @@ test.describe("PDF Consistency - Font, Logo, TOC, Heights", () => {
     // Navigate to the last spread using slider
     const spreadCount = parseInt(
       (await page.locator("#spread-count").textContent()) || "0",
+      10,
     );
     const slider = page.locator('input[type="range"]');
     if ((await slider.count()) > 0) {
@@ -195,7 +197,7 @@ test.describe("PDF Consistency - Font, Logo, TOC, Heights", () => {
     // Get all page HTMLs and check for TOC continuation
     const tocResult = await page.evaluate(() => {
       const debugEl = document.getElementById("debug-info");
-      const pageCount = parseInt(debugEl?.dataset.pages || "0");
+      const pageCount = parseInt(debugEl?.dataset.pages || "0", 10);
 
       // We need to check all pages for toc-continuation-spacer
       // The test-preview renders pages in PageListViewer

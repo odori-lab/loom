@@ -1,27 +1,25 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
 import {
-  ThreadsPost,
-  ThreadsProfile,
-  BookStructure,
-  StoredPage,
+  type BookStructure,
+  generateTocPage,
+  type StoredPage,
+  type ThreadsPost,
+  type ThreadsProfile,
 } from "@loom/shared";
-import { generatePageContents } from "@/lib/pdf/generator";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { generateContentBlocks } from "@/lib/pdf/content-blocks";
-import {
-  measureBlockHeights,
-  MeasuredBlock,
-  PageMapping,
-} from "@/lib/pdf/measure";
-import { splitOversizedBlocks } from "@/lib/pdf/measure";
+import { generatePageContents } from "@/lib/pdf/generator";
 import {
   assignBlocksToPages,
   buildPageMapping,
+  type MeasuredBlock,
+  measureBlockHeights,
+  type PageMapping,
   pagesToStoredPages,
+  splitOversizedBlocks,
 } from "@/lib/pdf/measure";
 import { calculateSpreads } from "@/lib/pdf/spreads";
-import { generateTocPage } from "@loom/shared";
 
 export function usePdfMeasurement(
   orderedPosts: ThreadsPost[],
@@ -133,7 +131,7 @@ export function usePdfMeasurement(
         }
       } finally {
         // Clean up iframe
-        if (iframe && iframe.parentNode) {
+        if (iframe?.parentNode) {
           iframe.parentNode.removeChild(iframe);
         }
         if (!cancelled) {

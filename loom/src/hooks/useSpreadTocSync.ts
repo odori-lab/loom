@@ -15,12 +15,9 @@ export function useSpreadTocSync() {
   >(null);
   const [visiblePages, setVisiblePages] = useState<Set<number>>(new Set());
 
-  const handleNavigateReady = useCallback(
-    (fn: (pageNum: number) => void) => {
-      setNavigateFn(() => fn);
-    },
-    [],
-  );
+  const handleNavigateReady = useCallback((fn: (pageNum: number) => void) => {
+    setNavigateFn(() => fn);
+  }, []);
 
   const handleSpreadChange = useCallback(
     (left: number | null, right: number | null) => {

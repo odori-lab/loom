@@ -1,11 +1,11 @@
+import type { Browser, BrowserContext } from "playwright";
 import { chromium } from "playwright-extra";
-import { Browser, BrowserContext, Page } from "playwright";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import {
-  ThreadsPost,
-  ThreadsProfile,
+import type {
   ScrapeResult,
   ScraperAccount,
+  ThreadsPost,
+  ThreadsProfile,
 } from "./types";
 
 chromium.use(StealthPlugin());
@@ -210,7 +210,7 @@ class ScraperWorker {
 
     // Remove webdriver property from page
     await page.addInitScript(() => {
-      // @ts-ignore
+      // @ts-expect-error
       delete window.navigator.__proto__.webdriver;
     });
 
@@ -291,10 +291,10 @@ class ScraperWorker {
           console.log(`[SCRAPER] Found ${formInputs.length} inputs in form`);
 
           if (formInputs.length >= 2) {
-            await formInputs[0]!.fill(account.username);
+            await formInputs[0]?.fill(account.username);
             console.log("[SCRAPER] ✓ Username filled (form input[0])");
             await page.waitForTimeout(500);
-            await formInputs[1]!.fill(account.password);
+            await formInputs[1]?.fill(account.password);
             console.log("[SCRAPER] ✓ Password filled (form input[1])");
             filled = true;
           }
@@ -333,7 +333,7 @@ class ScraperWorker {
           clicked = true;
           console.log("[SCRAPER] ✓ Clicked login button (form submit)");
         }
-      } catch (e) {
+      } catch (_e) {
         console.log("[SCRAPER] Form submit button not found");
       }
 
@@ -350,7 +350,7 @@ class ScraperWorker {
             clicked = true;
             console.log("[SCRAPER] ✓ Clicked login button (text-based)");
           }
-        } catch (e) {
+        } catch (_e) {
           console.log("[SCRAPER] Text-based button not found");
         }
       }
@@ -410,7 +410,7 @@ class ScraperWorker {
           { timeout: 15000 },
         );
         console.log(`[SCRAPER] ✓ Redirected to: ${page.url()}`);
-      } catch (e) {
+      } catch (_e) {
         const currentUrl = page.url();
         console.log(`[SCRAPER] Redirect timeout, current URL: ${currentUrl}`);
 
@@ -476,7 +476,7 @@ class ScraperWorker {
             await saveButton.click();
             await page.waitForTimeout(2000);
           }
-        } catch (e) {
+        } catch (_e) {
           console.log("[SCRAPER] Could not find save button, continuing...");
         }
       }
@@ -551,7 +551,7 @@ class ScraperWorker {
         console.log("[SCRAPER] Session invalid, creating new one...");
         try {
           await this.contextInstance.close();
-        } catch (e) {
+        } catch (_e) {
           // Ignore
         }
         this.contextInstance = null;
@@ -612,7 +612,7 @@ class ScraperWorker {
 
     // Remove webdriver property
     await page.addInitScript(() => {
-      // @ts-ignore
+      // @ts-expect-error
       delete window.navigator.__proto__.webdriver;
     });
 
@@ -1122,7 +1122,7 @@ class ScraperWorker {
         (a, b) =>
           new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime(),
       );
-      let posts: ThreadsPost[] = uniqueApiPosts.slice(0, limit).map((p) => ({
+      const posts: ThreadsPost[] = uniqueApiPosts.slice(0, limit).map((p) => ({
         id: p.id,
         username: p.username,
         content: p.content,
@@ -1373,7 +1373,7 @@ class ScraperWorker {
     profileTags?: string[];
   } | null {
     try {
-      const jsonStr = JSON.stringify(json);
+      const _jsonStr = JSON.stringify(json);
 
       // Walk the JSON tree to find ALL user nodes, then pick the richest one
       // (post-embedded user nodes are lightweight; the profile node has bio/follower data)

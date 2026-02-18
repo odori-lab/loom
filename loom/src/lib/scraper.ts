@@ -1,4 +1,4 @@
-import { ThreadsPost, ThreadsProfile } from "@loom/shared";
+import type { ThreadsPost, ThreadsProfile } from "@loom/shared";
 
 interface ScrapeResult {
   posts: ThreadsPost[];
@@ -48,7 +48,7 @@ function getWorkerConfig() {
     "Content-Type": "application/json",
   };
   if (apiKey) {
-    headers["Authorization"] = `Bearer ${apiKey}`;
+    headers.Authorization = `Bearer ${apiKey}`;
   }
   return { url: url.replace(/\/+$/, ""), headers };
 }

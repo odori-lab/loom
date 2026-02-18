@@ -110,11 +110,21 @@ interface TocEntry {
   chapterIndex?: number; // for grouping collapse
 }
 
-function parseTocHtml(html: string): { chapters: { title: string; pageNum: number | null; subChapters: { title: string; pageNum: number | null }[] }[] } {
+function parseTocHtml(html: string): {
+  chapters: {
+    title: string;
+    pageNum: number | null;
+    subChapters: { title: string; pageNum: number | null }[];
+  }[];
+} {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
   const items = doc.querySelectorAll(".toc-item");
-  const chapters: { title: string; pageNum: number | null; subChapters: { title: string; pageNum: number | null }[] }[] = [];
+  const chapters: {
+    title: string;
+    pageNum: number | null;
+    subChapters: { title: string; pageNum: number | null }[];
+  }[] = [];
 
   items.forEach((item) => {
     const titleEl = item.querySelector(".toc-chapter-title");
@@ -148,18 +158,42 @@ function buildTocEntries(pages: StoredPage[]): TocEntry[] {
     const pageNum = i + 1;
     switch (meta.type) {
       case "cover":
-        entries.push({ type: "special", label: "", labelKey: "dashboard.preview.cover", pageNumber: pageNum });
+        entries.push({
+          type: "special",
+          label: "",
+          labelKey: "dashboard.preview.cover",
+          pageNumber: pageNum,
+        });
         break;
       case "preface":
-        entries.push({ type: "special", label: "", labelKey: "dashboard.preview.preface", pageNumber: pageNum });
+        entries.push({
+          type: "special",
+          label: "",
+          labelKey: "dashboard.preview.preface",
+          pageNumber: pageNum,
+        });
         break;
       case "toc":
-        if (!entries.some((e) => e.labelKey === "dashboard.preview.tableOfContents")) {
-          entries.push({ type: "special", label: "", labelKey: "dashboard.preview.tableOfContents", pageNumber: pageNum });
+        if (
+          !entries.some(
+            (e) => e.labelKey === "dashboard.preview.tableOfContents",
+          )
+        ) {
+          entries.push({
+            type: "special",
+            label: "",
+            labelKey: "dashboard.preview.tableOfContents",
+            pageNumber: pageNum,
+          });
         }
         break;
       case "last":
-        entries.push({ type: "special", label: "", labelKey: "dashboard.preview.last", pageNumber: pageNum });
+        entries.push({
+          type: "special",
+          label: "",
+          labelKey: "dashboard.preview.last",
+          pageNumber: pageNum,
+        });
         break;
     }
   }
@@ -220,10 +254,11 @@ function ChapterChildren({
             key={`sub-${entry.pageNumber}`}
             ref={isActive ? activeRef : undefined}
             onClick={() => onNavigate(entry.pageNumber)}
-            className={`w-full text-left pr-3 py-1.5 pl-8 text-xs truncate transition-colors duration-150 ${isActive
-              ? "bg-[#f5f5f5] text-gray-900 font-medium"
-              : "text-gray-500 hover:bg-[#fafafa]"
-              }`}
+            className={`w-full text-left pr-3 py-1.5 pl-8 text-xs truncate transition-colors duration-150 ${
+              isActive
+                ? "bg-[#f5f5f5] text-gray-900 font-medium"
+                : "text-gray-500 hover:bg-[#fafafa]"
+            }`}
           >
             {label}
           </button>
@@ -289,7 +324,9 @@ export function TocPanel({
     const resolved = [...visiblePages].map(findNearest);
     const allSame =
       resolved.length > 0 &&
-      resolved.every((r) => r && resolved[0] && r.pageNumber === resolved[0].pageNumber);
+      resolved.every(
+        (r) => r && resolved[0] && r.pageNumber === resolved[0].pageNumber,
+      );
 
     if (allSame && resolved[0]) {
       result.add(resolved[0].pageNumber);
@@ -339,7 +376,7 @@ export function TocPanel({
   // Scroll active entry into view
   useEffect(() => {
     activeRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  }, [visiblePages]);
+  }, []);
 
   // Group sub-chapters by their parent chapter index
   const chapterChildren = useMemo(() => {
@@ -347,14 +384,19 @@ export function TocPanel({
     for (const e of entries) {
       if (e.type === "sub-chapter" && e.chapterIndex !== undefined) {
         if (!map.has(e.chapterIndex)) map.set(e.chapterIndex, []);
-        map.get(e.chapterIndex)!.push(e);
+        map.get(e.chapterIndex)?.push(e);
       }
     }
     return map;
   }, [entries]);
 
   return (
-    <div className={className ?? "hidden lg:flex flex-col w-56 bg-white border-l border-gray-200 shrink-0"}>
+    <div
+      className={
+        className ??
+        "hidden lg:flex flex-col w-56 bg-white border-l border-gray-200 shrink-0"
+      }
+    >
       {/* <div className="px-4 py-3 border-b border-gray-100">
         <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
           {t("dashboard.preview.toc")}
@@ -374,10 +416,11 @@ export function TocPanel({
                 key={`special-${entry.pageNumber}`}
                 ref={isActive ? activeRef : undefined}
                 onClick={() => onNavigate(entry.pageNumber)}
-                className={`w-full text-left pr-3 py-1.5 pl-4 text-xs font-semibold truncate transition-colors duration-150 ${isActive
-                  ? "bg-[#f5f5f5] text-gray-900"
-                  : "text-gray-900 hover:bg-[#fafafa]"
-                  }`}
+                className={`w-full text-left pr-3 py-1.5 pl-4 text-xs font-semibold truncate transition-colors duration-150 ${
+                  isActive
+                    ? "bg-[#f5f5f5] text-gray-900"
+                    : "text-gray-900 hover:bg-[#fafafa]"
+                }`}
               >
                 {label}
               </button>
@@ -388,9 +431,10 @@ export function TocPanel({
           const isCollapsed =
             entry.chapterIndex !== undefined &&
             collapsed.has(entry.chapterIndex);
-          const children = entry.chapterIndex !== undefined
-            ? chapterChildren.get(entry.chapterIndex) ?? []
-            : [];
+          const children =
+            entry.chapterIndex !== undefined
+              ? (chapterChildren.get(entry.chapterIndex) ?? [])
+              : [];
 
           return (
             <div key={`ch-${entry.pageNumber}`}>
@@ -402,10 +446,11 @@ export function TocPanel({
                   }
                   onNavigate(entry.pageNumber);
                 }}
-                className={`w-full text-left pr-3 py-1.5 pl-4 text-xs font-semibold truncate flex items-center gap-1 mt-1 transition-colors duration-150 ${isActive
-                  ? "bg-[#f5f5f5] text-gray-900"
-                  : "text-gray-900 hover:bg-[#fafafa]"
-                  }`}
+                className={`w-full text-left pr-3 py-1.5 pl-4 text-xs font-semibold truncate flex items-center gap-1 mt-1 transition-colors duration-150 ${
+                  isActive
+                    ? "bg-[#f5f5f5] text-gray-900"
+                    : "text-gray-900 hover:bg-[#fafafa]"
+                }`}
               >
                 {children.length > 0 && (
                   <svg
@@ -414,7 +459,12 @@ export function TocPanel({
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={3}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 )}
                 <span className="truncate">{label}</span>
@@ -523,7 +573,7 @@ export function HtmlSpreadViewer({
     if (currentData) {
       onSpreadChange?.(currentData.leftPage, currentData.rightPage);
     }
-  }, [currentSpread, currentData, onSpreadChange]);
+  }, [currentData, onSpreadChange]);
 
   const initialPageApplied = useRef(false);
   useEffect(() => {
@@ -597,9 +647,9 @@ export function HtmlSpreadViewer({
                 target={
                   targetData
                     ? {
-                      left: targetData.leftPage,
-                      right: targetData.rightPage,
-                    }
+                        left: targetData.leftPage,
+                        right: targetData.rightPage,
+                      }
                     : null
                 }
                 renderPage={renderPage}
@@ -777,9 +827,7 @@ export function PreviewModal() {
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <p className="text-gray-500">
-                {t("dashboard.preview.error")}
-              </p>
+              <p className="text-gray-500">{t("dashboard.preview.error")}</p>
               {previewUrl && (
                 <a
                   href={previewUrl}

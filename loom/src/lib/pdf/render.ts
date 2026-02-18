@@ -1,4 +1,4 @@
-import { ThreadsPost, ThreadsProfile } from "@loom/shared";
+import type { ThreadsPost, ThreadsProfile } from "@loom/shared";
 
 function getWorkerConfig() {
   const url = process.env.LOOM_WORKER_URL;
@@ -13,7 +13,7 @@ function getWorkerConfig() {
     "Content-Type": "application/json",
   };
   if (apiKey) {
-    headers["Authorization"] = `Bearer ${apiKey}`;
+    headers.Authorization = `Bearer ${apiKey}`;
   }
   return { url: url.replace(/\/+$/, ""), headers };
 }

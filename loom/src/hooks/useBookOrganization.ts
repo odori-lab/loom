@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { ThreadsPost, ThreadsProfile, BookStructure } from "@loom/shared";
+import type { BookStructure, ThreadsPost, ThreadsProfile } from "@loom/shared";
+import { useCallback, useState } from "react";
 
 export function useBookOrganization(
   posts: ThreadsPost[],
@@ -29,8 +29,6 @@ export function useBookOrganization(
       const result = data as BookStructure;
       setBookStructure(result);
       return result;
-    } catch (err) {
-      throw err;
     } finally {
       setOrganizing(false);
     }

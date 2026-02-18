@@ -1,12 +1,12 @@
 "use client";
 
-import { Suspense } from "react";
-import { Database } from "@loom/shared";
-import { I18nProvider } from "@/lib/i18n/context";
-import { DashboardProvider } from "@/components/dashboard/DashboardContext";
-import { LoomsTab } from "@/components/dashboard/LoomsTab";
-import { LoomPreviewPanel } from "@/components/dashboard/LoomPreviewPanel";
+import type { Database } from "@loom/shared";
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
+import { DashboardProvider } from "@/components/dashboard/DashboardContext";
+import { LoomPreviewPanel } from "@/components/dashboard/LoomPreviewPanel";
+import { LoomsTab } from "@/components/dashboard/LoomsTab";
+import { I18nProvider } from "@/lib/i18n/context";
 
 const PreviewModal = dynamic(
   () =>

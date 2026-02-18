@@ -1,6 +1,6 @@
-import { StoredPage } from "@loom/shared";
 import {
   calculateSpreads as calculateSpreadsFromStrings,
+  type StoredPage,
 } from "@loom/shared";
 
 // Re-export types

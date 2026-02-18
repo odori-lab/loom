@@ -1,11 +1,11 @@
 import "dotenv/config";
-import express from "express";
+import crypto from "node:crypto";
 import cors from "cors";
-import { scraperWorker } from "./scraper-worker";
-import { renderPagesToPdf, renderHtmlToPdf } from "./pdf-renderer";
+import express from "express";
 import { generateAllPagesHtml } from "./pdf/generator";
+import { renderHtmlToPdf, renderPagesToPdf } from "./pdf-renderer";
+import { scraperWorker } from "./scraper-worker";
 import { getSupabase } from "./supabase";
-import crypto from "crypto";
 
 const app = express();
 const PORT = process.env.PORT || 3001;

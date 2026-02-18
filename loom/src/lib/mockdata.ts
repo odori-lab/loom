@@ -1,5 +1,5 @@
 // Auto-generated from whatthesol profile scrape
-import { ThreadsPost, ThreadsProfile, BookStructure } from "@loom/shared";
+import type { BookStructure, ThreadsPost, ThreadsProfile } from "@loom/shared";
 
 export const MOCK_PROFILE: ThreadsProfile = {
   username: "whatthesol",
