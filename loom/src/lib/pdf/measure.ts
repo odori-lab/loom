@@ -6,7 +6,7 @@ import {
   IMAGE_FALLBACK_HEIGHTS,
   DEFAULT_IMAGE_FALLBACK,
 } from "./constants";
-import { PDF_STYLES } from "@loom/shared";
+import { PDF_STYLES, PRETENDARD_FONT_LINK } from "@loom/shared";
 
 // Re-export types and functions for backward compatibility
 export type { MeasuredBlock, PageMapping } from "./types";
@@ -78,6 +78,7 @@ export async function measureBlockHeights(
     <html>
       <head>
         <meta charset="UTF-8">
+        ${PRETENDARD_FONT_LINK}
         <style>${PDF_STYLES}</style>
         <style>
           body { margin: 0; padding: 0; }

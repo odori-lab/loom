@@ -10,6 +10,9 @@ export const PAGE_PADDING_SIDE = 76; // 20mm
 export const MAX_PAGE_HEIGHT = 600;
 export const SAFE_PAGE_HEIGHT = MAX_PAGE_HEIGHT - 15; // 612px
 
+// ─── Font ───
+export const PRETENDARD_FONT_LINK = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />`;
+
 // ─── Image measurement ───
 export const IMAGE_LOAD_TIMEOUT = 2000;
 

@@ -32,6 +32,7 @@ export {
   IMAGE_FALLBACK_HEIGHTS,
   DEFAULT_IMAGE_FALLBACK,
   ESSAY,
+  PRETENDARD_FONT_LINK,
 } from "./pdf/constants";
 
 // PDF templates
