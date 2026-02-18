@@ -1,10 +1,5 @@
 import { ThreadsProfile, escapeHtml, formatNumber, formatDate } from "@loom/shared";
-import type { MergedPost } from "@loom/shared";
 import { PostChunk } from "../layout";
-
-// Re-export shared essay functions for backward compatibility
-export { generateEssaySubChapterPage, generateEssayContinuationPage } from "@loom/shared";
-export type { CaptionMap } from "@loom/shared";
 
 // Generate content page from chunks (supports split posts) - WORKER ONLY (legacy Threads style)
 export function generateContentPageFromChunks(
