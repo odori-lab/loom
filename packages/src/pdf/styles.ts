@@ -452,8 +452,7 @@ export const PDF_STYLES = `
 
   .essay-inline-image {
     max-width: 100%;
-    max-height: 150px;
-    min-height: 100px;
+    height: 150px;
     object-fit: contain;
     border-radius: 8px;
     margin: 12px 0;

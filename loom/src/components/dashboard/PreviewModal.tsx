@@ -276,10 +276,11 @@ function ChapterChildren({
             key={`sub-${entry.pageNumber}`}
             ref={isActive ? activeRef : undefined}
             onClick={() => onNavigate(entry.pageNumber)}
-            className={`w-full text-left pr-3 py-1.5 pl-8 text-xs truncate transition-colors duration-150 ${isActive
+            className={`w-full text-left pr-3 py-1.5 pl-8 text-xs truncate transition-colors duration-150 ${
+              isActive
                 ? "bg-[#f5f5f5] text-gray-900 font-medium"
                 : "text-gray-500 hover:bg-[#fafafa]"
-              }`}
+            }`}
           >
             {label}
           </button>
@@ -432,10 +433,11 @@ export function TocPanel({
                 key={`special-${entry.pageNumber}`}
                 ref={isActive ? activeRef : undefined}
                 onClick={() => onNavigate(entry.pageNumber)}
-                className={`w-full text-left pr-3 py-1.5 pl-4 text-xs font-semibold truncate transition-colors duration-150 ${isActive
+                className={`w-full text-left pr-3 py-1.5 pl-4 text-xs font-semibold truncate transition-colors duration-150 ${
+                  isActive
                     ? "bg-[#f5f5f5] text-gray-900"
                     : "text-gray-900 hover:bg-[#fafafa]"
-                  }`}
+                }`}
               >
                 {label}
               </button>
@@ -461,10 +463,11 @@ export function TocPanel({
                   }
                   onNavigate(entry.pageNumber);
                 }}
-                className={`w-full text-left pr-3 py-1.5 pl-4 text-xs font-semibold truncate flex items-center gap-1 mt-1 transition-colors duration-150 ${isActive
+                className={`w-full text-left pr-3 py-1.5 pl-4 text-xs font-semibold truncate flex items-center gap-1 mt-1 transition-colors duration-150 ${
+                  isActive
                     ? "bg-[#f5f5f5] text-gray-900"
                     : "text-gray-900 hover:bg-[#fafafa]"
-                  }`}
+                }`}
               >
                 {children.length > 0 && (
                   <svg
