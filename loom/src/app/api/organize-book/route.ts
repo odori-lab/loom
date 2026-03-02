@@ -2,40 +2,48 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { BookStructure, ThreadsPost, ThreadsProfile } from "@loom/shared";
 import { type NextRequest, NextResponse } from "next/server";
 
+export const maxDuration = 300;
+
 export async function POST(request: NextRequest) {
-  try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "Gemini API key is not configured" },
-        { status: 500 },
-      );
-    }
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: "Gemini API key is not configured" },
+      { status: 500 },
+    );
+  }
 
-    const { posts, profile } = (await request.json()) as {
-      posts: ThreadsPost[];
-      profile: ThreadsProfile;
-    };
+  const { posts, profile } = (await request.json()) as {
+    posts: ThreadsPost[];
+    profile: ThreadsProfile;
+  };
 
-    if (!posts || !Array.isArray(posts) || posts.length === 0) {
-      return NextResponse.json(
-        { error: "Posts array is required and must not be empty" },
-        { status: 400 },
-      );
-    }
+  if (!posts || !Array.isArray(posts) || posts.length === 0) {
+    return NextResponse.json(
+      { error: "Posts array is required and must not be empty" },
+      { status: 400 },
+    );
+  }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const stream = new TransformStream();
+  const writer = stream.writable.getWriter();
+  const encoder = new TextEncoder();
 
-    const postData = posts.map((post) => ({
-      id: post.id,
-      content: post.content,
-      date: post.postedAt,
-      likeCount: post.likeCount,
-      hasImages: post.imageUrls.length > 0,
-    }));
+  // Run Gemini in background, keep connection alive with periodic flushes
+  (async () => {
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const prompt = `당신은 SNS 포스트를 책으로 엮는 전문 문학 편집자입니다.
+      const postData = posts.map((post) => ({
+        id: post.id,
+        content: post.content,
+        date: post.postedAt,
+        likeCount: post.likeCount,
+        hasImages: post.imageUrls.length > 0,
+      }));
+
+      const prompt = `당신은 SNS 포스트를 책으로 엮는 전문 문학 편집자입니다.
 
 아래는 "${profile.displayName}" (@${profile.username}) 님의 Threads 포스트 목록입니다.
 
@@ -81,60 +89,77 @@ ${JSON.stringify(postData, null, 2)}
 - 이미지 삽입 위치를 지정하지 마세요. 이미지는 시스템에서 자동으로 배치합니다.
 - 반드시 유효한 JSON만 반환해주세요.`;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+      // Keep connection alive while Gemini is thinking
+      const keepAlive = setInterval(async () => {
+        await writer.write(encoder.encode(" "));
+      }, 5000);
 
-    // Extract JSON from response (handle markdown code blocks)
-    let jsonText = text.trim();
-    const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/);
-    if (jsonMatch) {
-      jsonText = jsonMatch[1].trim();
-    }
+      const result = await model.generateContent(prompt);
+      clearInterval(keepAlive);
 
-    let bookStructure: BookStructure;
-    try {
-      bookStructure = JSON.parse(jsonText);
-    } catch {
-      console.error("[ORGANIZE_BOOK] Failed to parse Gemini response:", text);
-      return NextResponse.json(
-        { error: "Failed to parse AI response" },
-        { status: 500 },
+      const text = result.response.text();
+
+      let jsonText = text.trim();
+      const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (jsonMatch) {
+        jsonText = jsonMatch[1].trim();
+      }
+
+      let bookStructure: BookStructure;
+      try {
+        bookStructure = JSON.parse(jsonText);
+      } catch {
+        console.error("[ORGANIZE_BOOK] Failed to parse Gemini response:", text);
+        await writer.write(
+          encoder.encode(JSON.stringify({ error: "Failed to parse AI response" })),
+        );
+        await writer.close();
+        return;
+      }
+
+      // Validate all post IDs are accounted for
+      const allPostIds = new Set(posts.map((p) => p.id));
+      const assignedPostIds = new Set(
+        bookStructure.chapters.flatMap((ch) =>
+          ch.subChapters.flatMap((sub) => sub.postIds),
+        ),
       );
+
+      const missingPostIds = [...allPostIds].filter(
+        (id) => !assignedPostIds.has(id),
+      );
+
+      if (missingPostIds.length > 0) {
+        bookStructure.chapters.push({
+          id: "uncategorized",
+          title: "그 외 이야기",
+          description: "분류되지 않은 포스트 모음",
+          subChapters: [
+            {
+              id: "uncategorized-posts",
+              title: "미분류 포스트",
+              postIds: missingPostIds,
+            },
+          ],
+        });
+      }
+
+      await writer.write(encoder.encode(JSON.stringify(bookStructure)));
+      await writer.close();
+    } catch (error) {
+      console.error("[ORGANIZE_BOOK_ERROR]", error);
+      const message =
+        error instanceof Error ? error.message : "Failed to organize book";
+      try {
+        await writer.write(encoder.encode(JSON.stringify({ error: message })));
+        await writer.close();
+      } catch {
+        // writer already closed
+      }
     }
+  })();
 
-    // Validate all post IDs are accounted for
-    const allPostIds = new Set(posts.map((p) => p.id));
-    const assignedPostIds = new Set(
-      bookStructure.chapters.flatMap((ch) =>
-        ch.subChapters.flatMap((sub) => sub.postIds),
-      ),
-    );
-
-    const missingPostIds = [...allPostIds].filter(
-      (id) => !assignedPostIds.has(id),
-    );
-
-    if (missingPostIds.length > 0) {
-      bookStructure.chapters.push({
-        id: "uncategorized",
-        title: "그 외 이야기",
-        description: "분류되지 않은 포스트 모음",
-        subChapters: [
-          {
-            id: "uncategorized-posts",
-            title: "미분류 포스트",
-            postIds: missingPostIds,
-          },
-        ],
-      });
-    }
-
-    return NextResponse.json(bookStructure);
-  } catch (error) {
-    console.error("[ORGANIZE_BOOK_ERROR]", error);
-    const message =
-      error instanceof Error ? error.message : "Failed to organize book";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
+  return new Response(stream.readable, {
+    headers: { "Content-Type": "application/json" },
+  });
 }
