@@ -22,6 +22,8 @@ export interface CreateFlowState {
   loading: boolean;
   loadingMore: boolean;
   loadingPhase: LoadingPhase;
+  workerProgress: number;
+  workerMessage: string;
   error: string;
   selectedIds: Set<string>;
   sortOrder: SortOrder;

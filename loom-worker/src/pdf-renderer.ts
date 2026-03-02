@@ -50,7 +50,10 @@ async function imageUrlToBase64(url: string): Promise<string> {
 }
 
 // Replace all image URLs in HTML with base64 data URLs
-async function convertImagesToBase64(html: string): Promise<string> {
+async function convertImagesToBase64(
+  html: string,
+  onProgress?: (progress: number, message: string) => void,
+): Promise<string> {
   // Find all img src URLs (matching cdninstagram.com or any external URL)
   const imgRegex = /<img\s+[^>]*src="([^"]+)"[^>]*>/g;
   const matches = Array.from(html.matchAll(imgRegex));
@@ -61,16 +64,29 @@ async function convertImagesToBase64(html: string): Promise<string> {
   }
 
   console.log(`[PDF] Converting ${matches.length} images to base64...`);
+  onProgress?.(5, "이미지 변환 중...");
 
-  // Download all images in parallel
+  // Collect unique URLs to convert
+  const uniqueUrls = [
+    ...new Set(
+      matches
+        .map((m) => m[1]!)
+        .filter((url) => !url.startsWith("data:")),
+    ),
+  ];
+  const total = uniqueUrls.length;
+
+  // Download all images, tracking progress per completion
   const urlToBase64 = new Map<string, string>();
+  let completed = 0;
   await Promise.all(
-    matches.map(async (match) => {
-      const originalUrl = match[1]!;
-      if (!urlToBase64.has(originalUrl) && !originalUrl.startsWith("data:")) {
-        const base64Url = await imageUrlToBase64(originalUrl);
-        urlToBase64.set(originalUrl, base64Url);
-      }
+    uniqueUrls.map(async (originalUrl) => {
+      const base64Url = await imageUrlToBase64(originalUrl);
+      urlToBase64.set(originalUrl, base64Url);
+      completed++;
+      // Progress 5-40% based on images converted
+      const imgProgress = Math.min(40, 5 + Math.round((completed / total) * 35));
+      onProgress?.(imgProgress, `이미지 변환 중... (${completed}/${total})`);
     }),
   );
 
@@ -103,10 +119,14 @@ async function getBrowser(): Promise<Browser> {
 }
 
 // Core: render a single HTML document to a multi-page PDF
-async function doRenderHtmlToPdf(html: string): Promise<Buffer> {
+async function doRenderHtmlToPdf(
+  html: string,
+  onProgress?: (progress: number, message: string) => void,
+): Promise<Buffer> {
   // Convert all external images to base64 data URLs to avoid CORS/loading issues
-  const htmlWithBase64Images = await convertImagesToBase64(html);
+  const htmlWithBase64Images = await convertImagesToBase64(html, onProgress);
 
+  onProgress?.(45, "브라우저 준비 중...");
   const browser = await getBrowser();
   const page = await browser.newPage();
 
@@ -129,6 +149,7 @@ async function doRenderHtmlToPdf(html: string): Promise<Buffer> {
     console.log(`[PDF] Saved HTML to ${filename}`);
   }
 
+  onProgress?.(60, "페이지 렌더링 중...");
   await page.setContent(htmlWithBase64Images, {
     waitUntil: "load",
     timeout: 60000,
@@ -152,6 +173,7 @@ async function doRenderHtmlToPdf(html: string): Promise<Buffer> {
 
   console.log(`[PDF] Rendering PDF with ${imageCount} images`);
 
+  onProgress?.(75, "PDF 생성 중...");
   const pdfBuffer = await page.pdf({
     width: "148mm",
     height: "210mm",
@@ -160,6 +182,7 @@ async function doRenderHtmlToPdf(html: string): Promise<Buffer> {
   });
 
   await page.close();
+  onProgress?.(90, "마무리 중...");
   return Buffer.from(pdfBuffer);
 }
 
@@ -204,11 +227,14 @@ export function renderPagesToPdf(pages: string[]): Promise<Buffer> {
 }
 
 // Public API: render a single combined HTML document (used by /create-loom)
-export function renderHtmlToPdf(html: string): Promise<Buffer> {
+export function renderHtmlToPdf(
+  html: string,
+  onProgress?: (progress: number, message: string) => void,
+): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
     taskChain = taskChain.then(async () => {
       try {
-        const result = await doRenderHtmlToPdf(html);
+        const result = await doRenderHtmlToPdf(html, onProgress);
         resolve(result);
       } catch (error) {
         reject(error);

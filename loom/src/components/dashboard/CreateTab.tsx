@@ -6,6 +6,7 @@ import { useCreateFlow } from "@/components/create/CreateFlowContext";
 import { ErrorBanner } from "@/components/create/ErrorBanner";
 import { ProgressIndicator } from "@/components/create/ProgressIndicator";
 import { UsernameStep } from "@/components/create/UsernameStep";
+import { WorkerLoadingView } from "@/components/create/WorkerLoadingView";
 import { useSpreadTocSync } from "@/hooks/useSpreadTocSync";
 import { useI18n } from "@/lib/i18n/context";
 import { proxyImageUrl } from "@/lib/proxy";
@@ -23,9 +24,21 @@ const TocPanel = dynamic(
 
 export function CreateTabContent() {
   const {
-    state: { step, profile },
+    state: { step, profile, loading, loadingPhase, workerProgress, workerMessage },
   } = useCreateFlow();
   const { setActiveTab } = useDashboard();
+
+  // Show loading view during scraping/organizing phases
+  if (loading && loadingPhase !== "idle") {
+    return (
+      <WorkerLoadingView
+        scenario="submit"
+        progress={workerProgress}
+        message={workerMessage}
+        loadingPhase={loadingPhase}
+      />
+    );
+  }
 
   if (step === "organize" && profile) {
     return <OrganizeView />;
@@ -57,10 +70,22 @@ export function CreateTabContent() {
 
 function OrganizeView() {
   const {
-    state: { organizing, loading, measuring, profile, bookStructure },
+    state: { organizing, loading, measuring, profile, bookStructure, workerProgress, workerMessage },
     actions: { generateLoom },
     meta: { pages, orderedPosts },
   } = useCreateFlow();
+
+  // Show worker loading view during PDF generation
+  if (loading) {
+    return (
+      <WorkerLoadingView
+        scenario="generate"
+        progress={workerProgress}
+        message={workerMessage}
+        loadingPhase="idle"
+      />
+    );
+  }
   const { t } = useI18n();
 
   const {

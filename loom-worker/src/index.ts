@@ -186,6 +186,112 @@ app.post("/create-loom", async (req, res) => {
   }
 });
 
+// Scrape with NDJSON progress streaming (public — called directly from client)
+app.post("/scrape-stream", async (req, res) => {
+  const { username, limit = 100 } = req.body;
+
+  if (!username) {
+    res.status(400).json({ error: "Username is required" });
+    return;
+  }
+
+  res.setHeader("Content-Type", "application/x-ndjson");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("X-Accel-Buffering", "no");
+  res.flushHeaders();
+
+  const emit = (type: string, data: Record<string, unknown>) => {
+    res.write(JSON.stringify({ type, ...data }) + "\n");
+  };
+
+  try {
+    const result = await scraperWorker.scrapeProfile(
+      username,
+      limit,
+      (progress, message) => emit("progress", { progress, message }),
+    );
+
+    if (!result.success) {
+      emit("error", { error: result.error || "Scrape failed" });
+    } else {
+      emit("complete", { data: result });
+    }
+  } catch (err) {
+    emit("error", {
+      error: err instanceof Error ? err.message : "Unknown error",
+    });
+  }
+
+  res.end();
+});
+
+// Create loom with NDJSON progress streaming (public — called directly from client)
+app.post("/create-loom-stream", async (req, res) => {
+  const { pages, userId } = req.body;
+
+  if (!pages || !Array.isArray(pages) || pages.length === 0) {
+    res.status(400).json({ error: "pages array is required" });
+    return;
+  }
+  if (!userId) {
+    res.status(400).json({ error: "userId is required" });
+    return;
+  }
+
+  res.setHeader("Content-Type", "application/x-ndjson");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("X-Accel-Buffering", "no");
+  res.flushHeaders();
+
+  const emit = (type: string, data: Record<string, unknown>) => {
+    res.write(JSON.stringify({ type, ...data }) + "\n");
+  };
+
+  try {
+    console.log(
+      `[CreateLoomStream] Generating PDF from ${pages.length} pre-rendered pages...`,
+    );
+    const startTime = Date.now();
+
+    const html = generateAllPagesHtml(pages);
+    const pdfBuffer = await renderHtmlToPdf(html, (progress, message) =>
+      emit("progress", { progress, message }),
+    );
+
+    // Upload to Supabase Storage
+    emit("progress", { progress: 90, message: "업로드 중..." });
+    const loomId = crypto.randomUUID();
+    const pdfPath = `${userId}/${loomId}.pdf`;
+
+    const { error: uploadError } = await getSupabase()
+      .storage.from("looms-pdf")
+      .upload(pdfPath, pdfBuffer, {
+        contentType: "application/pdf",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("[CreateLoomStream] Upload error:", uploadError);
+      emit("error", { error: uploadError.message });
+    } else {
+      emit("progress", { progress: 95, message: "완료 중..." });
+      const duration = Date.now() - startTime;
+      const sizeMB = (pdfBuffer.length / (1024 * 1024)).toFixed(2);
+      console.log(
+        `[CreateLoomStream] Done in ${duration}ms - ${sizeMB}MB, path: ${pdfPath}`,
+      );
+      emit("complete", { data: { pdfPath, loomId } });
+    }
+  } catch (err) {
+    console.error("[CreateLoomStream] Error:", err);
+    emit("error", {
+      error: err instanceof Error ? err.message : "Unknown error",
+    });
+  }
+
+  res.end();
+});
+
 app.listen(PORT, () => {
   console.log(`loom-worker running on port ${PORT}`);
 });

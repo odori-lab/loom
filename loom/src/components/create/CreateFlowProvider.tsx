@@ -7,7 +7,10 @@ import { usePdfMeasurement } from "@/hooks/usePdfMeasurement";
 import { usePostSelection } from "@/hooks/usePostSelection";
 import { MOCK_BOOK_STRUCTURE, MOCK_POSTS, MOCK_PROFILE } from "@/lib/mockdata";
 import { createClient } from "@/lib/supabase/client";
-import { createLoomDirect, scrapeThreadsDirect } from "@/lib/worker-client";
+import {
+  createLoomWithProgress,
+  scrapeThreadsWithProgress,
+} from "@/lib/worker-client";
 import {
   CreateFlowContext,
   type CreateFlowContextValue,
@@ -45,6 +48,8 @@ export function CreateFlowProvider({
   const [currentSpread, setCurrentSpread] = useState(0);
   const [, setCurrentUsername] = useState("");
   const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>("idle");
+  const [workerProgress, setWorkerProgress] = useState(0);
+  const [workerMessage, setWorkerMessage] = useState("");
 
   // Composed hooks
   const book = useBookOrganization(
@@ -116,12 +121,17 @@ export function CreateFlowProvider({
   const submitUsername = async (username: string) => {
     setLoading(true);
     setLoadingPhase("scraping");
+    setWorkerProgress(0);
+    setWorkerMessage("");
     setError("");
     try {
-      // Phase 1: Scrape posts
+      // Phase 1: Scrape posts with real-time progress
       const cleanUsername = username.replace(/^@/, "").trim();
       const { posts: scrapedPosts, profile: scrapedProfile } =
-        await scrapeThreadsDirect(cleanUsername, 100);
+        await scrapeThreadsWithProgress(cleanUsername, 100, (progress, message) => {
+          setWorkerProgress(progress);
+          setWorkerMessage(message);
+        });
 
       setPosts(scrapedPosts);
       setProfile(scrapedProfile);
@@ -131,6 +141,12 @@ export function CreateFlowProvider({
 
       // Phase 2: Organize book structure (before navigating)
       setLoadingPhase("organizing");
+      setWorkerProgress(0);
+      setWorkerMessage("책 구조 분석 중...");
+      // Simulate progress for the organize step (Next.js API route, no streaming)
+      const organizeTimer = setInterval(() => {
+        setWorkerProgress((prev) => (prev < 90 ? prev + 5 : prev));
+      }, 1500);
       try {
         const organizeRes = await fetch("/api/organize-book", {
           method: "POST",
@@ -149,6 +165,9 @@ export function CreateFlowProvider({
           orgErr instanceof Error ? orgErr.message : orgErr,
         );
         // Continue without book structure - will use default ordering
+      } finally {
+        clearInterval(organizeTimer);
+        setWorkerProgress(100);
       }
 
       // Phase 3: Navigate only after both phases complete
@@ -165,6 +184,8 @@ export function CreateFlowProvider({
     if (!profile) return;
 
     setLoading(true);
+    setWorkerProgress(0);
+    setWorkerMessage("");
     setError("");
     try {
       // 1. Call worker directly for PDF generation (bypasses Vercel timeout)
@@ -177,7 +198,14 @@ export function CreateFlowProvider({
 
       // Extract HTML strings for worker
       const htmlPages = pdf.pages.map((p) => p.html);
-      const { pdfPath, loomId } = await createLoomDirect(htmlPages, userId);
+      const { pdfPath, loomId } = await createLoomWithProgress(
+        htmlPages,
+        userId,
+        (progress, message) => {
+          setWorkerProgress(progress);
+          setWorkerMessage(message);
+        },
+      );
 
       // 2. Register loom in DB via Vercel API (fast, no timeout risk)
       const res = await fetch("/api/looms", {
@@ -240,6 +268,8 @@ export function CreateFlowProvider({
         loading,
         loadingMore: selection.loadingMore,
         loadingPhase,
+        workerProgress,
+        workerMessage,
         hasMore: selection.hasMore,
         error,
         selectedIds: selection.selectedIds,
@@ -290,6 +320,8 @@ export function CreateFlowProvider({
       downloadUrl,
       loading,
       loadingPhase,
+      workerProgress,
+      workerMessage,
       error,
       currentSpread,
       currentStepIndex,

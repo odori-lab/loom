@@ -52,6 +52,7 @@ class ScraperWorker {
   async scrapeProfile(
     targetUsername: string,
     limit: number = 50,
+    onProgress?: (progress: number, message: string) => void,
   ): Promise<ScrapeResult> {
     return new Promise<ScrapeResult>((resolve) => {
       this.taskChain = this.taskChain.then(async () => {
@@ -63,6 +64,7 @@ class ScraperWorker {
             this.account,
             targetUsername,
             limit,
+            onProgress,
           );
 
           resolve({
@@ -601,7 +603,9 @@ class ScraperWorker {
     account: ScraperAccount,
     targetUsername: string,
     limit: number,
+    onProgress?: (progress: number, message: string) => void,
   ): Promise<{ profile: ThreadsProfile; posts: ThreadsPost[] }> {
+    onProgress?.(5, "세션 확인 중...");
     const context = await this.getContext(account);
     const page = await context.newPage();
 
@@ -737,6 +741,7 @@ class ScraperWorker {
 
     try {
       // Navigate to profile (domcontentloaded is enough — SSR data is in the initial HTML)
+      onProgress?.(20, "프로필 이동 중...");
       console.log(`[SCRAPER] Navigating to @${targetUsername} profile...`);
       await page.goto(`https://www.threads.com/@${targetUsername}`, {
         waitUntil: "domcontentloaded",
@@ -1074,6 +1079,8 @@ class ScraperWorker {
         );
       }
 
+      onProgress?.(35, "데이터 추출 중...");
+
       // Scroll and collect posts via API interception
       let lastHeight = 0;
       let scrollAttempts = 0;
@@ -1107,6 +1114,12 @@ class ScraperWorker {
           console.log(
             `[SCRAPER] Collected ${uniqueCount} unique posts from API so far...`,
           );
+          // Progress 50-85% based on posts collected vs limit
+          const collectProgress = Math.min(
+            85,
+            50 + Math.round(((uniqueCount / limit) * 35)),
+          );
+          onProgress?.(collectProgress, `포스트 수집 중... (${uniqueCount}개)`);
           lastApiPostCount = uniqueCount;
           scrollAttempts = 0; // Reset on progress
         } else if (newHeight === lastHeight) {
@@ -1159,6 +1172,7 @@ class ScraperWorker {
         );
       }
 
+      onProgress?.(90, "마무리 중...");
       return { profile, posts };
     } finally {
       await page.close();

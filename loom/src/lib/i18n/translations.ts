@@ -135,6 +135,16 @@ export const translations = {
     "create.organize.generate": "PDF 생성",
     "create.organize.noStructure": "AI가 책 구조를 구성하지 못했습니다",
 
+    // Loading view
+    "loading.title.submit": "책을 만드는 중이에요...",
+    "loading.title.generate": "PDF를 생성하는 중이에요...",
+    "loading.stage.connecting": "연결",
+    "loading.stage.fetchingPosts": "포스트 수집",
+    "loading.stage.analyzingStructure": "책 구조 분석",
+    "loading.stage.convertingImages": "이미지 변환",
+    "loading.stage.renderingPdf": "PDF 렌더링",
+    "loading.stage.uploading": "업로드",
+
     // Auth
     "auth.signOut": "로그아웃",
 
@@ -289,6 +299,16 @@ export const translations = {
     "create.organize.organizing": "Organizing...",
     "create.organize.generate": "Generate PDF",
     "create.organize.noStructure": "AI could not organize the book structure",
+
+    // Loading view
+    "loading.title.submit": "Making your book...",
+    "loading.title.generate": "Generating your PDF...",
+    "loading.stage.connecting": "Connecting",
+    "loading.stage.fetchingPosts": "Fetching posts",
+    "loading.stage.analyzingStructure": "Analyzing structure",
+    "loading.stage.convertingImages": "Converting images",
+    "loading.stage.renderingPdf": "Rendering PDF",
+    "loading.stage.uploading": "Uploading",
 
     // Auth
     "auth.signOut": "Sign out",
