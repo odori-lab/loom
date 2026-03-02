@@ -24,7 +24,7 @@ export function useBookOrganization(
         body: JSON.stringify({ posts, profile }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok || data.error) throw new Error(data.error ?? "Failed to organize book");
 
       const result = data as BookStructure;
       setBookStructure(result);

@@ -7,6 +7,10 @@
     "src/app/api/looms/route.ts": {
       "maxDuration": 60,
       "memory": 1024
+    },
+    "src/app/api/organize-book/route.ts": {
+      "maxDuration": 300,
+      "memory": 512
     }
   }
 }
