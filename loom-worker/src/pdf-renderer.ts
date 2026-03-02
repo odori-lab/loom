@@ -18,7 +18,9 @@ async function imageUrlToBase64(url: string): Promise<string> {
 
     if (!response.ok) {
       console.error(`[PDF] Failed to fetch image: ${url} (${response.status})`);
-      return url; // Return original URL on failure
+      // Return transparent 1x1 GIF — returning the original URL would cause
+      // Playwright CORP errors since CDN sends Cross-Origin-Resource-Policy: same-origin
+      return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
     }
 
     const buffer = await response.arrayBuffer();
@@ -43,7 +45,7 @@ async function imageUrlToBase64(url: string): Promise<string> {
     return `data:image/jpeg;base64,${base64}`;
   } catch (error) {
     console.error(`[PDF] Error converting image to base64:`, error);
-    return url; // Return original URL on error
+    return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
   }
 }
 
