@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { createClient } from "@/lib/supabase/server";
@@ -18,5 +19,9 @@ export default async function MyPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  return <DashboardShell user={user} initialLooms={looms || []} />;
+  return (
+    <Suspense fallback={<div className="h-screen flex items-center justify-center" />}>
+      <DashboardShell user={user} initialLooms={looms || []} />
+    </Suspense>
+  );
 }
